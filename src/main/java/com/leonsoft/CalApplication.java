@@ -1,6 +1,7 @@
 package com.leonsoft;
 
 import java.awt.BorderLayout;
+import java.nio.charset.Charset;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -13,6 +14,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 public class CalApplication {
 
 	public static void main(String[] args) {
+
 		SpringApplication.run(CalApplication.class, args);
 	}
 
