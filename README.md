@@ -1,18 +1,29 @@
-# leonbookinsKarpathos
-leonbookinsKarpathos
+##### leonbookinsKarpathos
+
+
+### App Params 
+
+    sourceEncoding: UTF-8 
+    java.version:   19     
 
 
 
+### To Start   use Spring boot  maven plug in in idea   >>>   
+    Step (1)    leonbookinsKarpathos [package]
 
-To Start   use  >>>         leonbookinsKarpathos [spring-boot:run]   
-
-it sis set for java 19  ASUL
-
-DB CREATION
-see  C:\DEVC\leonbookinsKarpathos\dev\app\leonbookinsKarpathos\src\main\resources\persistence-sqlite.properties
+    Step (2)    leonbookinsKarpathos [spring-boot:run]   
 
 
-spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
-hibernate.hbm2ddl.auto=none
---hibernate.hbm2ddl.auto=create
+### DB CREATION
+
+ 
+    C:\DEVC\leonbookinsKarpathos\dev\app\leonbookinsKarpathos\src\main\resources\persistence-sqlite.properties
+
+### JPA 
+    
+    spring.jpa.database-platform=org.hibernate.community.dialect.SQLiteDialect
+        hibernate.hbm2ddl.auto=none
+        --hibernate.hbm2ddl.auto=create
+
+
 
