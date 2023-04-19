@@ -125,7 +125,15 @@ public class BookingsController {
             LocalDate stDt = LocalDate.parse(booking.getStartDate(), formatterISO);
             LocalDate edDt = LocalDate.parse(booking.getEndDate(), formatterISO);
 
-            String statusCancelled = "<td     style=\"    background-color: rgb(247, 201, 201);   color: rgb(27, 6, 46);  \">" + booking.getStatus() + "</td>";
+            String delUrl = "/booking/del?bid="+ booking.getId();
+
+
+            String statusCancelled = "<td     style=\"    background-color: rgb(247, 201, 201);   color: rgb(27, 6, 46);  \">" +
+
+                  "<a href='"+delUrl+"'  target='_self'   >"+booking.getStatus()+"</a>"
+//                  booking.getStatus()
+
+                  + "</td>";
             String statusActive = "<td>" + booking.getStatus() + "</td>";
             String status = statusActive;
             if (Objects.equals(booking.getStatus(), "cancelled")) {
@@ -203,12 +211,18 @@ public class BookingsController {
         return booking;
     }
 
-    @PostMapping(value = "/booking/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    Boolean delete(@RequestBody Booking booking) {
 
+
+    @PostMapping(value = "/booking/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    Boolean deleteObject(@RequestBody Booking booking) {
         log.info(" Delete    {}", booking.getId());
         bookingRepository.deleteById(booking.getId());
         return true;
+    }
+    @GetMapping(value = "/booking/del")
+    void delCancelledBooking( @RequestParam(name = "bid") String bookingId ) {
+        log.info(" Delete  a cancelled   {}", bookingId);
+        bookingRepository.deleteById(bookingId);
     }
 
 
