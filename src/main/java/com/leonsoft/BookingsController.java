@@ -186,7 +186,13 @@ public class BookingsController {
     @PostMapping(value = "/booking/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     Booking create(@RequestBody Booking booking) {
 
-        booking.setId(UUID.randomUUID().toString());
+        // booking.setId(UUID.randomUUID().toString());
+        // todo need to change all ids  to new way  :)
+
+
+
+        booking.setId(""+booking.hashCode() );
+
         log.info(" SAVE   {}  ", booking);
 
         // convert from String to localDate
