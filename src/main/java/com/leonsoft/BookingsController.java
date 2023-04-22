@@ -45,7 +45,7 @@ public class BookingsController {
         LocalDate stDate = LocalDate.parse(fromDateEuroFmt, formatterEURO);
         LocalDate edDate = LocalDate.parse(toDateEuroFmt, formatterEURO);
 
-        List<Booking> results = bookingRepository.findByStartDateBetweenOrderByStartDateAsc(
+        List<Booking> results = bookingRepository.findByStartDateBetweenOrderByStartDateDesc(
               stDate.format(DateTimeFormatter.ISO_DATE),
               edDate.format(DateTimeFormatter.ISO_DATE));
 
@@ -74,7 +74,7 @@ public class BookingsController {
         LocalDate stDate = LocalDate.parse(fromDateEuroFmt, formatterEURO);
         LocalDate edDate = LocalDate.parse(toDateEuroFmt, formatterEURO);
 
-        List<Booking> all = bookingRepository.findByStartDateBetweenOrderByStartDateAsc(
+        List<Booking> all = bookingRepository.findByStartDateBetweenOrderByStartDateDesc(
               stDate.format(DateTimeFormatter.ISO_DATE),
               edDate.format(DateTimeFormatter.ISO_DATE));
 
@@ -186,12 +186,9 @@ public class BookingsController {
     @PostMapping(value = "/booking/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     Booking create(@RequestBody Booking booking) {
 
-        // booking.setId(UUID.randomUUID().toString());
+        booking.setId(UUID.randomUUID().toString());
         // todo need to change all ids  to new way  :)
-
-
-
-        booking.setId(""+booking.hashCode() );
+        //booking.setId(""+booking.hashCode() );
 
         log.info(" SAVE   {}  ", booking);
 

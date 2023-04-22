@@ -99,7 +99,7 @@ public class BookingsPDFExporter {
     private void writeTableData(PdfPTable table) {
 
         Font font = FontFactory.getFont(FontFactory.COURIER);
-        font.setSize(8);
+        font.setSize(7);
 
 
         for (Booking booking : bookingList) {
@@ -166,15 +166,15 @@ public class BookingsPDFExporter {
     public void export(HttpServletResponse response) throws DocumentException, IOException {
         Document document = new Document(PageSize.A4.rotate());
 
-        document.setMargins(10, 10, 20, 20);
+        document.setMargins(6, 6, 20, 20);
 
 
         PdfWriter.getInstance(document, response.getOutputStream());
 
         document.open();
-        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
-        font.setSize(8);
-        font.setColor(Color.BLUE);
+//        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
+//        font.setSize(7);
+//        font.setColor(Color.BLUE);
 
 //        Paragraph p = new Paragraph("Bookings", font);
 //        p.setAlignment(Paragraph.ALIGN_CENTER);
