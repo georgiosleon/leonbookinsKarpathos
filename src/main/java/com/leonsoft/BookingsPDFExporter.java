@@ -1,6 +1,6 @@
-package com.leonsoft.services;
+package com.leonsoft;
 
-import com.leonsoft.businesslogic.pojos.Booking;
+import com.leonsoft.models.Booking;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Font;

@@ -1,8 +1,7 @@
-package com.leonsoft.endpoints.rest.json;
+package com.leonsoft;
 
 
-import com.leonsoft.services.BookingsService;
-import com.leonsoft.businesslogic.pojos.Booking;
+import com.leonsoft.models.Booking;
 import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

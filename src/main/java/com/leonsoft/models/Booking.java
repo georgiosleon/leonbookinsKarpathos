@@ -1,4 +1,4 @@
-package com.leonsoft.businesslogic.pojos;
+package com.leonsoft.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
