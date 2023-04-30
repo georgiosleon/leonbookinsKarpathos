@@ -1,4 +1,4 @@
-package com.leonsoft.config;
+package com.leonsoft.app.config;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;

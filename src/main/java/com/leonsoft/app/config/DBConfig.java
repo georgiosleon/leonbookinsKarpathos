@@ -1,4 +1,4 @@
-package com.leonsoft.config;
+package com.leonsoft.app.config;
 
 
 import java.util.Objects;

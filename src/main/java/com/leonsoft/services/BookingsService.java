@@ -1,8 +1,8 @@
-package com.leonsoft;
+package com.leonsoft.services;
 
 
-import com.leonsoft.models.Booking;
-import com.leonsoft.repositories.BookingRepository;
+import com.leonsoft.businesslogic.pojos.Booking;
+import com.leonsoft.database.repo.BookingRepository;
 import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

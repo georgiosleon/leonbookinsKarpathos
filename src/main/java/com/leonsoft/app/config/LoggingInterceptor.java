@@ -1,4 +1,4 @@
-package com.leonsoft.config;
+package com.leonsoft.app.config;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;

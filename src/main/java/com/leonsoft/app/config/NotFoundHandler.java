@@ -1,4 +1,4 @@
-package com.leonsoft.config;
+package com.leonsoft.app.config;
 
 import java.io.File;
 import java.io.FileInputStream;
