@@ -1,7 +1,8 @@
-package com.leonsoft;
+package com.leonsoft.api;
 
 
 import com.leonsoft.models.Booking;
+import com.leonsoft.services.BookingsService;
 import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;

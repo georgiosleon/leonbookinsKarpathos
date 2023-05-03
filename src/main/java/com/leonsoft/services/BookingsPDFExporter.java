@@ -1,4 +1,4 @@
-package com.leonsoft;
+package com.leonsoft.services;
 
 import com.leonsoft.models.Booking;
 import com.lowagie.text.Document;
@@ -14,9 +14,6 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.awt.Color;
 import java.io.IOException;
 import java.util.List;
-
-
-
 
 
 public class BookingsPDFExporter {
@@ -92,15 +89,12 @@ public class BookingsPDFExporter {
         table.addCell(cell);
 
 
-
-
     }
 
     private void writeTableData(PdfPTable table) {
 
         Font font = FontFactory.getFont(FontFactory.COURIER);
         font.setSize(7);
-
 
         for (Booking booking : bookingList) {
             PdfPCell cell = new PdfPCell();
@@ -123,40 +117,40 @@ public class BookingsPDFExporter {
             cell.setPhrase(new Phrase(booking.getAgency(), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(String.valueOf(booking.getNumOfGuests()) , font));
+            cell.setPhrase(new Phrase(String.valueOf(booking.getNumOfGuests()), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(String.valueOf(booking.getNumOfNights()) , font));
+            cell.setPhrase(new Phrase(String.valueOf(booking.getNumOfNights()), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(String.valueOf(booking.getCharge()) , font));
+            cell.setPhrase(new Phrase(String.valueOf(booking.getCharge()), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(String.valueOf(booking.getCommission()) , font));
+            cell.setPhrase(new Phrase(String.valueOf(booking.getCommission()), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(String.valueOf(booking.getReceived()) , font));
+            cell.setPhrase(new Phrase(String.valueOf(booking.getReceived()), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(String.valueOf(booking.getBalance()) , font));
+            cell.setPhrase(new Phrase(String.valueOf(booking.getBalance()), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(booking.getCountry() , font));
+            cell.setPhrase(new Phrase(booking.getCountry(), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(booking.getIdentification() , font));
+            cell.setPhrase(new Phrase(booking.getIdentification(), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(booking.getAfm() , font));
+            cell.setPhrase(new Phrase(booking.getAfm(), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(booking.getVoucher() , font));
+            cell.setPhrase(new Phrase(booking.getVoucher(), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(booking.getInvoiceNumber() , font));
+            cell.setPhrase(new Phrase(booking.getInvoiceNumber(), font));
             table.addCell(cell);
 
-            cell.setPhrase(new Phrase(booking.getTaxRefNumber() , font));
+            cell.setPhrase(new Phrase(booking.getTaxRefNumber(), font));
             table.addCell(cell);
 
 
@@ -167,7 +161,6 @@ public class BookingsPDFExporter {
         Document document = new Document(PageSize.A4.rotate());
 
         document.setMargins(6, 6, 20, 20);
-
 
         PdfWriter.getInstance(document, response.getOutputStream());
 
@@ -185,7 +178,7 @@ public class BookingsPDFExporter {
         table.setWidthPercentage(100f);
 
 //        table.setWidths(new float[]{1.5f, 3.5f, 3.0f, 3.0f, 1.5f});
-        table.setSpacingBefore( 1);
+        table.setSpacingBefore(1);
 
         writeTableHeader(table);
         writeTableData(table);

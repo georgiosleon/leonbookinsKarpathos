@@ -1,4 +1,4 @@
-package com.leonsoft;
+package com.leonsoft.api;
 
 
 import com.leonsoft.models.Booking;
