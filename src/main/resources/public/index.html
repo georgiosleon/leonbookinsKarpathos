@@ -290,16 +290,28 @@
 
                 var pojo = JSON.stringify(items.get(item.id).recordData);
 
-                $.ajax({
-                    type: 'POST',
-                    url: '/booking/delete',
-                    contentType: 'application/json',
-                    data: pojo,
-                    success: function (data, status, xhr) {
-                        // alert('status: ' + status + ', data: ' + data);
-                        callback(item); // do remove 
-                    }
-                });
+
+
+                w2confirm('Are you sure?')
+                .yes(() => {
+                        
+                    $.ajax({
+                        type: 'POST',
+                        url: '/booking/delete',
+                        contentType: 'application/json',
+                        data: pojo,
+                        success: function (data, status, xhr) {
+                            // alert('status: ' + status + ', data: ' + data);
+                            callback(item); // do remove 
+                        }
+                    });
+
+                })
+                .no(() => {
+                    w2alert( 'Nothing changed or deleted ');
+                })
+
+              
             }
 
         };
@@ -386,7 +398,8 @@
 
         var statusList = [
             { id: 'active', text: 'Active' },
-            { id: 'cancelled', text: 'Cancelled' }
+            { id: 'cancelled', text: 'Cancelled' },
+            { id: 'paid', text: 'Paid' }
         ];
 
 
@@ -843,7 +856,7 @@
                                         return false;
                                     }
                                 });
-                                if (fItems != null && fItems.length > 0  &&  w2ui.myForm.getValue('status').id == 'active' ) {
+                                if (fItems != null && fItems.length > 0  && ( w2ui.myForm.getValue('status').id == 'active'  ||   w2ui.myForm.getValue('status').id == 'paid' )  ) {
 
                                     w2popup.open({
                                         title: 'Message',
@@ -870,7 +883,7 @@
                                         start: convertDate(w2ui.myForm.getValue('startDate')).setHours(12, 0, 0),
                                         end: convertDate(w2ui.myForm.getValue('endDate')).setHours(12, 0, 0),
 
-                                        content: '🏠' + w2ui.myForm.getValue('numOfNights') + '  👨‍👩‍👦' +  w2ui.myForm.getValue('numOfGuests') + ' ' + w2ui.myForm.getValue('name'),
+                                        content: '🛌' + w2ui.myForm.getValue('numOfNights') + '  👨‍👩‍👦' +  w2ui.myForm.getValue('numOfGuests') + ' ' + w2ui.myForm.getValue('name'),
                         
                                         className: w2ui.myForm.getValue('agency').id,
                                         recordData: this.getCleanRecord(),
@@ -896,7 +909,7 @@
                                         success: function (element, status, xhr) {
 
 
-                                            if (w2ui.myForm.getValue('status').id == 'active') {
+                                            if (w2ui.myForm.getValue('status').id == 'active'   ||   w2ui.myForm.getValue('status').id == 'paid'   ) {
                                                 // only add to timeline if status is active 
 
                                                 items.add({
@@ -1044,7 +1057,7 @@
                         console.log(element);
 
 
-                        if (element.status == 'active') {
+                        if (element.status == 'active'  || element.status == 'paid'      ) {
 
                             items.add({
                                 id: element.id,
