@@ -29,9 +29,9 @@ public class BookingsController {
           @RequestParam(name = "fromDate") String fromDateEuroFmt,
           @RequestParam(name = "toDate") String toDateEuroFmt
     ) throws DocumentException, IOException {
-        log.info("/booking/export/pdf");
-        log.info("fromDate param  " + fromDateEuroFmt);
-        log.info("toDate param  " + toDateEuroFmt);
+        log.debug("/booking/export/pdf");
+        log.debug("fromDate param  " + fromDateEuroFmt);
+        log.debug("toDate param  " + toDateEuroFmt);
         bookingsService.exportToPDF(response, fromDateEuroFmt, toDateEuroFmt);
     }
 
@@ -40,9 +40,9 @@ public class BookingsController {
     String report(
           @RequestParam(name = "fromDate") String fromDateEuroFmt,
           @RequestParam(name = "toDate") String toDateEuroFmt) {
-        log.info("/booking/report");
-        log.info("fromDate param  " + fromDateEuroFmt);
-        log.info("toDate param  " + toDateEuroFmt);
+        log.debug("/booking/report");
+        log.debug("fromDate param  " + fromDateEuroFmt);
+        log.debug("toDate param  " + toDateEuroFmt);
         return bookingsService.report(fromDateEuroFmt, toDateEuroFmt).toString();
 
     }
@@ -51,21 +51,21 @@ public class BookingsController {
     @PostMapping(value = "/booking/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     Booking create(@RequestBody Booking booking) {
         booking.setId(UUID.randomUUID().toString());
-        log.info(" SAVE   {}  ", booking);
+        log.debug(" SAVE   {}  ", booking);
         return bookingsService.create(booking);
     }
 
 
     @PostMapping(value = "/booking/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     Boolean deleteObject(@RequestBody Booking booking) {
-        log.info(" Delete    {}", booking.getId());
+        log.debug(" Delete    {}", booking.getId());
         bookingsService.deleteObject(booking);
         return true;
     }
 
     @GetMapping(value = "/booking/del")
     void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {
-        log.info(" Delete  a cancelled   {}", bookingId);
+        log.debug(" Delete  a cancelled   {}", bookingId);
         bookingsService.delCancelledBooking(bookingId);
     }
 

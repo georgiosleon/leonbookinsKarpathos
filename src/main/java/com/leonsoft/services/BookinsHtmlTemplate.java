@@ -12,10 +12,9 @@ public class BookinsHtmlTemplate {
 
     public static String report(String fromDateEuroFmt, String toDateEuroFmt, List<Booking> all) {
 
-        log.info("/booking/report");
-
-        log.info("fromDate param  " + fromDateEuroFmt);
-        log.info("toDate param  " + toDateEuroFmt);
+        log.debug("/booking/report");
+        log.debug("fromDate param  " + fromDateEuroFmt);
+        log.debug("toDate param  " + toDateEuroFmt);
 
         StringBuilder report = new StringBuilder();
 

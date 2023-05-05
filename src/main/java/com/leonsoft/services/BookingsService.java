@@ -24,10 +24,9 @@ public class BookingsService {
     public void exportToPDF(HttpServletResponse response, String fromDateEuroFmt, String toDateEuroFmt
     ) throws DocumentException, IOException {
 
-        log.info("/booking/export/pdf");
-
-        log.info("fromDate param  " + fromDateEuroFmt);
-        log.info("toDate param  " + toDateEuroFmt);
+        log.debug("/booking/export/pdf");
+        log.debug("fromDate param  " + fromDateEuroFmt);
+        log.debug("toDate param  " + toDateEuroFmt);
 
         LocalDate stDate = LocalDate.parse(fromDateEuroFmt, BookingsUtils.formatterEURO);
         LocalDate edDate = LocalDate.parse(toDateEuroFmt, BookingsUtils.formatterEURO);
@@ -47,10 +46,9 @@ public class BookingsService {
 
     public String report(String fromDateEuroFmt, String toDateEuroFmt) {
 
-        log.info("/booking/report");
-
-        log.info("fromDate param  " + fromDateEuroFmt);
-        log.info("toDate param  " + toDateEuroFmt);
+        log.debug("/booking/report");
+        log.debug("fromDate param  " + fromDateEuroFmt);
+        log.debug("toDate param  " + toDateEuroFmt);
 
         LocalDate stDate = LocalDate.parse(fromDateEuroFmt, BookingsUtils.formatterEURO);
         LocalDate edDate = LocalDate.parse(toDateEuroFmt, BookingsUtils.formatterEURO);
@@ -68,7 +66,7 @@ public class BookingsService {
 
         booking.setId(UUID.randomUUID().toString());
 
-        log.info(" SAVE   {}  ", booking);
+        log.debug(" SAVE   {}  ", booking);
 
         // convert from String to localDate
         LocalDate stDate = LocalDate.parse(booking.getStartDate(), BookingsUtils.formatterEURO);
@@ -93,13 +91,13 @@ public class BookingsService {
     }
 
     public Boolean deleteObject(Booking booking) {
-        log.info(" Delete    {}", booking.getId());
+        log.debug(" Delete    {}", booking.getId());
         bookingRepository.deleteById(booking.getId());
         return true;
     }
 
     public void delCancelledBooking(String bookingId) {
-        log.info(" Delete  a cancelled   {}", bookingId);
+        log.debug(" Delete  a cancelled   {}", bookingId);
         bookingRepository.deleteById(bookingId);
     }
 
