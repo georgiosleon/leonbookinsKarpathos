@@ -2,7 +2,7 @@
 <html lang="en">
 
 <head>
-    <title>Planner Leon (c) 20023 </title>
+    <title>Beds and Guests - ΚΑΡΠΑΘΟΣ - 2023 by - Leon Solutions - </title>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="description" content="" />
@@ -201,7 +201,7 @@
                 // $("#save").hide();
                 $('[name="save"]').hide();
                 $('[name="reset"]').hide();
-                w2ui.myForm.hide('name', 'numOfGuests', 'numOfNights', 'charge', 'identification', 'email', 'extraInfo')
+                w2ui.myForm.hide('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email', 'extraInfo')
 
             });
             $("#show").click(function () {
@@ -209,7 +209,7 @@
                 // $("#save").show();
                 $('[name="save"]').show();
                 $('[name="reset"]').show();
-                w2ui.myForm.show('name', 'numOfGuests', 'numOfNights', 'charge', 'identification', 'email', 'extraInfo')
+                w2ui.myForm.show('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email', 'extraInfo')
             });
         });
 
@@ -485,7 +485,7 @@
                         html: {
                             label: 'Country &nbsp;  &nbsp; ',
                             anchor: '%anchorCountry%',
-                            attr: ' style="width: 220px;  text-align:center; "'
+                            attr: ' style="width: 180px;  text-align:center; "'
                         },
                         options: {
                             items: countryList
@@ -505,7 +505,7 @@
                         required: true,
                         html: {
                             label: '&nbsp;&nbsp;&nbsp; From ',
-                            text: '&nbsp;  &nbsp;  &nbsp;   %anchorEndDate%  %anchorNumOfNights%  🏠 ',
+                            text: '&nbsp;  &nbsp;  &nbsp;   %anchorEndDate%  %anchorNumOfNights%  🛌 ',
                             attr: 'style="  width: 100px; font-weight: bold; text-align:center;"'
                         },
                         options: {
@@ -910,7 +910,7 @@
                                                     end: convertDate(element.endDate).setHours(12, 0, 0),
 
                                                     // title: element.title,
-                                                    content: '🏠' + element.numOfNights +  '  👨‍👩‍👦' +  element.numOfGuests + ' ' + element.name,
+                                                    content: '🛌' + element.numOfNights +  '  👨‍👩‍👦' +  element.numOfGuests + ' ' + element.name,
 
                                                     className: element.agency,
                                                     recordData: element,
@@ -963,52 +963,52 @@
                     },
 
 
-                    // left90: {
-                    //     text: '<< 90d',
-                    //     class: 'w2ui-btn-grey',
-                    //     style: 'text-transform: uppercase; color: black;  font-size: 12px; ',  // border: 1px solid black;
-                    //     onClick(event) {
-                    //         // w2alert('Custom Action')
-                    //         moveToDate = new Date(moveToDate.getTime() - (90 * 24 * 60 * 60 * 1000));     /// plus 90 days
-                    //         timeline.moveTo(moveToDate, { animation: true });
-                    //     }
-                    // },
+                    left90: {
+                        text: '<< 90d',
+                        class: 'w2ui-btn-grey',
+                        style: 'text-transform: uppercase; color: black;  font-size: 12px; ',  // border: 1px solid black;
+                        onClick(event) {
+                            // w2alert('Custom Action')
+                            moveToDate = new Date(moveToDate.getTime() - (90 * 24 * 60 * 60 * 1000));     /// plus 90 days
+                            timeline.moveTo(moveToDate, { animation: true });
+                        }
+                    },
 
-                    // left30: {
-                    //     text: '< 30d',
-                    //     class: 'w2ui-btn-grey',
-                    //     style: 'text-transform: uppercase;  color: black; font-size: 12px;  ',
-                    //     onClick(event) {
-                    //         // w2alert('Custom Action')
-                    //         moveToDate = new Date(moveToDate.getTime() - (30 * 24 * 60 * 60 * 1000));     /// plus 300 days
-                    //         timeline.moveTo(moveToDate, { animation: true });
-                    //     }
-                    // },
-
-
-
-                    // right30: {
-                    //     text: '30d >',
-                    //     class: 'w2ui-btn-grey',
-                    //     style: 'text-transform: uppercase;  color: black; font-size: 12px; ',
-                    //     onClick(event) {
-                    //         // w2alert('Custom Action')
-                    //         moveToDate = new Date(moveToDate.getTime() + (30 * 24 * 60 * 60 * 1000));     /// plus 20 days
-                    //         timeline.moveTo(moveToDate, { animation: true });
-                    //     }
-                    // },
+                    left30: {
+                        text: '< 30d',
+                        class: 'w2ui-btn-grey',
+                        style: 'text-transform: uppercase;  color: black; font-size: 12px;  ',
+                        onClick(event) {
+                            // w2alert('Custom Action')
+                            moveToDate = new Date(moveToDate.getTime() - (30 * 24 * 60 * 60 * 1000));     /// plus 300 days
+                            timeline.moveTo(moveToDate, { animation: true });
+                        }
+                    },
 
 
-                    // right90: {
-                    //     text: '90d >>',
-                    //     class: 'w2ui-btn-grey',
-                    //     style: 'text-transform: uppercase; color: black;  font-size: 12px; ',
-                    //     onClick(event) {
-                    //         // w2alert('Custom Action')
-                    //         moveToDate = new Date(moveToDate.getTime() + (90 * 24 * 60 * 60 * 1000));     /// plus 20 days
-                    //         timeline.moveTo(moveToDate, { animation: true });
-                    //     }
-                    // },
+
+                    right30: {
+                        text: '30d >',
+                        class: 'w2ui-btn-grey',
+                        style: 'text-transform: uppercase;  color: black; font-size: 12px; ',
+                        onClick(event) {
+                            // w2alert('Custom Action')
+                            moveToDate = new Date(moveToDate.getTime() + (30 * 24 * 60 * 60 * 1000));     /// plus 20 days
+                            timeline.moveTo(moveToDate, { animation: true });
+                        }
+                    },
+
+
+                    right90: {
+                        text: '90d >>',
+                        class: 'w2ui-btn-grey',
+                        style: 'text-transform: uppercase; color: black;  font-size: 12px; ',
+                        onClick(event) {
+                            // w2alert('Custom Action')
+                            moveToDate = new Date(moveToDate.getTime() + (90 * 24 * 60 * 60 * 1000));     /// plus 20 days
+                            timeline.moveTo(moveToDate, { animation: true });
+                        }
+                    },
 
 
 
@@ -1058,7 +1058,7 @@
 
                                 // title: element.title,
                                 
-                                content: '🏠' + element.numOfNights + '  👨‍👩‍👦' +  element.numOfGuests + ' ' + element.name,
+                                content: '🛌' + element.numOfNights + '  👨‍👩‍👦' +  element.numOfGuests + ' ' + element.name,
                                 className: element.agency,
                                 recordData: element,
                             });
@@ -1084,6 +1084,12 @@
 
 
             w2ui.myForm.on('change', function (event) {
+
+
+                 //  Event: change Target: agency 
+                if (event != null && event.target == 'agency') {
+                    //alert('on change  agency ');
+                }
 
 
                 //  Event: change Target: startDate 
