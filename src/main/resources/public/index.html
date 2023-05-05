@@ -106,6 +106,22 @@
 
     <script>
 
+        function delAction(id) {
+         
+            // String delUrl = "/booking/del?bid=" + booking.getId();
+            $.ajax({
+                    type: 'GET',
+                    url: '/booking/del',
+                    data: {
+                        bid: id
+                    },
+                    contentType: 'application/json',
+                    success: function (data, status, xhr) {
+                        w2alert( 'Deleted a cancelled booking - all good re-run the report to confirm');
+                    }
+            });  // ajax 
+
+        }
 
 
         function financial(x) {
@@ -874,8 +890,6 @@
                                         success: function (element, status, xhr) {
 
 
-
-
                                             if (w2ui.myForm.getValue('status').id == 'active') {
                                                 // only add to timeline if status is active 
 
@@ -896,6 +910,9 @@
                                                     recordData: element,
                                                 });
 
+                                            } else {
+                                                // if status is Cancelled        show popup for info 
+                                                w2alert ( 'Saved a Cancelled booking - all good check the report to confirm' );
                                             }
 
 

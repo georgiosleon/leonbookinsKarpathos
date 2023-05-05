@@ -69,9 +69,9 @@ public class BookinsHtmlTemplate {
             ////// pre processing
             LocalDate stDt = LocalDate.parse(booking.getStartDate(), BookingsUtils.formatterISO);
             LocalDate edDt = LocalDate.parse(booking.getEndDate(), BookingsUtils.formatterISO);
-            String delUrl = "/booking/del?bid=" + booking.getId();
+
             String statusCancelled = "<td     style=\"    background-color: rgb(247, 201, 201);   color: rgb(27, 6, 46);  \">" +
-                  "<a href='" + delUrl + "'  target='_self'   >" + booking.getStatus() + "</a>"
+                  " <a id='delAct' href='#' onclick='delAction(\""+ booking.getId()+"\");return false;'> " + booking.getStatus() + "</a>"
                   + "</td>";
 
             String status = "<td>" + booking.getStatus() + "</td>";
@@ -143,8 +143,8 @@ public class BookinsHtmlTemplate {
 
               // build row
               report.append("<tr>")
-                  .append("<td>").append( BookingsUtils.df.format(totals.getTotGuests())).append("</td>")
-                  .append("<td>").append( BookingsUtils.df.format(totals.getTotNights())).append("</td>")
+                  .append("<td>").append( totals.getTotGuests()).append("</td>")
+                  .append("<td>").append( totals.getTotNights()).append("</td>")
                   .append("<td>").append( BookingsUtils.df.format( totals.getTotCharge())).append("</td>")
                   .append("<td>").append(  BookingsUtils.df.format(totals.getTotCommission())).append("</td>")
                   .append("<td>").append(  BookingsUtils.df.format( totals.getTotReceived())) .append("</td>")
