@@ -107,19 +107,33 @@
     <script>
 
         function delAction(id) {
-         
-            // String delUrl = "/booking/del?bid=" + booking.getId();
-            $.ajax({
-                    type: 'GET',
-                    url: '/booking/del',
-                    data: {
-                        bid: id
-                    },
-                    contentType: 'application/json',
-                    success: function (data, status, xhr) {
-                        w2alert( 'Deleted a cancelled booking - all good re-run the report to confirm');
-                    }
-            });  // ajax 
+            
+
+            w2confirm('Are you sure?')
+            .yes(() => {
+                    
+                    // console.log('Yes')
+
+                    // String delUrl = "/booking/del?bid=" + booking.getId();
+                    $.ajax({
+                            type: 'GET',
+                            url: '/booking/del',
+                            data: {
+                                bid: id
+                            },
+                            contentType: 'application/json',
+                            success: function (data, status, xhr) {
+                                w2alert( 'Deleted a cancelled booking - all good re-run the report to confirm');
+                            }
+                    });  // ajax 
+
+
+            })
+            .no(() => {
+                w2alert( 'Nothing changed or deleted ');
+            })
+
+          
 
         }
 
@@ -423,6 +437,8 @@
                 // need to set url  for save  and get 
                 fields: [
 
+
+
                     {
                         field: 'name', type: 'text',
                         required: true,
@@ -432,7 +448,6 @@
                             attr: 'style="  text-transform: uppercase; width: 300px; font-weight: bold; text-align:center; "'
                         }
                     },
-
                     {
                         field: 'numOfGuests', type: 'list',
                         required: true,
@@ -444,11 +459,6 @@
                         // options: { min: 1, max: 6 }
                         options: { items: [1, 2, 3, 4, 5, 6] }
                     },
-
-                   
-
-
-                    // Line   Customer,Agency,Voucher 
                     {
                         field: 'agency', type: 'list',
                         required: true,
@@ -460,10 +470,6 @@
                         },
                         options: { items: agencyList }
                     },
-
-
-
-                    // Line  Room
                     {
                         field: 'room', type: 'list',
                         required: true,
@@ -474,12 +480,24 @@
                         },
                         options: { items: roomList }
                     },
+                    {
+                        field: 'country', type: 'list',
+                        html: {
+                            label: 'Country &nbsp;  &nbsp; ',
+                            anchor: '%anchorCountry%',
+                            attr: ' style="width: 220px;  text-align:center; "'
+                        },
+                        options: {
+                            items: countryList
+                        }
+                    },
+
+                   
 
 
 
-                    // Line 3 startDate, endDate,  numOfNights
 
-
+                    // line
                     {
                         field: 'startDate', type: 'date',
                         // format: 'd.m.yyyy',  
@@ -498,10 +516,6 @@
                             // all dates before start will be unselectable
                         }
                     },
-
-
-                   
-
                     {
 
                         field: 'endDate', type: 'date',
@@ -518,7 +532,6 @@
                             format: 'dd/mm/yyyy'
                         }
                     },
-
                     {
                         field: 'numOfNights', type: 'int',
                         required: true,
@@ -532,26 +545,19 @@
                         options: { min: 1 }
 
                     },
+                   
 
-                    {
-                        field: 'country', type: 'list',
-                        html: {
-                            label: 'Country &nbsp;  &nbsp; ',
-                            anchor: '%anchorCountry%',
-                            attr: ' style="width: 220px;  text-align:center; "'
-                        },
-                        options: {
-                            items: countryList
-                        }
-                    },
+                    
 
-                    // Line 4  Money
+
+
+                    // line
                     {
                         field: 'charge', type: 'float',
                         // required: true,
                         html: {
                             label: 'Total',
-                            text: '€ &nbsp; %anchorCommission%  € &nbsp; %anchorReceived% € &nbsp; %anchorBalance% €  &nbsp;&nbsp;&nbsp;   %anchorStatus%',
+                            text: '€ &nbsp; %anchorCommission%  € &nbsp; %anchorReceived% € &nbsp; %anchorBalance% €  &nbsp;&nbsp;&nbsp;  &nbsp; &nbsp; &nbsp; &nbsp;  %anchorStatus%',
                             attr: 'style="width: 80px; font-weight: bold; text-align:center; "'
                         },
                         options: {
@@ -560,7 +566,6 @@
                         }
 
                     },
-
                     {
                         field: 'commission', type: 'float',
                         // required: true,
@@ -574,7 +579,6 @@
                             // , decimalSymbol:',' 
                         }
                     },
-
                     {
                         field: 'received', type: 'float',
                         // required: true,
@@ -602,8 +606,6 @@
                             // ,decimalSymbol:',' 
                         }
                     },
-
-
                     {
                         field: 'status', type: 'list',
                         required: true,
@@ -619,85 +621,89 @@
                     },
 
 
-                    // Line 5     Identification, AFM
+
+
+                    // line
                     {
                         field: 'identification', type: 'text',
                         // required: true,
                         html: {
-                            label: 'ID &nbsp;',
-                            text: '&nbsp;  &nbsp; %anchorAfm% %anchorVoucher%  ',
-                            attr: 'style="width: 220px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
+                            label: 'ΑΡ.ΔΙΑΒ. ή ΤΑΥΤ. &nbsp;',
+                            text: '&nbsp;  &nbsp; %anchorAfm%  %anchorEmail%  %anchorTel% ',
+                            attr: 'style="width: 200px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
                         }
                     },
-
-
-
                     {
                         field: 'afm', type: 'text',
                         // required: true,
                         html: {
-                            label: 'TAX ID &nbsp;',
+                            label: 'ΑΦΜ &nbsp;',
                             anchor: '%anchorAfm%',
-                            attr: 'style="width: 220px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
+                            attr: 'style="width: 200px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
                         }
                     },
-
-
-                    {
-                        field: 'taxRefNumber', type: 'text',
-                        // required: true,
-                        html: {
-                            label: '&nbsp; &nbsp;  S/N Declaration &nbsp; ',
-                            anchor: '%anchortaxRefNumber%',
-                            attr: 'style="width: 220px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
-                        }
-                    },
-
-
                     {
                         field: 'email', type: 'email',
                         html: {
-                            label: 'Email',
-                            text: '&nbsp; &nbsp; %anchorTel%  &nbsp; %anchortaxRefNumber% ',
-                            attr: 'style="width: 300px; text-align:center;"'
+                            label: '&nbsp;&nbsp; Email &nbsp;',
+                            anchor: '%anchorEmail%',
+                            attr: 'style="width: 200px; text-align:center;"'
                         }
                     },
                     {
                         field: 'tel', type: 'int',
                         html: {
-                            label: 'Tel. &nbsp; ',
+                            label: '&nbsp;&nbsp; &nbsp; Tel &nbsp; ',
                             anchor: '%anchorTel%',
-                            attr: 'style="width: 160px; text-align:center;"'
+                            attr: 'style="width: 150px; text-align:center;"'
                         }
                     },
+
+
+
+
+
+
+                    // line
                     {
                         field: 'voucher', type: 'text',
                         html: {
-                            label: '&nbsp; &nbsp; &nbsp; &nbsp;   Voucher   &nbsp; &nbsp; ',
-                            anchor: '%anchorVoucher%',
-                            attr: 'style="width: 220px;  text-transform: uppercase; font-weight: bold; text-align:center;"'
+                            label: 'Voucher &nbsp; ',
+                            text:  '&nbsp; %anchortaxRefNumber%   %anchorInvoiceNumber%  ',
+                            attr:  'style="width: 200px;  text-transform: uppercase; font-weight: bold; text-align:center;"'
                         }
                     },
-
-                    // Line 5  Extra Info 
                     {
-                        field: 'extraInfo', type: 'textarea',
+                        field: 'taxRefNumber', type: 'text',
+                        // required: true,
                         html: {
-                            label: 'Notes ',
-                            text: ' &nbsp; %anchorInvoiceNumber%  ',
-                            attr: 'style="width: 500px; height: 60px; resize: none" '
+                            label: '&nbsp; TAX &nbsp; &nbsp; ',
+                            anchor: '%anchortaxRefNumber%',
+                            attr: 'style="width: 200px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
                         }
                     },
-
                     {
                         field: 'invoiceNumber', type: 'text',
                         // required: true,
                         html: {
-                            label: ' &nbsp;&nbsp; &nbsp; Invoice Number &nbsp;',
+                            label: ' Invoice &nbsp;',
                             anchor: '%anchorInvoiceNumber%',
-                            attr: 'style="width: 220px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
+                            attr: 'style="width: 200px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
                         }
                     },
+
+
+
+                    // line
+                    {
+                        field: 'extraInfo', type: 'textarea',
+                        html: {
+                            label: 'Notes',
+                            attr: 'style="width: 600px; height: 60px; resize: none" '
+                        }
+                    },
+
+                  
 
 
 
@@ -837,7 +843,7 @@
                                         return false;
                                     }
                                 });
-                                if (fItems != null && fItems.length > 0) {
+                                if (fItems != null && fItems.length > 0  &&  w2ui.myForm.getValue('status').id == 'active' ) {
 
                                     w2popup.open({
                                         title: 'Message',
@@ -944,7 +950,7 @@
 
 
                     reset: {
-                        text: 'clean',
+                        text: 'reset',
                         class: 'w2ui-btn-red',
                         style: 'text-transform: uppercase; color: blue; font-size: 12px;',
                         onClick(event) {
