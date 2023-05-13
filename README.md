@@ -1,17 +1,5 @@
-### TODO 
-
-1) fix Javascript 
-2) add 3 new types of apps
-3) Car Rentals 
-4) BUS bookins
-5) local goverment
-6) or  make custom form + timelines   per user with custom drop-down categories per form  
-5) add security  users  ( admin , user , subuser  ) 
 
 
-
-
-##### leonbookinsKarpathos
 
 
 ### App Params 
