@@ -1,0 +1,65 @@
+
+.vis-item.bookingcom {
+    background-color: rgb(196, 221, 253);
+    border-color: rgb(22, 2, 59);
+    color: rgb(1, 26, 29);
+}
+
+.vis-item.walkin {
+    background-color: rgb(154, 230, 154);
+    border-color: rgb(23, 32, 23);
+    color: rgb(21, 22, 18);
+}
+
+.vis-item.abnb {
+    background-color: rgb(247, 201, 201);
+    border-color: rgb(39, 3, 27);
+    color: rgb(27, 6, 46);
+}
+
+
+.vis-item.closed {
+    background-color: black;
+    border-color: black;
+    color: rgb(255, 255, 255);
+}
+
+
+.vis-item.vis-selected {
+    color: black;
+}
+
+
+/* alternating column backgrounds */
+.vis-time-axis .vis-grid.vis-odd {
+    background: #f5f5f5;
+}
+
+.w2ui-input[readonly],
+.w2ui-input[disabled] {
+    background-image: none;
+    background-color: #ffffff !important;
+    color: #09053f !important;
+}
+
+.w2ui-input {
+    background-image: none;
+    background-color: #ffffff !important;
+    color: #09053f !important;
+}
+
+
+table,
+th,
+td {
+    border: 1px solid black;
+    border-collapse: collapse;
+}
+
+th,
+td {
+    padding-top: 5px;
+    padding-bottom: 5px;
+    padding-left: 5px;
+    padding-right: 5px;
+}
