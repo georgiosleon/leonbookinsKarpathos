@@ -9,9 +9,8 @@
 
 
 
-### To Start   use Spring boot  maven plug in in idea   >>>   
+### To Start   use Spring boot  maven plug-in    in idea   >>>   
     Step (1)    leonbookinsKarpathos [package]
-
     Step (2)    leonbookinsKarpathos [spring-boot:run]   
 
 
