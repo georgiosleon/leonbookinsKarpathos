@@ -10,9 +10,28 @@ window.onload = function() {
         // alert("Yeah!");
     } else {
         // jQuery is not loaded
-        alert("Doesn't Work");
+        alert("jQuery Doesn't Work");
     }
 }// window.onload
+
+function  delActionAjaxCall(){
+ // console.log('Yes')
+
+            // String delUrl = "/booking/del?bid=" + booking.getId();
+            $.ajax({
+                type: 'GET',
+                url: '/booking/del',
+                data: {
+                    bid: id
+                },
+                contentType: 'application/json',
+                success: function (data, status, xhr) {
+                    w2alert('Deleted a cancelled booking - all good re-run the report to confirm');
+                }
+            });  // ajax
+
+}
+
 
 // functions
 function updateClock (){
@@ -41,34 +60,13 @@ function updateClock (){
    	$("#clock").html(currentTimeString);
  }
 function delAction(id) {
-
-
     w2confirm('Are you sure?')
         .yes(() => {
-
-            // console.log('Yes')
-
-            // String delUrl = "/booking/del?bid=" + booking.getId();
-            $.ajax({
-                type: 'GET',
-                url: '/booking/del',
-                data: {
-                    bid: id
-                },
-                contentType: 'application/json',
-                success: function (data, status, xhr) {
-                    w2alert('Deleted a cancelled booking - all good re-run the report to confirm');
-                }
-            });  // ajax
-
-
+            delActionAjaxCall()
         })
         .no(() => {
             w2alert('Nothing changed or deleted ');
         })
-
-
-
 }
 function financial(x) {
     if (x) {
@@ -126,9 +124,7 @@ var moveToDate = new Date();// set to current date
 // initialise vis timeline componenet
 var groups = new vis.DataSet();
 // var items = new vis.DataSet();
-var items = new vis.DataSet({
-    type: { start: "ISODate", end: "ISODate" },
-});
+var items = new vis.DataSet({type: { start: "ISODate", end: "ISODate" }});
 var timelineoOtions = {
 
 
