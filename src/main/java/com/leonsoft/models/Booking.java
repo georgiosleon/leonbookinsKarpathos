@@ -3,6 +3,7 @@ package com.leonsoft.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -87,6 +88,10 @@ public class Booking {
 
     @Column(name = "status")
     private String status;
+
+
+    @Column(name = "request_DateTime")
+    private LocalDateTime   requestDateTime;
 
 
 }

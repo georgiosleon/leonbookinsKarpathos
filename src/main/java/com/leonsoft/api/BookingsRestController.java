@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
-public class BookingsController {
+public class BookingsRestController {
 
     @Autowired
     BookingsService bookingsService;
@@ -60,7 +60,7 @@ public class BookingsController {
     Boolean deleteObject(@RequestBody Booking booking) {
         log.debug(" Delete    {}", booking.getId());
         bookingsService.deleteObject(booking);
-        return true;
+        return Boolean.TRUE;
     }
 
     @GetMapping(value = "/booking/del")

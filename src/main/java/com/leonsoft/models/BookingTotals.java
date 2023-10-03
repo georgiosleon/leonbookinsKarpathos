@@ -15,23 +15,11 @@ import lombok.ToString;
 @EqualsAndHashCode
 
 public class BookingTotals {
+    private Double totCharge =  Double.valueOf(0.0);
+    private Double totReceived =  Double.valueOf(0.0);
+    private Double totCommission =  Double.valueOf(0.0);
+    private Double totBalance = Double.valueOf(0.0);   // balance =   charge  -  ( received + commission )
 
-    private Integer totNights = 0;
-    private Double totCharge = 0.0;
-    private Double totReceived = 0.0;
-    private Double totCommission = 0.0;
-    private Double totBalance = 0.0;  // balance =   charge  -  ( received + commission )
-    private Integer totGuests = 0;
-
-//    private String totCancelledStatus;
-//    private String totActiveStatus;
-
-//    private String totActiveStatus;
-//    private String totActiveStatus;
-//    private String totActiveStatus;
-
-//    private String agency;
-//    private String country;
-//    private String room;
-
+    private Integer totNights = Integer.valueOf(0);
+    private Integer totGuests = Integer.valueOf(0);
 }
