@@ -14,7 +14,7 @@ window.onload = function() {
     }
 }// window.onload
 
-function  delActionAjaxCall(){
+function  delActionAjaxCall(id){
  // console.log('Yes')
 
             // String delUrl = "/booking/del?bid=" + booking.getId();
@@ -62,7 +62,7 @@ function updateClock (){
 function delAction(id) {
     w2confirm('Are you sure?')
         .yes(() => {
-            delActionAjaxCall()
+            delActionAjaxCall(id)
         })
         .no(() => {
             w2alert('Nothing changed or deleted ');
