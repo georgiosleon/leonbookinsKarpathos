@@ -1,4 +1,4 @@
-package com.leonsoft.models;
+package com.leonsoft.booking.models;
 
 import lombok.Data;
 import lombok.EqualsAndHashCode;

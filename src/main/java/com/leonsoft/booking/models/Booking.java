@@ -1,4 +1,4 @@
-package com.leonsoft.models;
+package com.leonsoft.booking.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

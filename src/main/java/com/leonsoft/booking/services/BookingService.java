@@ -1,8 +1,8 @@
-package com.leonsoft.services;
+package com.leonsoft.booking.services;
 
 
-import com.leonsoft.models.Booking;
-import com.leonsoft.repositories.BookingRepository;
+import com.leonsoft.booking.models.Booking;
+import com.leonsoft.booking.repositories.BookingRepository;
 import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class BookingsService {
+public class BookingService {
 
     @Autowired
     protected BookingRepository bookingRepository;
@@ -28,8 +28,8 @@ public class BookingsService {
         log.debug("fromDate param  " + fromDateEuroFmt);
         log.debug("toDate param  " + toDateEuroFmt);
 
-        LocalDate stDate = LocalDate.parse(fromDateEuroFmt, BookingsUtils.formatterEURO);
-        LocalDate edDate = LocalDate.parse(toDateEuroFmt, BookingsUtils.formatterEURO);
+        LocalDate stDate = LocalDate.parse(fromDateEuroFmt, DateTimeService.formatterEURO);
+        LocalDate edDate = LocalDate.parse(toDateEuroFmt, DateTimeService.formatterEURO);
 
         List<Booking> results = bookingRepository.findByStartDateBetweenOrderByStartDateDesc(
               stDate.format(DateTimeFormatter.ISO_DATE),
@@ -39,7 +39,7 @@ public class BookingsService {
         String headerKey = "Content-Disposition";
         String headerValue = "attachment; filename=bookings_" + LocalDate.now() + ".pdf";
         response.setHeader(headerKey, headerValue);
-        BookingsPDFExporter exporter = new BookingsPDFExporter(results);
+        BookingPDFExporter exporter = new BookingPDFExporter(results);
         exporter.export(response);
 
     }
@@ -50,14 +50,14 @@ public class BookingsService {
         log.debug("fromDate param  " + fromDateEuroFmt);
         log.debug("toDate param  " + toDateEuroFmt);
 
-        LocalDate stDate = LocalDate.parse(fromDateEuroFmt, BookingsUtils.formatterEURO);
-        LocalDate edDate = LocalDate.parse(toDateEuroFmt, BookingsUtils.formatterEURO);
+        LocalDate stDate = LocalDate.parse(fromDateEuroFmt, DateTimeService.formatterEURO);
+        LocalDate edDate = LocalDate.parse(toDateEuroFmt, DateTimeService.formatterEURO);
 
         List<Booking> all = bookingRepository.findByStartDateBetweenOrderByStartDateDesc(
               stDate.format(DateTimeFormatter.ISO_DATE),
               edDate.format(DateTimeFormatter.ISO_DATE));
 
-        return BookinsHtmlTemplate.report(fromDateEuroFmt, toDateEuroFmt, all);
+        return BookingHtmlTemplate.report(fromDateEuroFmt, toDateEuroFmt, all);
 
     }
 
@@ -69,8 +69,8 @@ public class BookingsService {
         log.debug(" SAVE   {}  ", booking);
 
         // convert from String to localDate
-        LocalDate stDate = LocalDate.parse(booking.getStartDate(), BookingsUtils.formatterEURO);
-        LocalDate edDate = LocalDate.parse(booking.getEndDate(), BookingsUtils.formatterEURO);
+        LocalDate stDate = LocalDate.parse(booking.getStartDate(), DateTimeService.formatterEURO);
+        LocalDate edDate = LocalDate.parse(booking.getEndDate(), DateTimeService.formatterEURO);
 
         // save  ISO String formate
         booking.setStartDate(stDate.format(DateTimeFormatter.ISO_DATE));
@@ -84,8 +84,8 @@ public class BookingsService {
         booking = bookingRepository.save(booking);
 
         // send back EURO format
-        booking.setStartDate(BookingsUtils.formatterEURO.format(stDate));
-        booking.setEndDate(BookingsUtils.formatterEURO.format(edDate));
+        booking.setStartDate(DateTimeService.formatterEURO.format(stDate));
+        booking.setEndDate(DateTimeService.formatterEURO.format(edDate));
 
         return booking;
     }
@@ -104,10 +104,10 @@ public class BookingsService {
     public List<Booking> getAll() {
         List<Booking> all = bookingRepository.findAllByOrderByStartDateAsc();
         for (Booking booking : all) {
-            LocalDate stDt = LocalDate.parse(booking.getStartDate(), BookingsUtils.formatterISO);
-            booking.setStartDate(BookingsUtils.formatterEURO.format(stDt));
-            LocalDate edDt = LocalDate.parse(booking.getEndDate(), BookingsUtils.formatterISO);
-            booking.setEndDate(BookingsUtils.formatterEURO.format(edDt));
+            LocalDate stDt = LocalDate.parse(booking.getStartDate(), DateTimeService.formatterISO);
+            booking.setStartDate(DateTimeService.formatterEURO.format(stDt));
+            LocalDate edDt = LocalDate.parse(booking.getEndDate(), DateTimeService.formatterISO);
+            booking.setEndDate(DateTimeService.formatterEURO.format(edDt));
         }
         return all;
     }

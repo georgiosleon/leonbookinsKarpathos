@@ -1,6 +1,6 @@
-package com.leonsoft.services;
+package com.leonsoft.booking.services;
 
-import com.leonsoft.models.Booking;
+import com.leonsoft.booking.models.Booking;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
 import com.lowagie.text.Font;
@@ -16,11 +16,11 @@ import java.io.IOException;
 import java.util.List;
 
 
-public class BookingsPDFExporter {
+public class BookingPDFExporter {
 
     private final List<Booking> bookingList;
 
-    public BookingsPDFExporter(List<Booking> bookingList) {
+    public BookingPDFExporter(List<Booking> bookingList) {
         this.bookingList = bookingList;
     }
 

@@ -1,11 +1,11 @@
-package com.leonsoft.services;
+package com.leonsoft.booking.services;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.time.format.DateTimeFormatter;
 import java.util.Locale;
 
-public class BookingsUtils {
+public class DateTimeService {
 
     public static DateTimeFormatter formatterEURO = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     public static DateTimeFormatter formatterISO = DateTimeFormatter.ofPattern("yyyy-MM-dd");

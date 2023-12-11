@@ -1,14 +1,14 @@
-package com.leonsoft.services;
+package com.leonsoft.booking.services;
 
-import com.leonsoft.models.Booking;
-import com.leonsoft.models.BookingTotals;
+import com.leonsoft.booking.models.Booking;
+import com.leonsoft.booking.models.BookingTotals;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class BookinsHtmlTemplate {
+public class BookingHtmlTemplate {
 
     public static String report(String fromDateEuroFmt, String toDateEuroFmt, List<Booking> all) {
 
@@ -66,8 +66,8 @@ public class BookinsHtmlTemplate {
 
 
             ////// pre processing
-            LocalDate stDt = LocalDate.parse(booking.getStartDate(), BookingsUtils.formatterISO);
-            LocalDate edDt = LocalDate.parse(booking.getEndDate(), BookingsUtils.formatterISO);
+            LocalDate stDt = LocalDate.parse(booking.getStartDate(), DateTimeService.formatterISO);
+            LocalDate edDt = LocalDate.parse(booking.getEndDate(), DateTimeService.formatterISO);
 
             String statusCancelled = "<td     style=\"    background-color: rgb(247, 201, 201);   color: rgb(27, 6, 46);  \">" +
                   " <a id='delAct' href='#' onclick='delAction(\""+ booking.getId()+"\");return false;'> " + booking.getStatus() + "</a>"
@@ -91,8 +91,8 @@ public class BookinsHtmlTemplate {
 
                   .append(status)
 
-                  .append("<td>").append(BookingsUtils.formatterEURO.format(stDt)).append("</td>")
-                  .append("<td>").append(BookingsUtils.formatterEURO.format(edDt)).append("</td>")
+                  .append("<td>").append(DateTimeService.formatterEURO.format(stDt)).append("</td>")
+                  .append("<td>").append(DateTimeService.formatterEURO.format(edDt)).append("</td>")
 
                   .append("<td>").append(booking.getRoom()).append("</td>")
                   .append("<td>").append(booking.getName()).append("</td>")
@@ -144,10 +144,10 @@ public class BookinsHtmlTemplate {
               report.append("<tr>")
                   .append("<td>").append( totals.getTotGuests()).append("</td>")
                   .append("<td>").append( totals.getTotNights()).append("</td>")
-                  .append("<td>").append( BookingsUtils.df.format( totals.getTotCharge())).append("</td>")
-                  .append("<td>").append(  BookingsUtils.df.format(totals.getTotCommission())).append("</td>")
-                  .append("<td>").append(  BookingsUtils.df.format( totals.getTotReceived())) .append("</td>")
-                  .append("<td>").append( BookingsUtils.df.format( totals.getTotBalance() )) .append("</td>")
+                  .append("<td>").append( DateTimeService.df.format( totals.getTotCharge())).append("</td>")
+                  .append("<td>").append(  DateTimeService.df.format(totals.getTotCommission())).append("</td>")
+                  .append("<td>").append(  DateTimeService.df.format( totals.getTotReceived())) .append("</td>")
+                  .append("<td>").append( DateTimeService.df.format( totals.getTotBalance() )) .append("</td>")
               .append(" </tr>");
         report.append("  </table>")
 

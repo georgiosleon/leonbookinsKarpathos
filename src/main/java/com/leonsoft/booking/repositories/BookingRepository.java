@@ -1,6 +1,6 @@
-package com.leonsoft.repositories;
+package com.leonsoft.booking.repositories;
 
-import com.leonsoft.models.Booking;
+import com.leonsoft.booking.models.Booking;
 import java.util.List;
 import org.springframework.data.repository.CrudRepository;
 

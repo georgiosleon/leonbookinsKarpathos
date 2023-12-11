@@ -1,8 +1,8 @@
-package com.leonsoft.api;
+package com.leonsoft.booking.api;
 
 
-import com.leonsoft.models.Booking;
-import com.leonsoft.services.BookingsService;
+import com.leonsoft.booking.models.Booking;
+import com.leonsoft.booking.services.BookingService;
 import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -19,10 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
-public class BookingsRestController {
+public class BookingRestController {
 
     @Autowired
-    BookingsService bookingsService;
+    BookingService bookingService;
 
     @GetMapping("/booking/export/pdf")
     public void exportToPDF(HttpServletResponse response,
@@ -32,7 +32,7 @@ public class BookingsRestController {
         log.debug("/booking/export/pdf");
         log.debug("fromDate param  " + fromDateEuroFmt);
         log.debug("toDate param  " + toDateEuroFmt);
-        bookingsService.exportToPDF(response, fromDateEuroFmt, toDateEuroFmt);
+        bookingService.exportToPDF(response, fromDateEuroFmt, toDateEuroFmt);
     }
 
 
@@ -43,7 +43,7 @@ public class BookingsRestController {
         log.debug("/booking/report");
         log.debug("fromDate param  " + fromDateEuroFmt);
         log.debug("toDate param  " + toDateEuroFmt);
-        return bookingsService.report(fromDateEuroFmt, toDateEuroFmt).toString();
+        return bookingService.report(fromDateEuroFmt, toDateEuroFmt).toString();
 
     }
 
@@ -52,26 +52,26 @@ public class BookingsRestController {
     Booking create(@RequestBody Booking booking) {
         booking.setId(UUID.randomUUID().toString());
         log.debug(" SAVE   {}  ", booking);
-        return bookingsService.create(booking);
+        return bookingService.create(booking);
     }
 
 
     @PostMapping(value = "/booking/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     Boolean deleteObject(@RequestBody Booking booking) {
         log.debug(" Delete    {}", booking.getId());
-        bookingsService.deleteObject(booking);
+        bookingService.deleteObject(booking);
         return Boolean.TRUE;
     }
 
     @GetMapping(value = "/booking/del")
     void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {
         log.debug(" Delete  a cancelled   {}", bookingId);
-        bookingsService.delCancelledBooking(bookingId);
+        bookingService.delCancelledBooking(bookingId);
     }
 
     @GetMapping(value = "/booking/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     List<Booking> getAll() {
-        return bookingsService.getAll();
+        return bookingService.getAll();
     }
 
 }
