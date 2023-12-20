@@ -7,6 +7,7 @@ import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
@@ -81,11 +82,17 @@ public class BookingService {
         booking.setReceived(booking.getReceived() == null ? 0.0 : booking.getReceived());
         booking.setBalance(booking.getBalance() == null ? 0.0 : booking.getBalance());
 
+        booking.setRequestDateTime(  LocalDateTime.now() );
+
+
         booking = bookingRepository.save(booking);
 
         // send back EURO format
         booking.setStartDate(DateTimeService.formatterEURO.format(stDate));
         booking.setEndDate(DateTimeService.formatterEURO.format(edDate));
+
+
+
 
         return booking;
     }
