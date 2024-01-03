@@ -1,5 +1,5 @@
 // v1.0.1
-var version = "Beds and Guests Planner - ΚΑΡΠΑΘΟΣ - 2023 by - Leon Solutions - v. 1.0.1 ";
+var version = "ΚΑΡΠΑΘΟΣ planner - 2023 by ΓΕΩΡΓΙΟΣ ΛΕΟΥ ΟΘΟΣ ";
 //////
 //////
 //////
@@ -14,23 +14,39 @@ window.onload = function() {
     }
 }// window.onload
 
-function  delActionAjaxCall(id){
- // console.log('Yes')
 
-            // String delUrl = "/booking/del?bid=" + booking.getId();
-            $.ajax({
-                type: 'GET',
-                url: '/booking/del',
-                data: {
-                    bid: id
-                },
-                contentType: 'application/json',
-                success: function (data, status, xhr) {
-                    w2alert('Deleted a cancelled booking - all good re-run the report to confirm');
-                }
-            });  // ajax
 
-}
+// function delAction(id) {
+
+
+//     w2confirm(
+//     'Delete Cancelled   '+ id +'  Are you sure?')
+//         .yes(() => {
+//             delActionAjaxCall(id)
+//         })
+//         .no(() => {
+//             w2alert('Nothing changed or deleted ');
+//         })
+// }
+
+// function  delActionAjaxCall(id){
+//  // console.log('Yes')
+
+//             // String delUrl = "/booking/del?bid=" + booking.getId();
+//             $.ajax({
+//                 type: 'GET',
+//                 url: '/booking/del',
+//                 data: {
+//                     bid: id
+//                 },
+//                 contentType: 'application/json',
+//                 success: function (data, status, xhr) {
+//                     w2alert('Deleted a cancelled booking - all good re-run the report to confirm');
+//                 }
+//             });  // ajax
+
+// }
+
 
 
 // functions
@@ -59,51 +75,52 @@ function updateClock (){
 
    	$("#clock").html(currentTimeString);
  }
-function delAction(id) {
-    w2confirm('Are you sure?')
-        .yes(() => {
-            delActionAjaxCall(id)
-        })
-        .no(() => {
-            w2alert('Nothing changed or deleted ');
-        })
-}
-function financial(x) {
-    if (x) {
-        return Number.parseFloat(x).toFixed(2);
-        // .replace('.', ',');
-    }
-    return Number.parseFloat(0).toFixed(2);
-    // .replace('.', ',');
-}
-function convertDate(str) {
-    var parts = str.split("/");
-    var dt = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
-    dt.setHours(12, 0, 0);
 
-    return dt;
-}
-function convertDate_00_00_00(str) {
+
+
+
+
+
+// function financial(x) {
+//     if (x) {
+//         return Number.parseFloat(x).toFixed(2);
+//         // .replace('.', ',');
+//     }
+//     return Number.parseFloat(0).toFixed(2);
+//     // .replace('.', ',');
+// }
+
+
+function convertDate(str) {
     var parts = str.split("/");
     var dt = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
     dt.setHours(0, 0, 0);
 
     return dt;
 }
+
+// function convertDate_00_00_00(str) {
+//     var parts = str.split("/");
+//     var dt = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+//     dt.setHours(0, 0, 0);
+
+//     return dt;
+// }
+
+
 function initForm() {
 
     w2ui['myForm'].setValue('startDate', formattedDate(new Date));
     w2ui['myForm'].setValue('endDate', formattedDate(new Date));
-    w2ui['myForm'].setValue('numOfNights', 0);
+    // w2ui['myForm'].setValue('numOfNights', 0);
+
+    // w2ui['myForm'].setValue('status', { id: 'active', text: 'Active' });
 
 
-    w2ui['myForm'].setValue('status', { id: 'active', text: 'Active' });
-
-
-    w2ui['myForm'].setValue('balance', null);
-    w2ui['myForm'].setValue('charge', null);
-    w2ui['myForm'].setValue('received', null);
-    w2ui['myForm'].setValue('commission', null);
+    // w2ui['myForm'].setValue('balance', null);
+    // w2ui['myForm'].setValue('charge', null);
+    // w2ui['myForm'].setValue('received', null);
+    // w2ui['myForm'].setValue('commission', null);
     w2ui['myForm'].refresh();
 
 }
@@ -124,9 +141,14 @@ var moveToDate = new Date();// set to current date
 // initialise vis timeline componenet
 var groups = new vis.DataSet();
 // var items = new vis.DataSet();
-var items = new vis.DataSet({type: { start: "ISODate", end: "ISODate" }});
+
+
+
+
+var items = new vis.DataSet({type: { start: "ISODate", end: "ISODate" }});   
 var timelineoOtions = {
 
+    locale: 'en',
 
     maxHeight: 2000,
     horizontalScroll: true,
@@ -147,7 +169,7 @@ var timelineoOtions = {
         followMouse: true,
     },
 
-    stack: false,
+    stack: true,
 
     // editable: true,
 
@@ -186,9 +208,7 @@ var timelineoOtions = {
 
         var pojo = JSON.stringify(items.get(item.id).recordData);
 
-
-
-        w2confirm('Are you sure?')
+        w2confirm('Delete  '+ items.get(item.id).recordData.name +'    Are you sure?')
             .yes(() => {
 
                 $.ajax({
@@ -212,63 +232,315 @@ var timelineoOtions = {
 
 };
 // add some rooms
+
+
+
 var roomList = [
+
+    // 
     {
-        id: 'APT2',
-        text: 'APT 2'
+        id: 'Shopping',
+        text: '🛍️ Shopping'
     },
     {
-        id: 'APT6',
-        text: 'APT 6'
+        id: 'Dine',
+        text: '🍽️ Dine'
     },
     {
-        id: 'STU7',
-        text: 'STU 7'
+        id: 'Wine',
+        text: '🍷 Wine Drinking'
     },
     {
-        id: 'STU8',
-        text: 'STU 8'
+        id: 'Beer',
+        text: '🍺 Beer Drinking'
     },
     {
-        id: 'STU9',
-        text: 'STU 9'
+        id: 'Drinks',
+        text: '🍹 Drinks'
     },
     {
-        id: 'STU10',
-        text: 'STU 10'
+        id: 'Cafe',
+        text: '☕ Cafe'
+    },
+
+    // {
+    //     id: 'FastFood',
+    //     text: '🌯🍕🍔 FastFood'
+    // },
+    {
+        id: 'Pizza',
+        text: '🍕 Pizza'
     },
     {
-        id: 'STU11',
-        text: 'STU 11'
+        id: 'Burger',
+        text: '🍔 Burger'
     },
     {
-        id: 'STU12',
-        text: 'STU 12'
+        id: 'Souvlaki',
+        text: '🌯 Souvlaki'
+    },
+
+    // {
+    //      id: 'Sweets',
+    //     text: '🧁🍦 Sweets'
+    // },
+
+    {
+        id: 'Sweets',
+        text: '🧁 Sweets '
     },
     {
-        id: 'POT',
-        text: 'POTIDEION'
+        id: 'IceCream',
+        text: '🍦 Ice Cream'
+    },
+   
+    // Αθλητικά   
+   
+   
+    {
+        id: 'Sports',
+        text: '⚽️🏄 Sports'
+    },
+   
+   
+    {
+        id: 'Walking',
+        text: '🚶🏻 Walking'
+    },
+
+    {
+        id: 'Biking',
+        text: '🚴 Biking'
+    },
+
+    {
+        id: 'Soccer',
+        text: '⚽️ Ποδόσφαιρο'
     },
     {
-        id: 'MER',
-        text: 'MERTONAS'
-    }
+        id: 'Basket',
+        text: '🏀 Μπάσκετ'
+    },
+    {
+        id: 'Surfing',
+        text: '🏄 Surfing'
+    },
+
+    {
+        id: 'Rowing',
+        text: '🚣‍♂️ Rowing '
+    },
+
+    {
+        id: 'Swimming',
+        text: '🏊 Swimming '
+    },
+
+    {
+        id: 'Yoga',
+        text: '🧘‍♀️ Yoga '
+    },
+    
+    {
+        id: 'Climbing',
+        text: '🧗‍♀️ Climbing '
+    },
+
+    {
+        id: 'Tennis',
+        text: '🎾 Tennis'
+    },
+   
+    {
+        id: 'MartialArts',
+        text: '🥋 Martial Arts'
+    },
+    {
+        id: 'Boxing',
+        text: '🥊 Boxing'
+    },
+    {
+        id: 'Gym',
+        text: '🏋️‍♂️ Gym'
+    },
+
+    {
+        id: 'Cards',
+        text: '🃏 Cards'
+    },
+    {
+        id: 'PingPong',
+        text: '🏓 PingPong'
+    },
+    {
+        id: 'Chess',
+        text: '♟️ Chess'
+    },
+    {
+        id: 'Tavli',
+        text: '🎲 Tavli'
+    },
+    {
+        id: 'Bowling',
+        text: '🎳 Bowling'
+    },
+    {
+        id: 'Gaming',
+        text: '🎮 Gaming'
+    },
+    {
+        id: 'MusicLessons',
+        text: '🎼 Music Lessons'
+    },
+    {
+        id: 'KidsActivities',
+        text: '🎠 Kids Activities'
+    },
+    
+    
 
 
-];  // for the dropdown  select room
+
+  //   (Θέατρο/Χορός, Μουσική, Σινεμά, Τέχνες, Βιβλίο, Φεστιβάλ, Ομιλίες)
+
+//    {
+//      id: 'Festival',
+//      text: '🎉 Φεστιβάλ'
+//     },
+
+    {
+        id: 'Awards',
+        text: '🎖️ Awards'
+    },
+    {
+        id: 'Theater',
+        text: '🎭 Θέατρο'
+    },
+    {
+        id: 'Music',
+        text: '🎤 Μουσική/Χορός '
+    },
+    {
+        id: 'Cinema',
+        text: '🎥 Σινεμά'
+    },
+    {
+        id: 'Arts',
+        text: '🎨 Τέχνες/Arts'
+    },
+    {
+        id: 'Book',
+        text: '📖 Βιβλίο'
+    },
+    {
+        id: 'Festival',
+        text: '🎉 Φεστιβάλ'
+    },
+    {
+        id: 'Talk',
+        text: '💬 Ομιλία'
+    },
+    {
+        id: 'Museum',
+        text: '🏺 Museum'
+    },
+    {
+        id: 'AnimalLovers',
+        text: '🐾 AnimalLovers'
+    },
+    
+
+    // Κοινωνικά/Social  
+    //     (Αργίες, Γιορτές, Κηδεία, Μνημόσυνο) 
+    
+    {
+        id: 'Church',
+        text: '⛪ Εκκλησία'
+    },
+    {
+        id: 'WeedingUnion',
+        text: '💒 Γάμος'
+    },
+    {
+        id: 'Engagement',
+        text: '❤️ Αρραβώνας'
+    },
+    {
+        id: 'BAPTISM',
+        text: '👼 Βάπτιση'
+    },
+    {
+        id: 'ChurchHoliday',
+        text: '⛪🎉 Πανηγύρι/Εορτή'
+    },
+    {
+        id: 'FUNERAL',
+        text: '⚰️ Κηδεία'
+    },
+    {
+        id: 'Memorial',
+        text: '🕯️ Μνημόσυνο'
+    },
+   
+
+    // Συγκοινωνίες/Transportation
+//    {
+//        id: 'Bus',
+//        text: '🚌 Bus'
+//    },
+//    {
+//        id: 'Airplane',
+//        text: '✈️ Airplane'
+//    },
+//    {
+//        id: 'Boat',
+//        text: '⛴️ Ferry/Boat '
+//    }
+
+
+];  
+
+
+// for the dropdown  select room
 // roomList.push({id: idVal,  text: descVal});
+
+//todo  check that the css ids ate updated
 var agencyList = [
-    { id: 'abnb', text: 'AirBnB' },
-    { id: 'bookingcom', text: 'Booking.com' },
-    { id: 'walkin', text: 'Walk-in' },
-    { id: 'closed', text: 'Closed' },
+    { id: 'bookingcom', text: 'Πολιτιστικά/Cultural' },
+    { id: 'other',      text: 'Αθλητικά/Sport' },
+    { id: 'abnb',       text: 'Κοινωνικά/Social' },
+    { id: 'walkin',     text: 'Συγκοινωνίες/Transportation' },
+    { id: 'closed',     text: 'Dine/Wine' },
 ];
-var statusList = [
-    { id: 'active', text: 'Active' },
-    { id: 'cancelled', text: 'Cancelled' },
-    { id: 'paid', text: 'Paid' }
-];
-var countryList = ["Afghanistan", "Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bonaire, Sint Eustatius and Saba", "Bosnia and Herzegovina", "Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory", "Brunei Darussalam", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Cayman Islands", "Central African Republic ", "Chad", "Chile", "China", "Christmas Island", "Cocos Islands", "Colombia", "Comoros", "Congo", "Cook Islands", "Costa Rica", "Croatia", "Cuba", "Curaçao", "Cyprus", "Czechia", "Côte d'Ivoire", "Denmark", "Djibouti", "Dominica", "Dominican Republic ", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Falkland Islands/Malvinas", "Faroe Islands", "Fiji", "Finland", "France", "French Guiana", "French Polynesia", "French Southern Territories", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Heard Island and McDonald Islands", "Holy See", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica", "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea Notrh", "Korea South", "Kuwait", "Kyrgyzstan", "Lao People's Democratic Republic", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macao", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Niue", "Norfolk Island", "Northern Mariana Islands", "Norway", "Oman", "Pakistan", "Palau", "Palestine, State of", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn", "Poland", "Portugal", "Puerto Rico", "Qatar", "Republic of North Macedonia", "Romania", "Russian Federation", "Rwanda", "Réunion", "Saint Barthélemy", "Saint Helena, Ascension and Tristan da Cunha", "Saint Kitts and Nevis", "Saint Lucia", "Saint Martin (French part)", "Saint Pierre and Miquelon", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Sint Maarten (Dutch part)", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Georgia", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Svalbard and Jan Mayen", "Sweden", "Switzerland", "Syrian Arab Republic", "Taiwan", "Tajikistan", "Tanzania, United Republic of", "Thailand", "Timor-Leste", "Togo", "Tokelau", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Turks and Caicos Islands", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Viet Nam", "Virgin Islands (British)", "Virgin Islands (U.S.)", "Wallis and Futuna", "Western Sahara", "Yemen", "Zambia", "Zimbabwe"];
+
+
+// var roomList = [
+
+//     // 
+//     {
+//         id: 'Cultural',
+//         text: 'Πολιτιστικά/Cultural'
+//     },
+  
+//     {
+//         id: 'Sport',
+//         text: 'Αθλητικά/Sport'
+//     },
+//     {
+//         id: 'Social',
+//         text: '🛍️ Κοινωνικά/Social'
+//     },
+//     {
+//         id: 'Transportation',
+//         text: '🛍️ Συγκοινωνίες/Transportation'
+//     }
+
+// ];  // for the dropdown  select room
+
+
+// var agencyList = [
+//     { id: 'other',      text: 'default' },
+// ];
 
 
 
@@ -280,11 +552,12 @@ $(function () {
 //////////////
 
             w2utils.settings.dateFormat = 'yyyy-mm-dd';
+            
             // w2utils.settings.currencyPrefix = '€';
             $("#tid").html(""+ version );;
             $("#tid").css({ 'color': 'blue', 'font-size': '150%' });
-            $("#tid").css('text-align', 'right');
-            $("#clock").css('text-align', 'right');
+            $("#tid").css('text-align', 'left');
+            $("#clock").css('text-align', 'left');
             // CLOCK
             setInterval('updateClock()', 1000);
 
@@ -307,12 +580,11 @@ $(function () {
 
 
 
-
             $("#hide").click(function () {
                     // $("#save").hide();
                     $('[name="save"]').hide();
                     $('[name="reset"]').hide();
-                    w2ui.myForm.hide('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email', 'extraInfo')
+                    w2ui.myForm.hide('name', 'startDate', 'extraInfo')
 
                 });
             $("#show").click(function () {
@@ -320,7 +592,7 @@ $(function () {
                 // $("#save").show();
                 $('[name="save"]').show();
                 $('[name="reset"]').show();
-                w2ui.myForm.show('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email', 'extraInfo')
+                w2ui.myForm.show('name', 'startDate', 'extraInfo')
             });
             $('#myForm').w2form({
                 name: 'myForm',
@@ -356,93 +628,68 @@ $(function () {
                 fields: [
 
 
-
                     {
                         field: 'name', type: 'text',
                         required: true,
                         html: {
                             label: 'Name',
-                            text: '%anchorNumOfGuests%  &nbsp; &nbsp; %anchorAgency%   &nbsp; &nbsp;  %anchorRoom%  &nbsp; &nbsp;   %anchorCountry%  ',
+                            text: '&nbsp; &nbsp;   %anchorAgency%  &nbsp; &nbsp;   %anchorRoom%   ',
                             attr: 'style="  text-transform: uppercase; width: 300px; font-weight: bold; text-align:center; "'
                         }
                     },
-                    {
-                        field: 'numOfGuests', type: 'list',
-                        required: true,
-                        html: {
-                            label: '&nbsp;  &nbsp;  &nbsp;  Num. Of Guests 👨‍👩‍👦  &nbsp; ',
-                            anchor: '%anchorNumOfGuests%',
-                            attr: 'style="  width: 50px; font-weight: bold; text-align:center;"'
-                        },
-                        // options: { min: 1, max: 6 }
-                        options: { items: [1, 2, 3, 4, 5, 6] }
-                    },
+                    
                     {
                         field: 'agency', type: 'list',
                         required: true,
                         html: {
-                            label: '&nbsp; &nbsp; Agency &nbsp;  &nbsp; ',
+                            label: '&nbsp; &nbsp;  Kατηγορία  &nbsp;  &nbsp; ',
                             anchor: '%anchorAgency%',
                             // text: '&nbsp;  %anchorVoucher% &nbsp; &nbsp;',
-                            attr: 'style=" width: 100px;  font-weight: bold;  text-align:center;"'
+                            attr: 'style=" width: 200px;  font-weight: bold;  text-align:center;"'
                         },
                         options: { items: agencyList }
                     },
+
                     {
                         field: 'room', type: 'list',
                         required: true,
                         html: {
-                            label: '&nbsp; &nbsp; Room &nbsp;',
+                            label: '&nbsp; &nbsp; Υπό-Kατηγορία &nbsp;',
                             anchor: '%anchorRoom%',
-                            attr: 'style="  width: 100px; font-weight: bold; text-align:center; "'
+                            attr: 'style="  width: 300px; font-weight: bold; text-align:center; "'
                         },
                         options: { items: roomList }
                     },
-                    {
-                        field: 'country', type: 'list',
-                        html: {
-                            label: 'Country &nbsp;  &nbsp; ',
-                            anchor: '%anchorCountry%',
-                            attr: ' style="width: 180px;  text-align:center; "'
-                        },
-                        options: {
-                            items: countryList
-                        }
-                    },
-
-
-
-
-
 
                     // line
                     {
                         field: 'startDate', type: 'date',
-                        // format: 'd.m.yyyy',
-                        // todo now using isoDate format as vis timeline is configured as iso
                         required: true,
                         html: {
-                            label: '&nbsp;&nbsp;&nbsp; From ',
-                            text: '&nbsp;  &nbsp;  &nbsp;   %anchorEndDate%  %anchorNumOfNights%  🛌 ',
-                            attr: 'style="  width: 100px; font-weight: bold; text-align:center;"'
+                            label: '&nbsp;&nbsp;&nbsp; Από ',
+                            text: '&nbsp;  &nbsp;  &nbsp;    %anchorEndDate%  &nbsp;  &nbsp;',
+                            attr: 'style="  width: 250px; font-weight: bold; text-align:center;"'
                         },
                         options: {
                             // start: new Date().toISOString().substring(0, 10) // nowISOString  e.g. '2023-02-25'
                             // end: query('input[type=endDate]')[0] ,
                             // start: formattedDate(new Date()),
-                            format: 'dd/mm/yyyy'
+                           format: 'dd/mm/yyyy'
                             // all dates before start will be unselectable
                         }
                     },
+
+
+
                     {
 
                         field: 'endDate', type: 'date',
                         required: true,
                         // on endDate change  calculate  numOfNights  from start date and endDate
                         html: {
-                            label: '&nbsp;&nbsp;&nbsp; To &nbsp;&nbsp;&nbsp;&nbsp; ',
+                            label: '&nbsp;&nbsp;&nbsp; Εώς  &nbsp;&nbsp;&nbsp;&nbsp; ',
                             anchor: '%anchorEndDate%',
-                            attr: 'style=" width: 100px; font-weight: bold; text-align:center;"'
+                            attr: 'style=" width: 250px; font-weight: bold; text-align:center;"'
                         },
                         options: {
                             // start: query('input[type=startDate]')[0]
@@ -450,165 +697,8 @@ $(function () {
                             format: 'dd/mm/yyyy'
                         }
                     },
-                    {
-                        field: 'numOfNights', type: 'int',
-                        required: true,
-                        disabled: true,
-                        // Todo:  on numOfNights change  calculate  endDate from start date
-                        html: {
-                            label: '&nbsp; Nights &nbsp;',
-                            anchor: '%anchorNumOfNights%',
-                            attr: 'style="width: 50px; font-weight: bold; text-align:center;"'
-                        },
-                        options: { min: 1 }
 
-                    },
-
-
-
-
-
-
-                    // line
-                    {
-                        field: 'charge', type: 'float',
-                        // required: true,
-                        html: {
-                            label: 'Total',
-                            text: '€ &nbsp; %anchorCommission%  € &nbsp; %anchorReceived% € &nbsp; %anchorBalance% €  &nbsp;&nbsp;&nbsp;  &nbsp; &nbsp; &nbsp; &nbsp;  %anchorStatus%',
-                            attr: 'style="width: 80px; font-weight: bold; text-align:center; "'
-                        },
-                        options: {
-                            groupSymbol: ''
-                            // , decimalSymbol:','
-                        }
-
-                    },
-                    {
-                        field: 'commission', type: 'float',
-                        // required: true,
-                        html: {
-                            label: '&nbsp; &nbsp;  &nbsp;  &nbsp; &nbsp; &nbsp; Commission &nbsp; &nbsp; ',
-                            anchor: '%anchorCommission%',
-                            attr: 'style="width: 80px; font-weight: bold; text-align:center; "'
-                        },
-                        options: {
-                            groupSymbol: ''
-                            // , decimalSymbol:','
-                        }
-                    },
-                    {
-                        field: 'received', type: 'float',
-                        // required: true,
-                        html: {
-                            label: '&nbsp; &nbsp;  &nbsp;  &nbsp; &nbsp; &nbsp; Received &nbsp; &nbsp; ',
-                            anchor: '%anchorReceived%',
-                            attr: 'style="width: 80px; font-weight: bold; text-align:center; "'
-                        },
-                        options: {
-                            groupSymbol: ''
-                            // , decimalSymbol:','
-                        }
-                    },
-                    {
-                        field: 'balance', type: 'float',
-                        // required: true,
-                        disabled: true,
-                        html: {
-                            label: '&nbsp; &nbsp; &nbsp; Balance &nbsp; &nbsp;',
-                            anchor: '%anchorBalance%',
-                            attr: 'style="width: 80px; font-weight: bold; text-align:center;"'
-                        },
-                        options: {
-                            groupSymbol: ''
-                            // ,decimalSymbol:','
-                        }
-                    },
-                    {
-                        field: 'status', type: 'list',
-                        required: true,
-                        html: {
-                            label: 'Status ',
-                            anchor: '%anchorStatus%',
-                            attr: 'style=" width: 100px;  font-weight: bold;  text-align:center;"'
-                        },
-                        options: {
-                            items: statusList
-                            // , selected : { id: 'active' }
-                        }
-                    },
-
-
-
-
-                    // line
-                    {
-                        field: 'identification', type: 'text',
-                        // required: true,
-                        html: {
-                            label: 'ΑΡ.ΔΙΑΒ. ή ΤΑΥΤ. &nbsp;',
-                            text: '&nbsp;  &nbsp; %anchorAfm%  %anchorEmail%  %anchorTel% ',
-                            attr: 'style="width: 200px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
-                        }
-                    },
-                    {
-                        field: 'afm', type: 'text',
-                        // required: true,
-                        html: {
-                            label: 'ΑΦΜ &nbsp;',
-                            anchor: '%anchorAfm%',
-                            attr: 'style="width: 200px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
-                        }
-                    },
-                    {
-                        field: 'email', type: 'email',
-                        html: {
-                            label: '&nbsp;&nbsp; Email &nbsp;',
-                            anchor: '%anchorEmail%',
-                            attr: 'style="width: 200px; text-align:center;"'
-                        }
-                    },
-                    {
-                        field: 'tel', type: 'int',
-                        html: {
-                            label: '&nbsp;&nbsp; &nbsp; Tel &nbsp; ',
-                            anchor: '%anchorTel%',
-                            attr: 'style="width: 150px; text-align:center;"'
-                        }
-                    },
-
-
-
-
-
-
-                    // line
-                    {
-                        field: 'voucher', type: 'text',
-                        html: {
-                            label: 'Voucher &nbsp; ',
-                            text: '&nbsp; %anchortaxRefNumber%   %anchorInvoiceNumber%  ',
-                            attr: 'style="width: 200px;  text-transform: uppercase; font-weight: bold; text-align:center;"'
-                        }
-                    },
-                    {
-                        field: 'taxRefNumber', type: 'text',
-                        // required: true,
-                        html: {
-                            label: '&nbsp; TAX &nbsp; &nbsp; ',
-                            anchor: '%anchortaxRefNumber%',
-                            attr: 'style="width: 200px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
-                        }
-                    },
-                    {
-                        field: 'invoiceNumber', type: 'text',
-                        // required: true,
-                        html: {
-                            label: ' Invoice &nbsp;',
-                            anchor: '%anchorInvoiceNumber%',
-                            attr: 'style="width: 200px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
-                        }
-                    },
+                 
 
 
 
@@ -616,13 +706,10 @@ $(function () {
                     {
                         field: 'extraInfo', type: 'textarea',
                         html: {
-                            label: 'Notes',
+                            label: 'Εxtra Info ',
                             attr: 'style="width: 600px; height: 60px; resize: none" '
                         }
                     },
-
-
-
 
 
 
@@ -631,87 +718,56 @@ $(function () {
 
                 actions: {
 
+                    // report: {
 
-                    // find: {
-                    //     text: 'find',
-                    //     class: 'w2ui-btn-grey',
+                    //     text: 'report',
+                    //     class: 'w2ui-btn-blue',
                     //     style: 'text-transform: uppercase; width: 100px;  color: white ; font-size: 12px;',
                     //     onClick(event) {
 
-                    //         var find  =   w2ui.myForm.getValue('name');
-                    //         alert ( ' TODO   ' + find );
 
-                    //         // todo goto back end and search
+                    //         $.ajax({
+                    //             type: 'GET',
+                    //             url: '/booking/report',
+                    //             data: {
+                    //                 fromDate: w2ui.myForm.getValue('startDate'),
+                    //                 toDate: w2ui.myForm.getValue('endDate')
+                    //             },
+                    //             contentType: 'application/json',
+                    //             success: function (data, status, xhr) {
 
-                    //         // var  filteredItems = items.get({
-                    //         // filter: item => {
-                    //         //     return item.name === find;
-                    //         // }
-                    //         // });
+                    //                 var contentHtml = data;
 
-                    //         // alert ( '' +  filteredItems[0].start );
+                    //                 w2popup.open({
+                    //                     title: 'Report ',
+                    //                     // with: 300,
+                    //                     // height: 500,
+                    //                     showMax: true,
+                    //                     openMaximized: true,
+                    //                     body: contentHtml,
+                    //                     actions: { Ok: w2popup.close }
+                    //                 });
 
-                    //         // var gotoDate  =  filteredItems[0].start ;
-                    //         // timeline.moveTo(gotoDate, { animation: true });
-
+                    //             }
+                    //         });  // ajax
 
 
                     //     }
                     // },
 
+                    // goto: {
+                    //     text: 'goto',
+                    //     class: 'w2ui-btn-blue',
+                    //     style: 'text-transform: uppercase; width: 100px;  color: white ; font-size: 12px;',
+                    //     onClick(event) {
 
+                    //         var gotoDate = convertDate(w2ui.myForm.getValue('startDate')).setHours(0, 0, 0);
+                    //         // moveToDate = gotoDate;
 
-                    report: {
+                    //         timeline.moveTo(gotoDate, { animation: true });
 
-
-                        text: 'report',
-                        class: 'w2ui-btn-blue',
-                        style: 'text-transform: uppercase; width: 100px;  color: white ; font-size: 12px;',
-                        onClick(event) {
-
-
-                            $.ajax({
-                                type: 'GET',
-                                url: '/booking/report',
-                                data: {
-                                    fromDate: w2ui.myForm.getValue('startDate'),
-                                    toDate: w2ui.myForm.getValue('endDate')
-                                },
-                                contentType: 'application/json',
-                                success: function (data, status, xhr) {
-
-                                    var contentHtml = data;
-
-                                    w2popup.open({
-                                        title: 'Report ',
-                                        // with: 300,
-                                        // height: 500,
-                                        showMax: true,
-                                        openMaximized: true,
-                                        body: contentHtml,
-                                        actions: { Ok: w2popup.close }
-                                    });
-
-                                }
-                            });  // ajax
-
-
-                        }
-                    },
-
-                    goto: {
-                        text: 'goto',
-                        class: 'w2ui-btn-blue',
-                        style: 'text-transform: uppercase; width: 100px;  color: white ; font-size: 12px;',
-                        onClick(event) {
-
-                            var gotoDate = convertDate(w2ui.myForm.getValue('startDate')).setHours(12, 0, 0);
-                            // moveToDate = gotoDate;
-
-                            timeline.moveTo(gotoDate, { animation: true });
-
-                        }
-                    },
+                    //     }
+                    // },
 
                     today: {
                         text: 'Today',
@@ -736,38 +792,35 @@ $(function () {
                                 // retrieve a filtered subset of the data
                                 var fItems = items.get({
                                     filter: function (item) {
-                                        // var a_start = Date.parse(w2ui.myForm.getValue('startDate'));
-                                        // var a_end = Date.parse(w2ui.myForm.getValue('endDate'));
-                                        // var b_start = Date.parse(item.start);
-                                        // var b_end = Date.parse(item.end);
+                                        
 
-                                        // alert('   ' + w2ui.myForm.getValue('startDate') + '   ' + w2ui.myForm.getValue('endDate') + '  \n ' +
-                                        //     '   ' + item.start + '   ' + item.end + '  \n '
-                                        // )
-
-                                        var a_start = convertDate(w2ui.myForm.getValue('startDate'));
-                                        var a_end = convertDate(w2ui.myForm.getValue('endDate'));
+                                        var a_start = convertDate(w2ui.myForm.getValue('startDate'))  .setHours(0, 0, 0) ;
+                                        var a_end = convertDate(w2ui.myForm.getValue('endDate'))  .setHours(23, 59, 59); ;
 
                                         var b_start = item.start;
                                         var b_end = item.end;
 
 
 
-                                        if (w2ui.myForm.getValue('room').id == item.group) {
-                                            if (a_start <= b_start && b_start < a_end) return true;    // b starts in a
-                                            if (a_start < b_end && b_end < a_end) return true;       // b ends in a
-                                            if (b_start < a_start && a_end <= b_end) return true;     // a in b
-                                        }
+                                        // if (w2ui.myForm.getValue('room').id == item.group) {
+                                        //     if (a_start <= b_start && b_start < a_end) return true;    // b starts in a
+                                        //     if (a_start < b_end && b_end < a_end) return true;       // b ends in a
+                                        //     if (b_start < a_start && a_end <= b_end) return true;     // a in b
+                                        // }
+
+                                        
                                         return false;
+
                                     }
                                 });
-                                if (fItems != null && fItems.length > 0 && (w2ui.myForm.getValue('status').id == 'active' || w2ui.myForm.getValue('status').id == 'paid')) {
+
+                                if (fItems != null && fItems.length > 0 ) {
 
                                     w2popup.open({
                                         title: 'Message',
                                         with: 300,
                                         height: 150,
-                                        body: 'Room is NOT available',
+                                        body: ' 🚗|🛵  Object  is NOT available',
                                         actions: { Ok: w2popup.close }
                                     });
 
@@ -785,10 +838,10 @@ $(function () {
                                         group: w2ui.myForm.getValue('room').id,
                                         // start: w2ui.myForm.getValue('startDate'),
                                         // end: w2ui.myForm.getValue('endDate'),
-                                        start: convertDate(w2ui.myForm.getValue('startDate')).setHours(12, 0, 0),
-                                        end: convertDate(w2ui.myForm.getValue('endDate')).setHours(12, 0, 0),
+                                        start: convertDate(w2ui.myForm.getValue('startDate')).setHours(0, 0, 0),
+                                        end: convertDate(w2ui.myForm.getValue('endDate')).setHours(23, 59, 59),
 
-                                        content: '🛌' + w2ui.myForm.getValue('numOfNights') + '  👨‍👩‍👦' + w2ui.myForm.getValue('numOfGuests') + ' ' + w2ui.myForm.getValue('name'),
+                                        content:  w2ui.myForm.getValue('name'),
 
                                         className: w2ui.myForm.getValue('agency').id,
                                         recordData: this.getCleanRecord(),
@@ -814,9 +867,6 @@ $(function () {
                                         success: function (element, status, xhr) {
 
 
-                                            if (w2ui.myForm.getValue('status').id == 'active' || w2ui.myForm.getValue('status').id == 'paid') {
-                                                // only add to timeline if status is active
-
                                                 items.add({
                                                     id: element.id,
                                                     type: 'range',
@@ -824,32 +874,16 @@ $(function () {
                                                     // start: element.startDate,
                                                     // end: element.endDate,
 
-                                                    start: convertDate(element.startDate).setHours(12, 0, 0),
-                                                    end: convertDate(element.endDate).setHours(12, 0, 0),
+                                                    start: convertDate(element.startDate).setHours(0, 0, 0),
+                                                    end: convertDate(element.endDate).setHours(23, 59, 59),
 
                                                     // title: element.title,
-                                                    content: '🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
+                                                    content: element.name,
 
                                                     className: element.agency,
                                                     recordData: element,
                                                 });
 
-                                            } else {
-                                                // if status is Cancelled        show popup for info
-                                                w2alert('Saved a Cancelled booking - all good check the report to confirm');
-                                            }
-
-
-                                            // timeline.setWindow(convertDate(w2ui.myForm.getValue('startDate')).setHours(12, 0, 0),  convertDate(w2ui.myForm.getValue('endDate')).setHours(12, 0, 0), { animation: true });
-
-                                            // alert('status: ' + status + ', data: ' + data);
-                                            // w2popup.open({
-                                            //     title: 'Saved Item ' + status,
-                                            //     with: 600,
-                                            //     height: 550,
-                                            //     body: JSON.stringify(data),
-                                            //     actions: { Ok: w2popup.close }
-                                            // });
 
                                         }
                                     });
@@ -958,8 +992,7 @@ $(function () {
                         console.log(element);
 
 
-                        if (element.status == 'active' || element.status == 'paid') {
-
+                      
                             items.add({
                                 id: element.id,
                                 type: 'range',
@@ -967,17 +1000,17 @@ $(function () {
                                 // start: element.startDate,
                                 // end: element.endDate,
 
-                                start: convertDate(element.startDate).setHours(12, 0, 0),
-                                end: convertDate(element.endDate).setHours(12, 0, 0),
+                                start: convertDate(element.startDate).setHours(0, 0, 0),
+                                end: convertDate(element.endDate).setHours(23, 59, 59),
 
                                 // title: element.title,
 
-                                content: '🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
+                                content: element.name,
                                 className: element.agency,
                                 recordData: element,
                             });
 
-                        }
+                        
                         // console.log(element.x); // 100, 200, 300
                         // console.log(index); // 0, 1, 2
                         // console.log(array); // same myArray object 3 times
@@ -1003,71 +1036,71 @@ $(function () {
                 //  Event: change Target: startDate
                 if (event != null && event.target == 'startDate') {
                     w2ui['myForm'].setValue('endDate', event.detail.value.current);
-                    w2ui['myForm'].setValue('numOfNights', 0);
+                    // w2ui['myForm'].setValue('numOfNights', 0);
                     w2ui['myForm'].refresh();
                     // console.dir(  w2ui['myForm'].get('endDate')  )  ;
                 }
 
                 //  Event: change Target: endDate
-                if (event != null && event.target == 'endDate') {
+                // if (event != null && event.target == 'endDate') {
 
 
-                    var startDateFld = w2ui['myForm'].getValue('startDate');
-                    var endDateFld = w2ui['myForm'].getValue('endDate');
+                //     var startDateFld = w2ui['myForm'].getValue('startDate');
+                //     var endDateFld = w2ui['myForm'].getValue('endDate');
 
-                    var date1 = convertDate_00_00_00(startDateFld);
-                    var date2 = convertDate_00_00_00(endDateFld);
+                //     var date1 = convertDate_00_00_00(startDateFld);
+                //     var date2 = convertDate_00_00_00(endDateFld);
 
-                    // To calculate the time difference of two dates
-                    var numOfNights = date2.getTime() - date1.getTime();
+                //     // To calculate the time difference of two dates
+                //     var numOfNights = date2.getTime() - date1.getTime();
 
-                    // To calculate the no. of days between two dates
-                    var numOfNights = numOfNights / (1000 * 3600 * 24);
+                //     // To calculate the no. of days between two dates
+                //     var numOfNights = numOfNights / (1000 * 3600 * 24);
 
-                    // set   numOfNights
-                    //  $("#numOfNights").val(numOfNights);
+                //     // set   numOfNights
+                //     //  $("#numOfNights").val(numOfNights);
 
-                    w2ui['myForm'].setValue('numOfNights', numOfNights.toFixed(0));
+                //     w2ui['myForm'].setValue('numOfNights', numOfNights.toFixed(0));
 
-                    w2ui['myForm'].refresh();
+                //     w2ui['myForm'].refresh();
 
-                    //  w2ui['form'].set('field_1', { type: 'int' });
-                    if (numOfNights <= 0) {
-                        // w2alert("<b>Error: </b> <br><br> Nights must be more than zero please enter correct dates.");
+                //     //  w2ui['form'].set('field_1', { type: 'int' });
+                //     if (numOfNights <= 0) {
+                //         // w2alert("<b>Error: </b> <br><br> Nights must be more than zero please enter correct dates.");
 
-                        w2popup.open({
-                            title: 'Message',
-                            with: 300,
-                            height: 150,
-                            body: 'Check your booking dates.',
-                            actions: { Ok: w2popup.close }
-                        });
+                //         w2popup.open({
+                //             title: 'Message',
+                //             with: 300,
+                //             height: 150,
+                //             body: 'Check your booking dates.',
+                //             actions: { Ok: w2popup.close }
+                //         });
 
-                    }
+                //     }
 
-                    // else {
-                    //     w2alert("Numuber Of Nights is calculated as " + numOfNights + " nigths. <br><br> Start: " + startDateFld + "<br> End: " + endDateFld );
-                    // }
-                }
+                //     // else {
+                //     //     w2alert("Numuber Of Nights is calculated as " + numOfNights + " nigths. <br><br> Start: " + startDateFld + "<br> End: " + endDateFld );
+                //     // }
+                // }
 
-                if (event != null && (event.target == 'received' || event.target == 'charge' || event.target == 'commission')) {
+                // if (event != null && (event.target == 'received' || event.target == 'charge' || event.target == 'commission')) {
 
-                    var chargeVal = financial(w2ui['myForm'].getValue('charge'));
-                    var receivedVal = financial(w2ui['myForm'].getValue('received'));
-                    var commissionVal = financial(w2ui['myForm'].getValue('commission'));
-                    w2ui['myForm'].refresh();
+                //     var chargeVal = financial(w2ui['myForm'].getValue('charge'));
+                //     var receivedVal = financial(w2ui['myForm'].getValue('received'));
+                //     var commissionVal = financial(w2ui['myForm'].getValue('commission'));
+                //     w2ui['myForm'].refresh();
 
-                    var newBalance = chargeVal - receivedVal;
-                    var newBalance = newBalance - commissionVal;
+                //     var newBalance = chargeVal - receivedVal;
+                //     var newBalance = newBalance - commissionVal;
 
-                    w2ui['myForm'].setValue('charge', chargeVal);
-                    w2ui['myForm'].setValue('received', receivedVal);
-                    w2ui['myForm'].setValue('commission', commissionVal);
-                    w2ui['myForm'].setValue('balance', financial(newBalance));
+                //     w2ui['myForm'].setValue('charge', chargeVal);
+                //     w2ui['myForm'].setValue('received', receivedVal);
+                //     w2ui['myForm'].setValue('commission', commissionVal);
+                //     w2ui['myForm'].setValue('balance', financial(newBalance));
 
-                    w2ui['myForm'].refresh();
+                //     w2ui['myForm'].refresh();
 
-                }
+                // }
 
 
                 w2ui['myForm'].refresh();
@@ -1077,51 +1110,60 @@ $(function () {
             // //  Timeline
             timeline.on('click', function (properties) {
 
-                // alert(  JSON.stringify( properties , null, 4)) ;
+//                 alert(  JSON.stringify( properties , null, 4)) ;
 
                 if (properties != null && properties.item != null) {
 
                     var booking = items.get(properties.item);
 
-                    // w2popup.open({
-                    //     title: 'Selected Item ',
-                    //     with: 600,
-                    //     height: 550,
-                    //     body: JSON.stringify(booking.recordData),
-                    //     actions: { Ok: w2popup.close }
-                    // })
 
+                    var pBody = '' ;
+                    pBody =  pBody +  '<br><br> &nbsp;&nbsp;&nbsp;&nbsp; ' +    booking.recordData.startDate;
+                    pBody =  pBody +  ' &nbsp;&nbsp;&nbsp;&nbsp; -  &nbsp;&nbsp;&nbsp;&nbsp;  ' +    booking.recordData.endDate;
+
+                    pBody =  pBody + '<br><br> &nbsp;&nbsp;&nbsp;&nbsp; '+  booking.recordData.name;
+
+                    if (  booking.recordData.extraInfo  != null ){
+                        pBody = pBody + '<br> <br> &nbsp;&nbsp;&nbsp;&nbsp; ' +  booking.recordData.extraInfo
+                    }
+
+                    w2popup.open({
+                         title: ' Selected ',
+                         with: 300,
+                         height: 350,
+                         body:  pBody,
+                         actions: { Ok: w2popup.close }
+                    });
 
 
                     w2ui['myForm'].setValue('name', booking.recordData.name);
-                    w2ui['myForm'].setValue('country', booking.recordData.country);
+                    // w2ui['myForm'].setValue('country', booking.recordData.country);
 
                     w2ui['myForm'].setValue('startDate', booking.recordData.startDate);
                     w2ui['myForm'].setValue('endDate', booking.recordData.endDate);
-                    w2ui['myForm'].setValue('numOfNights', booking.recordData.numOfNights);
+                    // w2ui['myForm'].setValue('numOfNights', booking.recordData.numOfNights);
 
-                    w2ui['myForm'].setValue('balance', financial(booking.recordData.balance));
-                    w2ui['myForm'].setValue('charge', financial(booking.recordData.charge));
-                    w2ui['myForm'].setValue('received', financial(booking.recordData.received));
-                    w2ui['myForm'].setValue('commission', financial(booking.recordData.commission));
+                    // w2ui['myForm'].setValue('balance', financial(booking.recordData.balance));
+                    // w2ui['myForm'].setValue('charge', financial(booking.recordData.charge));
+                    // w2ui['myForm'].setValue('received', financial(booking.recordData.received));
+                    // w2ui['myForm'].setValue('commission', financial(booking.recordData.commission));
 
-                    w2ui['myForm'].setValue('numOfGuests', booking.recordData.numOfGuests);
+                    // w2ui['myForm'].setValue('numOfGuests', booking.recordData.numOfGuests);
 
                     w2ui['myForm'].setValue('agency', booking.recordData.agency);
                     w2ui['myForm'].setValue('room', booking.recordData.room);
 
-                    w2ui['myForm'].setValue('voucher', booking.recordData.voucher);
-                    w2ui['myForm'].setValue('email', booking.recordData.email);
-                    w2ui['myForm'].setValue('tel', booking.recordData.tel);
-                    w2ui['myForm'].setValue('identification', booking.recordData.identification);
+                    // w2ui['myForm'].setValue('voucher', booking.recordData.voucher);
+                    // w2ui['myForm'].setValue('email', booking.recordData.email);
+                    // w2ui['myForm'].setValue('tel', booking.recordData.tel);
+                    // w2ui['myForm'].setValue('identification', booking.recordData.identification);
 
-                    w2ui['myForm'].setValue('invoiceNumber', booking.recordData.invoiceNumber);
-                    w2ui['myForm'].setValue('taxRefNumber', booking.recordData.taxRefNumber);
+                    // w2ui['myForm'].setValue('invoiceNumber', booking.recordData.invoiceNumber);
+                    // w2ui['myForm'].setValue('taxRefNumber', booking.recordData.taxRefNumber);
 
-                    w2ui['myForm'].setValue('afm', booking.recordData.afm);
+                    // w2ui['myForm'].setValue('afm', booking.recordData.afm);
+
                     w2ui['myForm'].setValue('extraInfo', booking.recordData.extraInfo);
-
-                    w2ui['myForm'].setValue('status', booking.recordData.status);
 
 
                     w2ui['myForm'].refresh();
