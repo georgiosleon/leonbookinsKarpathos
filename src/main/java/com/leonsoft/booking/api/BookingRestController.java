@@ -59,15 +59,14 @@ public class BookingRestController {
     @PostMapping(value = "/booking/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     Boolean deleteObject(@RequestBody Booking booking) {
         log.debug(" Delete    {}", booking.getId());
-        bookingService.deleteObject(booking);
-        return Boolean.TRUE;
+        return  bookingService.deleteObject(booking);
     }
 
-    @GetMapping(value = "/booking/del")
-    void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {
-        log.debug(" Delete  a cancelled   {}", bookingId);
-        bookingService.delCancelledBooking(bookingId);
-    }
+//    @GetMapping(value = "/booking/del")
+//    void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {
+//        log.debug(" Delete  a cancelled   {}", bookingId);
+//        bookingService.delCancelledBooking(bookingId);
+//    }
 
     @GetMapping(value = "/booking/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     List<Booking> getAll() {

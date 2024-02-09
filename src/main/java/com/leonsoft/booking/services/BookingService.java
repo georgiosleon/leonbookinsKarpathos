@@ -103,10 +103,10 @@ public class BookingService {
         return true;
     }
 
-    public void delCancelledBooking(String bookingId) {
-        log.debug(" Delete  a cancelled   {}", bookingId);
-        bookingRepository.deleteById(bookingId);
-    }
+//    public void delCancelledBooking(String bookingId) {
+//        log.debug(" Delete  a cancelled   {}", bookingId);
+//        bookingRepository.deleteById(bookingId);
+//    }
 
     public List<Booking> getAll() {
         List<Booking> all = bookingRepository.findAllByOrderByStartDateAsc();

@@ -69,14 +69,14 @@ public class BookingHtmlTemplate {
             LocalDate stDt = LocalDate.parse(booking.getStartDate(), DateTimeService.formatterISO);
             LocalDate edDt = LocalDate.parse(booking.getEndDate(), DateTimeService.formatterISO);
 
-            String statusCancelled = "<td     style=\"    background-color: rgb(247, 201, 201);   color: rgb(27, 6, 46);  \">" +
-                  " <a id='delAct' href='#' onclick='delAction(\""+ booking.getId()+"\");return false;'> " + booking.getStatus() + "</a>"
-                  + "</td>";
+//            String statusCancelled = "<td     style=\"    background-color: rgb(247, 201, 201);   color: rgb(27, 6, 46);  \">" +
+//                  " <a id='delAct' href='#' onclick='delAction(\""+ booking.getId()+"\");return false;'> " + booking.getStatus() + "</a>"
+//                  + "</td>";
 
             String status = "<td>" + booking.getStatus() + "</td>";
-            if (Objects.equals(booking.getStatus(), "cancelled")) {
-                status = statusCancelled;
-            }
+//            if (Objects.equals(booking.getStatus(), "cancelled")) {
+//                status = statusCancelled;
+//            }
 
             /////Calc totals
             totals.setTotBalance(totals.getTotBalance() + booking.getBalance()  );

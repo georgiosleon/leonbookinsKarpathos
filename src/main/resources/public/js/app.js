@@ -14,24 +14,32 @@ window.onload = function() {
     }
 }// window.onload
 
-function  delActionAjaxCall(id){
- // console.log('Yes')
-
-            // String delUrl = "/booking/del?bid=" + booking.getId();
-            $.ajax({
-                type: 'GET',
-                url: '/booking/del',
-                data: {
-                    bid: id
-                },
-                contentType: 'application/json',
-                success: function (data, status, xhr) {
-                    w2alert('Deleted a cancelled booking - all good re-run the report to confirm');
-                }
-            });  // ajax
-
-}
-
+//function  delActionAjaxCall(id){
+// // console.log('Yes')
+//
+//            // String delUrl = "/booking/del?bid=" + booking.getId();
+//            $.ajax({
+//                type: 'GET',
+//                url: '/booking/del',
+//                data: {
+//                    bid: id
+//                },
+//                contentType: 'application/json',
+//                success: function (data, status, xhr) {
+//                    w2alert('Deleted a cancelled booking - all good re-run the report to confirm');
+//                }
+//            });  // ajax
+//
+//}
+//function delAction(id) {
+//    w2confirm('Are you sure?')
+//        .yes(() => {
+//            delActionAjaxCall(id)
+//        })
+//        .no(() => {
+//            w2alert('Nothing changed or deleted ');
+//        })
+//}
 
 // functions
 function updateClock (){
@@ -59,15 +67,7 @@ function updateClock (){
 
    	$("#clock").html(currentTimeString);
  }
-function delAction(id) {
-    w2confirm('Are you sure?')
-        .yes(() => {
-            delActionAjaxCall(id)
-        })
-        .no(() => {
-            w2alert('Nothing changed or deleted ');
-        })
-}
+
 function financial(x) {
     if (x) {
         return Number.parseFloat(x).toFixed(2);
@@ -106,7 +106,104 @@ function initForm() {
     w2ui['myForm'].setValue('commission', null);
     w2ui['myForm'].refresh();
 
-}
+
+
+
+      $.ajax({
+                    type: 'GET',
+                    url: '/booking/getAll',
+                    contentType: 'application/json',
+                    success: function (data, status, xhr) {
+
+                        // w2popup.open({
+                        //     title: 'GET DATA  ' + status,
+                        //     with: 600,
+                        //     height: 550,
+                        //     body: JSON.stringify(data),
+                        //     actions: { Ok: w2popup.close }
+                        // });
+
+
+
+                        // d.setHours(15, 35, 1);
+
+                        data.forEach((element, index, array) => {
+
+                            console.log(element);
+
+
+                            if (element.status == 'active'  ) {
+
+                                items.add({
+                                    id: element.id,
+                                    type: 'range',
+                                    group: element.room,
+                                    // start: element.startDate,
+                                    // end: element.endDate,
+
+                                    start: convertDate(element.startDate).setHours(12, 0, 0),
+                                    end: convertDate(element.endDate).setHours(12, 0, 0),
+
+                                    // title: element.title,
+
+                                    content: '🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
+                                    className: element.agency,
+                                    recordData: element,
+                                });
+
+                            }
+                            else if ( element.status == 'paid') {
+
+                                items.add({
+                                    id: element.id,
+                                    type: 'range',
+                                    group: element.room,
+                                    // start: element.startDate,
+                                    // end: element.endDate,
+
+                                    start: convertDate(element.startDate).setHours(12, 0, 0),
+                                    end: convertDate(element.endDate).setHours(12, 0, 0),
+
+                                    // title: element.title,
+
+                                    content: '💲 🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
+                                    className: element.agency,
+                                    recordData: element,
+                                });
+
+                            }
+                            else if (element.status == 'cancelled' ) {
+                                 cancelledItems.add({
+                                    id: element.id,
+                                    type: 'range',
+                                    group: element.room,
+                                    // start: element.startDate,
+                                    // end: element.endDate,
+
+                                    start: convertDate(element.startDate).setHours(12, 0, 0),
+                                    end: convertDate(element.endDate).setHours(12, 0, 0),
+
+                                    // title: element.title,
+
+                                    content: '🚫 🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
+//                                                            className: element.agency,
+                                    recordData: element,
+                                });
+
+                             }
+
+
+                            // console.log(element.x); // 100, 200, 300
+                            // console.log(index); // 0, 1, 2
+                            // console.log(array); // same myArray object 3 times
+                        });
+
+
+                    } // success
+                }); // ajax
+
+}// initForm
+
 function formattedDate(d = new Date) {
     let month = String(d.getMonth() + 1);
     let day = String(d.getDate());
@@ -118,12 +215,10 @@ function formattedDate(d = new Date) {
     return `${day}/${month}/${year}`;
 }
 
-// vars
 var nowISOString = new Date().toISOString().substring(0, 10);
 var moveToDate = new Date();// set to current date
-// initialise vis timeline componenet
 var groups = new vis.DataSet();
-// var items = new vis.DataSet();
+
 var items = new vis.DataSet({type: { start: "ISODate", end: "ISODate" }});
 var timelineoOtions = {
 
@@ -186,8 +281,6 @@ var timelineoOtions = {
 
         var pojo = JSON.stringify(items.get(item.id).recordData);
 
-
-
         w2confirm('Are you sure?')
             .yes(() => {
 
@@ -211,6 +304,96 @@ var timelineoOtions = {
     }
 
 };
+
+
+var cancelledItems = new vis.DataSet({type: { start: "ISODate", end: "ISODate" }});
+var cancelledTimelineoOtions = {
+
+
+    maxHeight: 2000,
+    horizontalScroll: true,
+    verticalScroll: true,
+    zoomKey: "ctrlKey",
+
+    start: Date.now() - 1000 * 60 * 60 * 24 * 2, // minus 3 days
+    end: Date.now() + 1000 * 60 * 60 * 24 * 17, // plus 1 months aprox.
+
+    // zoomMin: 1000 * 60 * 60 * 24 * 16,             // 16  day in milliseconds
+    // zoomMax: 1000 * 60 * 60 * 24 * 29 * 1,         // about 1  months in milliseconds
+
+    showCurrentTime: true,
+
+    clickToUse: false,
+
+    tooltip: {
+        followMouse: true,
+    },
+
+    stack: true,
+    // editable: true,
+    editable: {
+        add: false,
+        remove: true
+    },
+
+
+    // moment: function(date) {
+    //     return  vis.moment(date).utc().utcOffset('+02:00');  // greek utc time
+    // },
+
+    orientation: {
+        axis: "both",
+        item: "top"
+    },
+
+    showMinorLabels: true,
+    timeAxis: { scale: 'day', step: 1 },
+    format: {
+        minorLabels: {
+            millisecond: '',
+            second: '',
+            minute: '',
+            hour: '',
+            weekday: '',
+            day: 'DD ddd',
+            month: '',
+            year: ''
+        }
+    },
+
+
+    onRemove: function (item, callback) {
+
+        var pojo = JSON.stringify(cancelledItems.get(item.id).recordData);
+
+
+        // todo  fix  message
+        w2confirm('Are you sure?  ')
+            .yes(() => {
+
+                $.ajax({
+                    type: 'POST',
+                    url: '/booking/delete',
+                    contentType: 'application/json',
+                    data: pojo,
+                    success: function (data, status, xhr) {
+                        // alert('status: ' + status + ', data: ' + data);
+                        callback(item); // do remove
+                    }
+                });
+
+            })
+            .no(() => {
+                w2alert('Nothing changed or deleted ');
+            })
+
+
+    }
+
+};
+
+
+
 // add some rooms
 var roomList = [
     {
@@ -265,12 +448,26 @@ var agencyList = [
 ];
 var statusList = [
     { id: 'active', text: 'Active' },
-    { id: 'cancelled', text: 'Cancelled' },
-    { id: 'paid', text: 'Paid' }
+    { id: 'cancelled', text: 'Cancelled 🚫' },
+    { id: 'paid', text: 'Paid 💲' }
 ];
 var countryList = ["Afghanistan", "Albania", "Algeria", "American Samoa", "Andorra", "Angola", "Anguilla", "Antarctica", "Antigua and Barbuda", "Argentina", "Armenia", "Aruba", "Australia", "Austria", "Azerbaijan", "Bahamas", "Bahrain", "Bangladesh", "Barbados", "Belarus", "Belgium", "Belize", "Benin", "Bermuda", "Bhutan", "Bolivia", "Bonaire, Sint Eustatius and Saba", "Bosnia and Herzegovina", "Botswana", "Bouvet Island", "Brazil", "British Indian Ocean Territory", "Brunei Darussalam", "Bulgaria", "Burkina Faso", "Burundi", "Cabo Verde", "Cambodia", "Cameroon", "Canada", "Cayman Islands", "Central African Republic ", "Chad", "Chile", "China", "Christmas Island", "Cocos Islands", "Colombia", "Comoros", "Congo", "Cook Islands", "Costa Rica", "Croatia", "Cuba", "Curaçao", "Cyprus", "Czechia", "Côte d'Ivoire", "Denmark", "Djibouti", "Dominica", "Dominican Republic ", "Ecuador", "Egypt", "El Salvador", "Equatorial Guinea", "Eritrea", "Estonia", "Eswatini", "Ethiopia", "Falkland Islands/Malvinas", "Faroe Islands", "Fiji", "Finland", "France", "French Guiana", "French Polynesia", "French Southern Territories", "Gabon", "Gambia", "Georgia", "Germany", "Ghana", "Gibraltar", "Greece", "Greenland", "Grenada", "Guadeloupe", "Guam", "Guatemala", "Guernsey", "Guinea", "Guinea-Bissau", "Guyana", "Haiti", "Heard Island and McDonald Islands", "Holy See", "Honduras", "Hong Kong", "Hungary", "Iceland", "India", "Indonesia", "Iran", "Iraq", "Ireland", "Isle of Man", "Israel", "Italy", "Jamaica", "Japan", "Jersey", "Jordan", "Kazakhstan", "Kenya", "Kiribati", "Korea Notrh", "Korea South", "Kuwait", "Kyrgyzstan", "Lao People's Democratic Republic", "Latvia", "Lebanon", "Lesotho", "Liberia", "Libya", "Liechtenstein", "Lithuania", "Luxembourg", "Macao", "Madagascar", "Malawi", "Malaysia", "Maldives", "Mali", "Malta", "Marshall Islands", "Martinique", "Mauritania", "Mauritius", "Mayotte", "Mexico", "Micronesia", "Moldova", "Monaco", "Mongolia", "Montenegro", "Montserrat", "Morocco", "Mozambique", "Myanmar", "Namibia", "Nauru", "Nepal", "Netherlands", "New Caledonia", "New Zealand", "Nicaragua", "Niger", "Nigeria", "Niue", "Norfolk Island", "Northern Mariana Islands", "Norway", "Oman", "Pakistan", "Palau", "Palestine, State of", "Panama", "Papua New Guinea", "Paraguay", "Peru", "Philippines", "Pitcairn", "Poland", "Portugal", "Puerto Rico", "Qatar", "Republic of North Macedonia", "Romania", "Russian Federation", "Rwanda", "Réunion", "Saint Barthélemy", "Saint Helena, Ascension and Tristan da Cunha", "Saint Kitts and Nevis", "Saint Lucia", "Saint Martin (French part)", "Saint Pierre and Miquelon", "Saint Vincent and the Grenadines", "Samoa", "San Marino", "Sao Tome and Principe", "Saudi Arabia", "Senegal", "Serbia", "Seychelles", "Sierra Leone", "Singapore", "Sint Maarten (Dutch part)", "Slovakia", "Slovenia", "Solomon Islands", "Somalia", "South Africa", "South Georgia", "South Sudan", "Spain", "Sri Lanka", "Sudan", "Suriname", "Svalbard and Jan Mayen", "Sweden", "Switzerland", "Syrian Arab Republic", "Taiwan", "Tajikistan", "Tanzania, United Republic of", "Thailand", "Timor-Leste", "Togo", "Tokelau", "Tonga", "Trinidad and Tobago", "Tunisia", "Turkey", "Turkmenistan", "Turks and Caicos Islands", "Tuvalu", "Uganda", "Ukraine", "United Arab Emirates", "United Kingdom", "United States of America", "Uruguay", "Uzbekistan", "Vanuatu", "Venezuela", "Viet Nam", "Virgin Islands (British)", "Virgin Islands (U.S.)", "Wallis and Futuna", "Western Sahara", "Yemen", "Zambia", "Zimbabwe"];
 
 
+
+
+var timeline;
+var cancelledTimeline;
+
+function onrangechange() {
+    var range = timeline.getWindow();
+    cancelledTimeline.setWindow(range.start, range.end,  {animation: false} );
+}
+
+function onrangechangecancelled() {
+    var range = cancelledTimeline.getWindow();
+    timeline.setWindow(range.start, range.end,  {animation: false} );
+}
 
 // docOnReady
 $(function () {
@@ -288,14 +485,22 @@ $(function () {
             // CLOCK
             setInterval('updateClock()', 1000);
 
+
+
             var container = document.getElementById('visualization');
             timeline = new vis.Timeline(container, null, timelineoOtions);
             timeline.setGroups(groups);
             timeline.setItems(items);
             timeline.setCurrentTime(Date.now());
 
-            for (let i = 0; i < roomList.length; i++) {
 
+            var cancelledContainer = document.getElementById('cancelled_visualization');
+            cancelledTimeline = new vis.Timeline(cancelledContainer, null, cancelledTimelineoOtions );
+            cancelledTimeline.setGroups(groups);
+            cancelledTimeline.setItems(cancelledItems);
+            cancelledTimeline.setCurrentTime(Date.now());
+
+            for (let i = 0; i < roomList.length; i++) {
                 var idVal = roomList[i].id;
                 var descVal = roomList[i].text;
                 groups.add({
@@ -305,7 +510,18 @@ $(function () {
                 });
             }
 
-
+            $("#active").click(function () {
+                     $("#visualization").show();
+                     $("#cancelled_visualization").hide();
+            });
+            $("#cancelled").click(function () {
+                $("#visualization").hide();
+                $("#cancelled_visualization").show();
+            });
+            $("#all").click(function () {
+                $("#visualization").show();
+                $("#cancelled_visualization").show();
+            });
 
 
             $("#hide").click(function () {
@@ -322,6 +538,7 @@ $(function () {
                 $('[name="reset"]').show();
                 w2ui.myForm.show('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email', 'extraInfo')
             });
+
             $('#myForm').w2form({
                 name: 'myForm',
 
@@ -362,7 +579,7 @@ $(function () {
                         required: true,
                         html: {
                             label: 'Name',
-                            text: '%anchorNumOfGuests%  &nbsp; &nbsp; %anchorAgency%   &nbsp; &nbsp;  %anchorRoom%  &nbsp; &nbsp;   %anchorCountry%  ',
+                            text: '%anchorNumOfGuests%  &nbsp; &nbsp; %anchorAgency%   &nbsp; &nbsp;  %anchorRoom%  &nbsp; ',
                             attr: 'style="  text-transform: uppercase; width: 300px; font-weight: bold; text-align:center; "'
                         }
                     },
@@ -398,17 +615,7 @@ $(function () {
                         },
                         options: { items: roomList }
                     },
-                    {
-                        field: 'country', type: 'list',
-                        html: {
-                            label: 'Country &nbsp;  &nbsp; ',
-                            anchor: '%anchorCountry%',
-                            attr: ' style="width: 180px;  text-align:center; "'
-                        },
-                        options: {
-                            items: countryList
-                        }
-                    },
+
 
 
 
@@ -610,20 +817,28 @@ $(function () {
                         }
                     },
 
+                    // line
+                    {
+                        field: 'country', type: 'list',
+                        html: {
+                            label: 'Country &nbsp;  &nbsp; ',
 
+                            attr: ' style="width: 180px;  text-align:center; "'
+                        },
+                        options: {
+                            items: countryList
+                        }
+                    },
 
                     // line
                     {
                         field: 'extraInfo', type: 'textarea',
+
                         html: {
-                            label: 'Notes',
+                            label: 'Notes    &nbsp;  &nbsp; ',
                             attr: 'style="width: 600px; height: 60px; resize: none" '
                         }
-                    },
-
-
-
-
+                    }
 
 
                 ],
@@ -709,7 +924,7 @@ $(function () {
                             // moveToDate = gotoDate;
 
                             timeline.moveTo(gotoDate, { animation: true });
-
+                            cancelledTimeline.moveTo(gotoDate, { animation: true });
                         }
                     },
 
@@ -720,6 +935,7 @@ $(function () {
                         onClick(event) {
                             moveToDate = new Date();
                             timeline.moveTo(moveToDate, { animation: true });
+                            cancelledTimeline.moveTo(moveToDate, { animation: true });
                         }
                     },
 
@@ -767,7 +983,7 @@ $(function () {
                                         title: 'Message',
                                         with: 300,
                                         height: 150,
-                                        body: 'Room is NOT available',
+                                        body: ' 🚨  Warning '   + w2ui.myForm.getValue('room').id  +  ' is  -  NOT AVAILABLE  -  ⛔ ',
                                         actions: { Ok: w2popup.close }
                                     });
 
@@ -814,7 +1030,7 @@ $(function () {
                                         success: function (element, status, xhr) {
 
 
-                                            if (w2ui.myForm.getValue('status').id == 'active' || w2ui.myForm.getValue('status').id == 'paid') {
+                                            if (w2ui.myForm.getValue('status').id == 'active' ) {
                                                 // only add to timeline if status is active
 
                                                 items.add({
@@ -833,10 +1049,50 @@ $(function () {
                                                     className: element.agency,
                                                     recordData: element,
                                                 });
+                                                 w2alert('Saved a Active booking');
+                                            }
+                                            else if ( w2ui.myForm.getValue('status').id == 'paid') {
+                                                                                            // only add to timeline if status is active
+                                                items.add({
+                                                    id: element.id,
+                                                    type: 'range',
+                                                    group: element.room,
+                                                    // start: element.startDate,
+                                                    // end: element.endDate,
 
-                                            } else {
+                                                    start: convertDate(element.startDate).setHours(12, 0, 0),
+                                                    end: convertDate(element.endDate).setHours(12, 0, 0),
+
+                                                    // title: element.title,
+                                                    content: '💲 🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
+
+                                                    className: element.agency,
+                                                    recordData: element,
+                                                });
+                                                 w2alert('Saved a 💲 Paid  booking');
+                                            }
+                                            else {
                                                 // if status is Cancelled        show popup for info
-                                                w2alert('Saved a Cancelled booking - all good check the report to confirm');
+
+                                                   cancelledItems.add({
+                                                        id: element.id,
+                                                        type: 'range',
+                                                        group: element.room,
+                                                        // start: element.startDate,
+                                                        // end: element.endDate,
+
+                                                        start: convertDate(element.startDate).setHours(12, 0, 0),
+                                                        end: convertDate(element.endDate).setHours(12, 0, 0),
+
+                                                        // title: element.title,
+                                                        content: '🚫 🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
+
+//                                                        className: element.agency,
+                                                        recordData: element,
+                                                    });
+
+                                                 w2alert('Saved a 🚫 Cancelled booking');
+
                                             }
 
 
@@ -857,15 +1113,19 @@ $(function () {
                                 }// else
 
 
-                            } else {
-                                w2alert("Fix problems then do save");
                             }
+                            else {
+                                w2alert("Fix problems then do save");
+                                setTimeout(function () { w2ui['myForm'].clear();
+                                    timeline.setSelection([]); // unselect timeline item
+                                    cancelledTimeline.setSelection([]); // unselect timeline item
+                                    initForm();
+                                 }, 3000);
 
-
+                            }
 
                         }
                     },
-
 
                     reset: {
                         text: 'reset',
@@ -875,6 +1135,8 @@ $(function () {
 
                             this.clear();
                             timeline.setSelection([]); // unselect timeline item
+                            cancelledTimeline.setSelection([]); // unselect timeline item
+
                             initForm();
 
                         }
@@ -889,6 +1151,8 @@ $(function () {
                             // w2alert('Custom Action')
                             moveToDate = new Date(moveToDate.getTime() - (90 * 24 * 60 * 60 * 1000));     /// plus 90 days
                             timeline.moveTo(moveToDate, { animation: true });
+                            cancelledTimeline.moveTo(moveToDate, { animation: true });
+
                         }
                     },
 
@@ -900,6 +1164,7 @@ $(function () {
                             // w2alert('Custom Action')
                             moveToDate = new Date(moveToDate.getTime() - (30 * 24 * 60 * 60 * 1000));     /// plus 300 days
                             timeline.moveTo(moveToDate, { animation: true });
+                            cancelledTimeline.moveTo(moveToDate, { animation: true });
                         }
                     },
 
@@ -913,6 +1178,7 @@ $(function () {
                             // w2alert('Custom Action')
                             moveToDate = new Date(moveToDate.getTime() + (30 * 24 * 60 * 60 * 1000));     /// plus 20 days
                             timeline.moveTo(moveToDate, { animation: true });
+                            cancelledTimeline.moveTo(moveToDate, { animation: true });
                         }
                     },
 
@@ -925,6 +1191,7 @@ $(function () {
                             // w2alert('Custom Action')
                             moveToDate = new Date(moveToDate.getTime() + (90 * 24 * 60 * 60 * 1000));     /// plus 20 days
                             timeline.moveTo(moveToDate, { animation: true });
+                            cancelledTimeline.moveTo(moveToDate, { animation: true });
                         }
                     },
 
@@ -933,66 +1200,17 @@ $(function () {
 
                 }
             });
+
+
             initForm();
 
-            $.ajax({
-                type: 'GET',
-                url: '/booking/getAll',
-                contentType: 'application/json',
-                success: function (data, status, xhr) {
 
-                    // w2popup.open({
-                    //     title: 'GET DATA  ' + status,
-                    //     with: 600,
-                    //     height: 550,
-                    //     body: JSON.stringify(data),
-                    //     actions: { Ok: w2popup.close }
-                    // });
-
-
-
-                    // d.setHours(15, 35, 1);
-
-                    data.forEach((element, index, array) => {
-
-                        console.log(element);
-
-
-                        if (element.status == 'active' || element.status == 'paid') {
-
-                            items.add({
-                                id: element.id,
-                                type: 'range',
-                                group: element.room,
-                                // start: element.startDate,
-                                // end: element.endDate,
-
-                                start: convertDate(element.startDate).setHours(12, 0, 0),
-                                end: convertDate(element.endDate).setHours(12, 0, 0),
-
-                                // title: element.title,
-
-                                content: '🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
-                                className: element.agency,
-                                recordData: element,
-                            });
-
-                        }
-                        // console.log(element.x); // 100, 200, 300
-                        // console.log(index); // 0, 1, 2
-                        // console.log(array); // same myArray object 3 times
-                    });
-
-
-
-
-                }
-            });
-             w2ui.myForm.on('*', function (event) {
+            w2ui.myForm.on('*', function (event) {
                  console.log('Event: ' + event.type, 'Target: ' + event.target, event);
-             });
-            w2ui.myForm.on('change', function (event) {
+            });
 
+
+            w2ui.myForm.on('change', function (event) {
 
                 //  Event: change Target: agency
                 if (event != null && event.target == 'agency') {
@@ -1074,6 +1292,8 @@ $(function () {
 
 
             });
+
+
             // //  Timeline
             timeline.on('click', function (properties) {
 
@@ -1132,6 +1352,18 @@ $(function () {
                 }
 
             });
+
+            timeline.on('rangechange', function (properties) {
+              onrangechange();
+            });
+            timeline.on('rangechanged', function (properties) {
+              onrangechange();
+
+            });
+            timeline.on('select', function (properties) {
+              onrangechange();
+            });
+
             // timeline.on('doubleClick', function (properties) {
             //     console.log("Double click event fired");
             //     w2alert('Not me!! The other button');
@@ -1140,6 +1372,76 @@ $(function () {
 
 
 
+
+            //   cancelledTimeline Click
+            cancelledTimeline.on('click', function (properties) {
+
+                // alert(  JSON.stringify( properties , null, 4)) ;
+
+                if (properties != null && properties.item != null) {
+
+                    var booking = cancelledItems.get(properties.item);
+
+                    // w2popup.open({
+                    //     title: 'Selected Item ',
+                    //     with: 600,
+                    //     height: 550,
+                    //     body: JSON.stringify(booking.recordData),
+                    //     actions: { Ok: w2popup.close }
+                    // })
+
+
+
+                    w2ui['myForm'].setValue('name', booking.recordData.name);
+                    w2ui['myForm'].setValue('country', booking.recordData.country);
+
+                    w2ui['myForm'].setValue('startDate', booking.recordData.startDate);
+                    w2ui['myForm'].setValue('endDate', booking.recordData.endDate);
+                    w2ui['myForm'].setValue('numOfNights', booking.recordData.numOfNights);
+
+                    w2ui['myForm'].setValue('balance', financial(booking.recordData.balance));
+                    w2ui['myForm'].setValue('charge', financial(booking.recordData.charge));
+                    w2ui['myForm'].setValue('received', financial(booking.recordData.received));
+                    w2ui['myForm'].setValue('commission', financial(booking.recordData.commission));
+
+                    w2ui['myForm'].setValue('numOfGuests', booking.recordData.numOfGuests);
+
+                    w2ui['myForm'].setValue('agency', booking.recordData.agency);
+                    w2ui['myForm'].setValue('room', booking.recordData.room);
+
+                    w2ui['myForm'].setValue('voucher', booking.recordData.voucher);
+                    w2ui['myForm'].setValue('email', booking.recordData.email);
+                    w2ui['myForm'].setValue('tel', booking.recordData.tel);
+                    w2ui['myForm'].setValue('identification', booking.recordData.identification);
+
+                    w2ui['myForm'].setValue('invoiceNumber', booking.recordData.invoiceNumber);
+                    w2ui['myForm'].setValue('taxRefNumber', booking.recordData.taxRefNumber);
+
+                    w2ui['myForm'].setValue('afm', booking.recordData.afm);
+                    w2ui['myForm'].setValue('extraInfo', booking.recordData.extraInfo);
+
+                    w2ui['myForm'].setValue('status', booking.recordData.status);
+
+
+                    w2ui['myForm'].refresh();
+
+
+                    // todo  load the form with the selected item from the timeline
+
+                }
+
+            });
+
+            cancelledTimeline.on('rangechange', function (properties) {
+              onrangechangecancelled();
+            });
+            cancelledTimeline.on('rangechanged', function (properties) {
+              onrangechangecancelled();
+
+            });
+            cancelledTimeline.on('select', function (properties) {
+              onrangechangecancelled();
+            });
 
 
 
