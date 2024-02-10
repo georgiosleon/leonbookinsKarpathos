@@ -97,7 +97,7 @@ function initForm() {
     w2ui['myForm'].setValue('numOfNights', 0);
 
 
-    w2ui['myForm'].setValue('status', { id: 'active', text: 'Active' });
+    w2ui['myForm'].setValue('status', { id: 'active', text: 'Active ⁉️' });
 
 
     w2ui['myForm'].setValue('balance', null);
@@ -146,7 +146,7 @@ function initForm() {
 
                                     // title: element.title,
 
-                                    content: '🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
+                                    content: ' ⁉️ 🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
                                     className: element.agency,
                                     recordData: element,
                                 });
@@ -279,9 +279,12 @@ var timelineoOtions = {
 
     onRemove: function (item, callback) {
 
-        var pojo = JSON.stringify(items.get(item.id).recordData);
+//     TODO FIXME    var pojo = JSON.stringify(items.get(item.id).recordData);
+        var pojo = JSON.stringify(item)
 
-        w2confirm('Are you sure?')
+
+         w2confirm('Are you sure 🚨DELETE🚨    the booking for  <br>   Name '+  items.get(item.id).recordData.name  +   ' <br> Room#   ' + item.recordData.room  +  '  ?'  )
+//       w2confirm('Are you sure 🚨  delete '+  items.get(item.id).recordData.name  +'  ?'  )
             .yes(() => {
 
                 $.ajax({
@@ -364,31 +367,31 @@ var cancelledTimelineoOtions = {
 
     onRemove: function (item, callback) {
 
-        var pojo = JSON.stringify(cancelledItems.get(item.id).recordData);
 
 
-        // todo  fix  message
-        w2confirm('Are you sure?  ')
-            .yes(() => {
+          var pojo = JSON.stringify(item)
 
-                $.ajax({
-                    type: 'POST',
-                    url: '/booking/delete',
-                    contentType: 'application/json',
-                    data: pojo,
-                    success: function (data, status, xhr) {
-                        // alert('status: ' + status + ', data: ' + data);
-                        callback(item); // do remove
-                    }
-                });
+          w2confirm('Are you sure 🚨DELETE🚨  the (Cancelled🚫) booking  <br> Name: '+  item.recordData.name  +   ' <br> Room#   ' + item.recordData.room  +  '  ?'  )
+              .yes(() => {
 
-            })
-            .no(() => {
-                w2alert('Nothing changed or deleted ');
-            })
+                  $.ajax({
+                      type: 'POST',
+                      url: '/booking/delete',
+                      contentType: 'application/json',
+                      data: pojo,
+                      success: function (data, status, xhr) {
+                          // alert('status: ' + status + ', data: ' + data);
+                          callback(item); // do remove
+                      }
+                  });
+
+              })
+              .no(() => {
+                  w2alert('Nothing changed or deleted ');
+              })
 
 
-    }
+      }
 
 };
 
@@ -447,7 +450,7 @@ var agencyList = [
     { id: 'closed', text: 'Closed' },
 ];
 var statusList = [
-    { id: 'active', text: 'Active' },
+    { id: 'active', text: 'Active ⁉️' },
     { id: 'cancelled', text: 'Cancelled 🚫' },
     { id: 'paid', text: 'Paid 💲' }
 ];
@@ -1004,7 +1007,7 @@ $(function () {
                                         start: convertDate(w2ui.myForm.getValue('startDate')).setHours(12, 0, 0),
                                         end: convertDate(w2ui.myForm.getValue('endDate')).setHours(12, 0, 0),
 
-                                        content: '🛌' + w2ui.myForm.getValue('numOfNights') + '  👨‍👩‍👦' + w2ui.myForm.getValue('numOfGuests') + ' ' + w2ui.myForm.getValue('name'),
+                                        content: '⁉️ 🛌' + w2ui.myForm.getValue('numOfNights') + '  👨‍👩‍👦' + w2ui.myForm.getValue('numOfGuests') + ' ' + w2ui.myForm.getValue('name'),
 
                                         className: w2ui.myForm.getValue('agency').id,
                                         recordData: this.getCleanRecord(),
@@ -1044,12 +1047,12 @@ $(function () {
                                                     end: convertDate(element.endDate).setHours(12, 0, 0),
 
                                                     // title: element.title,
-                                                    content: '🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
+                                                    content: '⁉️  🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
 
                                                     className: element.agency,
                                                     recordData: element,
                                                 });
-                                                 w2alert('Saved a Active booking');
+                                                 w2alert('Saved a ⁉️ Active booking');
                                             }
                                             else if ( w2ui.myForm.getValue('status').id == 'paid') {
                                                                                             // only add to timeline if status is active
@@ -1302,16 +1305,7 @@ $(function () {
                 if (properties != null && properties.item != null) {
 
                     var booking = items.get(properties.item);
-
-                    // w2popup.open({
-                    //     title: 'Selected Item ',
-                    //     with: 600,
-                    //     height: 550,
-                    //     body: JSON.stringify(booking.recordData),
-                    //     actions: { Ok: w2popup.close }
-                    // })
-
-
+                    // JSON.stringify(booking.recordData)
 
                     w2ui['myForm'].setValue('name', booking.recordData.name);
                     w2ui['myForm'].setValue('country', booking.recordData.country);
@@ -1352,7 +1346,43 @@ $(function () {
                 }
 
             });
+            timeline.on('doubleClick', function (properties) {
 
+                // alert(  JSON.stringify( properties , null, 4)) ;
+
+                if (properties != null && properties.item != null) {
+
+                    var booking = items.get(properties.item);
+                    // JSON.stringify(booking.recordData)
+
+
+              var bookingPopText =
+       "<br> FROM:<b>"+ booking.recordData.startDate   +   "</b>    TO:<b>"+ booking.recordData.endDate+"</b>"  +  "  &nbsp;&nbsp;&nbsp;&nbsp;    Status: " + ( booking.recordData.status == "paid" ?   " ⁉️ "+ booking.recordData.status + " 💲 " : booking.recordData.status )
+    +  "<br><br> Room:  <b>"+ booking.recordData.room      + " </b>   numOfNights: 🛌 <b>" + booking.recordData.numOfNights +"</b>"
+    +  "<br> Guest Name:  <b>"+ booking.recordData.name      + " </b>  numOfGuests  👨‍👩‍👦 <b>" +  booking.recordData.numOfGuests +"</b>"
+    +  "<br><br> ============================"
+    +  "<br> Extra Info:  <b>"+ ( booking.recordData.extraInfo != null ?    booking.recordData.extraInfo  : "" )    + " </b>"
+    +  "<br> ============================"
+    +  "<br> Charge:  "+  financial(booking.recordData.charge)
+    +  "<br> ============================"
+    +  "<br> (-)  commission :  "+  financial(booking.recordData.commission)
+    +  "<br> (-)  received :  "+  financial(booking.recordData.received)
+    +  "<br> ============================"
+    +  "<br> (+)  Balance :  "+  financial(booking.recordData.balance)
+    +  "<br> ============================"
+                                          ;
+
+                      w2popup.open({
+                         title: 'The Selected booking is ',
+                         with: 250,
+                         height: 363,
+                         body: bookingPopText,
+                         actions: { Ok: w2popup.close }
+                     })
+
+                }
+
+            });
             timeline.on('rangechange', function (properties) {
               onrangechange();
             });
@@ -1370,11 +1400,57 @@ $(function () {
             // });
 
 
-
-
-
             //   cancelledTimeline Click
             cancelledTimeline.on('click', function (properties) {
+
+                            // alert(  JSON.stringify( properties , null, 4)) ;
+
+                            if (properties != null && properties.item != null) {
+
+                                var booking = cancelledItems.get(properties.item);
+
+            // JSON.stringify(booking.recordData)
+
+                                w2ui['myForm'].setValue('name', booking.recordData.name);
+                                w2ui['myForm'].setValue('country', booking.recordData.country);
+
+                                w2ui['myForm'].setValue('startDate', booking.recordData.startDate);
+                                w2ui['myForm'].setValue('endDate', booking.recordData.endDate);
+                                w2ui['myForm'].setValue('numOfNights', booking.recordData.numOfNights);
+
+                                w2ui['myForm'].setValue('balance', financial(booking.recordData.balance));
+                                w2ui['myForm'].setValue('charge', financial(booking.recordData.charge));
+                                w2ui['myForm'].setValue('received', financial(booking.recordData.received));
+                                w2ui['myForm'].setValue('commission', financial(booking.recordData.commission));
+
+                                w2ui['myForm'].setValue('numOfGuests', booking.recordData.numOfGuests);
+
+                                w2ui['myForm'].setValue('agency', booking.recordData.agency);
+                                w2ui['myForm'].setValue('room', booking.recordData.room);
+
+                                w2ui['myForm'].setValue('voucher', booking.recordData.voucher);
+                                w2ui['myForm'].setValue('email', booking.recordData.email);
+                                w2ui['myForm'].setValue('tel', booking.recordData.tel);
+                                w2ui['myForm'].setValue('identification', booking.recordData.identification);
+
+                                w2ui['myForm'].setValue('invoiceNumber', booking.recordData.invoiceNumber);
+                                w2ui['myForm'].setValue('taxRefNumber', booking.recordData.taxRefNumber);
+
+                                w2ui['myForm'].setValue('afm', booking.recordData.afm);
+                                w2ui['myForm'].setValue('extraInfo', booking.recordData.extraInfo);
+
+                                w2ui['myForm'].setValue('status', booking.recordData.status);
+
+
+                                w2ui['myForm'].refresh();
+
+
+                                // todo  load the form with the selected item from the timeline
+
+                            }
+
+                        });
+            cancelledTimeline.on('doubleClick', function (properties) {
 
                 // alert(  JSON.stringify( properties , null, 4)) ;
 
@@ -1382,56 +1458,48 @@ $(function () {
 
                     var booking = cancelledItems.get(properties.item);
 
-                    // w2popup.open({
-                    //     title: 'Selected Item ',
-                    //     with: 600,
-                    //     height: 550,
-                    //     body: JSON.stringify(booking.recordData),
-                    //     actions: { Ok: w2popup.close }
-                    // })
+//delete:after {
+//    color: red;
+//    content: "\00D7";
+//    font-family: arial, sans-serif;
+//    font-size: 22px;
+//    font-weight: 700;
+//    -webkit-transition: color .2s linear;
+//    -moz-transition: color .2s linear;
+//    -ms-transition: color .2s linear;
+//    -o-transition: color .2s linear;
+//    transition: color .2s linear;
+//}
 
 
+                      var bookingPopText =
+                          "<br> FROM:<b>"+ booking.recordData.startDate   +   "</b>    TO:<b>"+ booking.recordData.endDate+"</b>"  +  "  &nbsp;&nbsp;&nbsp;&nbsp;    Status: " + booking.recordData.status + " 🚫 "
+                       +  "<br><br> Room:  <b>"+ booking.recordData.room      + " </b>   numOfNights: 🛌 <b>" + booking.recordData.numOfNights +"</b>"
+                       +  "<br> Guest Name:  <b>"+ booking.recordData.name      + " </b>  numOfGuests  👨‍👩‍👦 <b>" +  booking.recordData.numOfGuests +"</b>"
+                       +  "<br><br> ============================"
+                       +  "<br> Extra Info:  <b>"+ ( booking.recordData.extraInfo != null ?    booking.recordData.extraInfo  : "" )    + " </b>"
+                       +  "<br> ============================"
+                       +  "<br> Charge:  "+  financial(booking.recordData.charge)
+                       +  "<br> ============================"
+                       +  "<br> (-)  commission :  "+  financial(booking.recordData.commission)
+                       +  "<br> (-)  received :  "+  financial(booking.recordData.received)
+                       +  "<br> ============================"
+                       +  "<br> (+)  Balance :  "+  financial(booking.recordData.balance)
+                       +  "<br> ============================"
+                                                             ;
 
-                    w2ui['myForm'].setValue('name', booking.recordData.name);
-                    w2ui['myForm'].setValue('country', booking.recordData.country);
-
-                    w2ui['myForm'].setValue('startDate', booking.recordData.startDate);
-                    w2ui['myForm'].setValue('endDate', booking.recordData.endDate);
-                    w2ui['myForm'].setValue('numOfNights', booking.recordData.numOfNights);
-
-                    w2ui['myForm'].setValue('balance', financial(booking.recordData.balance));
-                    w2ui['myForm'].setValue('charge', financial(booking.recordData.charge));
-                    w2ui['myForm'].setValue('received', financial(booking.recordData.received));
-                    w2ui['myForm'].setValue('commission', financial(booking.recordData.commission));
-
-                    w2ui['myForm'].setValue('numOfGuests', booking.recordData.numOfGuests);
-
-                    w2ui['myForm'].setValue('agency', booking.recordData.agency);
-                    w2ui['myForm'].setValue('room', booking.recordData.room);
-
-                    w2ui['myForm'].setValue('voucher', booking.recordData.voucher);
-                    w2ui['myForm'].setValue('email', booking.recordData.email);
-                    w2ui['myForm'].setValue('tel', booking.recordData.tel);
-                    w2ui['myForm'].setValue('identification', booking.recordData.identification);
-
-                    w2ui['myForm'].setValue('invoiceNumber', booking.recordData.invoiceNumber);
-                    w2ui['myForm'].setValue('taxRefNumber', booking.recordData.taxRefNumber);
-
-                    w2ui['myForm'].setValue('afm', booking.recordData.afm);
-                    w2ui['myForm'].setValue('extraInfo', booking.recordData.extraInfo);
-
-                    w2ui['myForm'].setValue('status', booking.recordData.status);
-
-
-                    w2ui['myForm'].refresh();
-
-
-                    // todo  load the form with the selected item from the timeline
+                     w2popup.open({
+                         title: 'The  🚫 Cancelled booking is ',
+                         with: 250,
+                         height: 363,
+                         body: bookingPopText,
+                         actions: { Ok: w2popup.close }
+                     })
+// JSON.stringify(booking.recordData)
 
                 }
 
             });
-
             cancelledTimeline.on('rangechange', function (properties) {
               onrangechangecancelled();
             });
