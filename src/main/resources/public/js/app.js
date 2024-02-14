@@ -97,7 +97,7 @@ function initForm() {
     w2ui['myForm'].setValue('numOfNights', 0);
 
 
-    w2ui['myForm'].setValue('status', { id: 'active', text: 'Active ⁉️' });
+    w2ui['myForm'].setValue('status', { id: 'active', text: 'Active 🟡️' });
 
 
     w2ui['myForm'].setValue('balance', null);
@@ -146,7 +146,7 @@ function initForm() {
 
                                     // title: element.title,
 
-                                    content: ' ⁉️ 🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
+                                    content: ' 🟡️ 🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
                                     className: element.agency,
                                     recordData: element,
                                 });
@@ -450,7 +450,7 @@ var agencyList = [
     { id: 'closed', text: 'Closed' },
 ];
 var statusList = [
-    { id: 'active', text: 'Active ⁉️' },
+    { id: 'active', text: 'Active 🟡' },
     { id: 'cancelled', text: 'Cancelled 🚫' },
     { id: 'paid', text: 'Paid 💲' }
 ];
@@ -1047,12 +1047,12 @@ $(function () {
                                                     end: convertDate(element.endDate).setHours(12, 0, 0),
 
                                                     // title: element.title,
-                                                    content: '⁉️  🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
+                                                    content: '🟡  🛌' + element.numOfNights + '  👨‍👩‍👦' + element.numOfGuests + ' ' + element.name,
 
                                                     className: element.agency,
                                                     recordData: element,
                                                 });
-                                                 w2alert('Saved a ⁉️ Active booking');
+                                                 w2alert('Saved a 🟡 Active booking');
                                             }
                                             else if ( w2ui.myForm.getValue('status').id == 'paid') {
                                                                                             // only add to timeline if status is active
