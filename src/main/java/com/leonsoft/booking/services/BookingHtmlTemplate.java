@@ -3,6 +3,7 @@ package com.leonsoft.booking.services;
 import com.leonsoft.booking.models.Booking;
 import com.leonsoft.booking.models.BookingTotals;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
@@ -10,20 +11,34 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BookingHtmlTemplate {
 
-    public static String report(String fromDateEuroFmt, String toDateEuroFmt, List<Booking> all) {
-
+    public static String report(String name,  String fromDateEuroFmt, String toDateEuroFmt, List<Booking> all) {
         log.debug("/booking/report");
         log.debug("fromDate param  " + fromDateEuroFmt);
         log.debug("toDate param  " + toDateEuroFmt);
 
         StringBuilder report = new StringBuilder();
 
-        String pdfUrl = "/booking/export/pdf?fromDate=" + fromDateEuroFmt + "&toDate=" + toDateEuroFmt;
+        if (name == null || name.isBlank()) {
+
+            String pdfUrl = "/booking/export/pdf?fromDate=" + fromDateEuroFmt + "&toDate=" + toDateEuroFmt;
+            String href = " <a href=\"" + pdfUrl + "\">Export to PDF</a>  ";
+
+            report
+                  .append("<h3>").append("  From:  ").append(fromDateEuroFmt).append("  To:  ").append(toDateEuroFmt).append(href)
+                  .append("</h3>");
+
+        } else {
+            report
+                  .append("<h3>").append(" Found for: <b>").append( name.toUpperCase() ).append("</b>")
+                  .append("</h3>");
+        }
+
+
+
+
 
 
         report
-              .append("<h3>").append("  From:  ").append(fromDateEuroFmt).append("  To:  ").append(toDateEuroFmt).append("        <a href=\"" + pdfUrl + "\">Export to PDF</a>  ")
-              .append("</h3>")
 
            .append("<table>")
 
@@ -61,6 +76,7 @@ public class BookingHtmlTemplate {
 
 
         BookingTotals  totals  =  new BookingTotals();
+        totals.setTotBookings( all.size() );
 
         for (Booking booking : all) {
 
@@ -73,7 +89,7 @@ public class BookingHtmlTemplate {
 //                  " <a id='delAct' href='#' onclick='delAction(\""+ booking.getId()+"\");return false;'> " + booking.getStatus() + "</a>"
 //                  + "</td>";
 
-            String status = "<td>" + booking.getStatus() + "</td>";
+
 //            if (Objects.equals(booking.getStatus(), "cancelled")) {
 //                status = statusCancelled;
 //            }
@@ -86,10 +102,11 @@ public class BookingHtmlTemplate {
             totals.setTotGuests( totals.getTotGuests() + booking.getNumOfGuests()  );
             totals.setTotNights( totals.getTotNights() + booking.getNumOfNights()  );
 
+
             // build a row
             report.append("<tr>")
 
-                  .append(status)
+                  .append("<td>") .append( booking.getStatus()) .append( "</td>")
 
                   .append("<td>").append(DateTimeService.formatterEURO.format(stDt)).append("</td>")
                   .append("<td>").append(DateTimeService.formatterEURO.format(edDt)).append("</td>")
@@ -132,6 +149,7 @@ public class BookingHtmlTemplate {
               .append("<table>")
               ///   build row
               .append("<tr>")
+              .append("<th>Total Bookings</th>")
               .append("<th>Total Guests</th>")
               .append("<th>Total Nights</th>")
               .append("<th>Total Charge</th>")
@@ -142,6 +160,7 @@ public class BookingHtmlTemplate {
 
               // build row
               report.append("<tr>")
+                  .append("<td>").append( totals.getTotBookings()).append("</td>")
                   .append("<td>").append( totals.getTotGuests()).append("</td>")
                   .append("<td>").append( totals.getTotNights()).append("</td>")
                   .append("<td>").append( DateTimeService.df.format( totals.getTotCharge())).append("</td>")

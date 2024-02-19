@@ -40,7 +40,7 @@ public class BookingPDFExporter {
         cell.setPhrase(new Phrase("Arrival", font));
         table.addCell(cell);
 
-        cell.setPhrase(new Phrase("Departure", font));
+        cell.setPhrase(new Phrase("Depart", font));
         table.addCell(cell);
 
         cell.setPhrase(new Phrase("Room", font));

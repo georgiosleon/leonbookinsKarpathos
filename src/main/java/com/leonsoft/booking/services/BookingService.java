@@ -32,7 +32,11 @@ public class BookingService {
         LocalDate stDate = LocalDate.parse(fromDateEuroFmt, DateTimeService.formatterEURO);
         LocalDate edDate = LocalDate.parse(toDateEuroFmt, DateTimeService.formatterEURO);
 
-        List<Booking> results = bookingRepository.findByStartDateBetweenOrderByStartDateDesc(
+//        List<Booking> results = bookingRepository.findByStartDateBetweenOrderByStartDateDesc(
+//              stDate.format(DateTimeFormatter.ISO_DATE),
+//              edDate.format(DateTimeFormatter.ISO_DATE));
+
+        List<Booking> results = bookingRepository.findAllBookingsForReport(
               stDate.format(DateTimeFormatter.ISO_DATE),
               edDate.format(DateTimeFormatter.ISO_DATE));
 
@@ -45,7 +49,7 @@ public class BookingService {
 
     }
 
-    public String report(String fromDateEuroFmt, String toDateEuroFmt) {
+    public String report(String name, String fromDateEuroFmt, String toDateEuroFmt) {
 
         log.debug("/booking/report");
         log.debug("fromDate param  " + fromDateEuroFmt);
@@ -54,11 +58,17 @@ public class BookingService {
         LocalDate stDate = LocalDate.parse(fromDateEuroFmt, DateTimeService.formatterEURO);
         LocalDate edDate = LocalDate.parse(toDateEuroFmt, DateTimeService.formatterEURO);
 
-        List<Booking> all = bookingRepository.findByStartDateBetweenOrderByStartDateDesc(
-              stDate.format(DateTimeFormatter.ISO_DATE),
-              edDate.format(DateTimeFormatter.ISO_DATE));
+        List<Booking> results;
 
-        return BookingHtmlTemplate.report(fromDateEuroFmt, toDateEuroFmt, all);
+        if (name == null || name.isBlank()) {
+            results = bookingRepository
+                  .findAllBookingsForReport(stDate.format(DateTimeFormatter.ISO_DATE), edDate.format(DateTimeFormatter.ISO_DATE));
+        } else {
+            results = bookingRepository.findByNameContainingIgnoreCase(name);
+
+        }
+
+        return BookingHtmlTemplate.report(name, fromDateEuroFmt, toDateEuroFmt, results);
 
     }
 
@@ -82,17 +92,13 @@ public class BookingService {
         booking.setReceived(booking.getReceived() == null ? 0.0 : booking.getReceived());
         booking.setBalance(booking.getBalance() == null ? 0.0 : booking.getBalance());
 
-        booking.setRequestDateTime(  LocalDateTime.now() );
-
+        booking.setRequestDateTime(LocalDateTime.now());
 
         booking = bookingRepository.save(booking);
 
         // send back EURO format
         booking.setStartDate(DateTimeService.formatterEURO.format(stDate));
         booking.setEndDate(DateTimeService.formatterEURO.format(edDate));
-
-
-
 
         return booking;
     }

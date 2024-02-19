@@ -22,4 +22,5 @@ public class BookingTotals {
 
     private Integer totNights = Integer.valueOf(0);
     private Integer totGuests = Integer.valueOf(0);
+    private Integer totBookings = Integer.valueOf(0);
 }

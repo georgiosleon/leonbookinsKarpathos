@@ -4,6 +4,18 @@ var version = "Beds and Guests Planner - ΚΑΡΠΑΘΟΣ - 2023 by - Leon Solut
 //////
 //////
 //////
+
+
+var timeline;
+var cancelledTimeline;
+
+//function move() {
+//    var range = timeline.getWindow();
+//    cancelledTimeline.setWindow(range.start, range.end,  {animation: false} );
+//}
+
+
+
 window.onload = function() {
     if (window.jQuery) {
         // jQuery is loaded
@@ -459,8 +471,6 @@ var countryList = ["Afghanistan", "Albania", "Algeria", "American Samoa", "Andor
 
 
 
-var timeline;
-var cancelledTimeline;
 
 function onrangechange() {
     var range = timeline.getWindow();
@@ -531,7 +541,7 @@ $(function () {
                     // $("#save").hide();
                     $('[name="save"]').hide();
                     $('[name="reset"]').hide();
-                    w2ui.myForm.hide('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email', 'extraInfo')
+                    w2ui.myForm.hide('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email', 'extraInfo', 'country')
 
                 });
             $("#show").click(function () {
@@ -539,7 +549,7 @@ $(function () {
                 // $("#save").show();
                 $('[name="save"]').show();
                 $('[name="reset"]').show();
-                w2ui.myForm.show('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email', 'extraInfo')
+                w2ui.myForm.show('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email', 'extraInfo', 'country')
             });
 
             $('#myForm').w2form({
@@ -850,39 +860,91 @@ $(function () {
                 actions: {
 
 
-                    // find: {
-                    //     text: 'find',
-                    //     class: 'w2ui-btn-grey',
-                    //     style: 'text-transform: uppercase; width: 100px;  color: white ; font-size: 12px;',
-                    //     onClick(event) {
-
-                    //         var find  =   w2ui.myForm.getValue('name');
-                    //         alert ( ' TODO   ' + find );
-
-                    //         // todo goto back end and search
-
-                    //         // var  filteredItems = items.get({
-                    //         // filter: item => {
-                    //         //     return item.name === find;
-                    //         // }
-                    //         // });
-
-                    //         // alert ( '' +  filteredItems[0].start );
-
-                    //         // var gotoDate  =  filteredItems[0].start ;
-                    //         // timeline.moveTo(gotoDate, { animation: true });
-
-
-
-                    //     }
-                    // },
+//                     find: {
+//                         text: 'find',
+//                         class: 'w2ui-btn-blue',
+//                         style: 'text-transform: uppercase; width: 100px;  color: white ; font-size: 12px;',
+//                         onClick(event) {
+//
+//                             var find  =   w2ui.myForm.getValue('name');
+//                             // alert ( ' TODO   ' + find );
+//                             var  filteredItems = items.get({
+//                                 filter: item => {
+//                                        if (item.recordData.name.indexOf(find) >= 0)   {
+//
+//                                            let id  =  item.id ;
+//
+//                                             timeline.setSelection(id, {focus: true});
+//                                             cancelledTimeline.setSelection(id, {focus: true});
+//
+//                                          return true;
+//                                        }
+//                                        return false;
+//                                  }
+//                             });
 
 
+//for (let i = 0; i < filteredItems.length; i++) {
+//    console.log(filteredItems[i]);
+//
+////    let gotoDate  =  filteredItems[i].start ;
+//     let id  =  filteredItems[i].id ;
+//
+//    timeline.setSelection(id, {focus: true});
+//    cancelledTimeline.setSelection(id, {focus: true});
+//
+//    alert ( ' exit ? ' );
+//
+////    timeline.moveTo(gotoDate, { animation: true });
+////    cancelledTimeline.moveTo(gotoDate, { animation: true });
+//
+////    alert ( gotoDate );
+//}
 
-                    report: {
 
 
-                        text: 'report',
+
+//                            w2popup.open({
+//                                        title: 'Exit?',
+//                                        body: ' '  +   JSON.stringify(filteredItems)   ,
+//                                        actions: {
+//                                            Ok(event) {
+//
+////                                               timeline.moveTo(gotoDate, { animation: false });
+//                                               w2popup.close();
+//                                            },
+//                                            Cancel(event) {
+//                                               w2popup.close();
+//
+//                                            }
+//                                        }
+//                            });// popup
+//
+
+
+
+//                           alert ( '' + filteredItems.length + ' ' + JSON.stringify(filteredItems)   );
+
+
+//                                    var gotoDate  =  filteredItems[i].start ;
+//
+// timeline.moveTo(item.start, { animation: true });
+//
+//                                    w2alert("Fix problems then do save" + gotoDate );
+//
+//
+//
+
+
+
+
+//                         }// onClick
+//                     },
+
+
+                    find: {
+
+                        text: 'find',
                         class: 'w2ui-btn-blue',
                         style: 'text-transform: uppercase; width: 100px;  color: white ; font-size: 12px;',
                         onClick(event) {
@@ -892,6 +954,7 @@ $(function () {
                                 type: 'GET',
                                 url: '/booking/report',
                                 data: {
+                                    name: w2ui.myForm.getValue('name'),
                                     fromDate: w2ui.myForm.getValue('startDate'),
                                     toDate: w2ui.myForm.getValue('endDate')
                                 },
@@ -980,7 +1043,21 @@ $(function () {
                                         return false;
                                     }
                                 });
-                                if (fItems != null && fItems.length > 0 && (w2ui.myForm.getValue('status').id == 'active' || w2ui.myForm.getValue('status').id == 'paid')) {
+
+
+                                 var bal=  financial( w2ui.myForm.getValue('balance') ) ;
+                                    alert ( bal );
+//                                  w2ui['myForm'].setValue('balance', financial(booking.recordData.balance));
+//                                                                w2ui['myForm'].setValue('charge', financial(booking.recordData.charge));
+//                                                                w2ui['myForm'].setValue('received', financial(booking.recordData.received));
+//                                                                w2ui['myForm'].setValue('commission', financial(booking.recordData.commission));
+
+
+
+
+
+                                if (fItems != null && fItems.length > 0
+                                   && (w2ui.myForm.getValue('status').id == 'active' || w2ui.myForm.getValue('status').id == 'paid')) {
 
                                     w2popup.open({
                                         title: 'Message',

@@ -38,12 +38,19 @@ public class BookingRestController {
 
     @GetMapping(value = "/booking/report", produces = MediaType.TEXT_PLAIN_VALUE)
     String report(
-          @RequestParam(name = "fromDate") String fromDateEuroFmt,
+          @RequestParam( name = "name", required = false ) String name,
+          @RequestParam(name = "fromDate" ) String fromDateEuroFmt,
           @RequestParam(name = "toDate") String toDateEuroFmt) {
-        log.debug("/booking/report");
-        log.debug("fromDate param  " + fromDateEuroFmt);
-        log.debug("toDate param  " + toDateEuroFmt);
-        return bookingService.report(fromDateEuroFmt, toDateEuroFmt).toString();
+        log.info("/booking/report");
+        log.info("fromDate param  " + fromDateEuroFmt);
+        log.info("toDate param  " + toDateEuroFmt);
+        log.info("name param  " + name);
+
+        if ( name != null ) {
+//            name = name.replaceAll("\\s+", "");
+            name = name.trim();
+        }
+        return bookingService.report( name, fromDateEuroFmt, toDateEuroFmt);
 
     }
 
