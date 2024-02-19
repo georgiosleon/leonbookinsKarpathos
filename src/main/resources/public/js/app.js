@@ -1046,7 +1046,7 @@ $(function () {
 
 
                                  var bal=  financial( w2ui.myForm.getValue('balance') ) ;
-                                    alert ( bal );
+                                  //  alert ( bal );
 //                                  w2ui['myForm'].setValue('balance', financial(booking.recordData.balance));
 //                                                                w2ui['myForm'].setValue('charge', financial(booking.recordData.charge));
 //                                                                w2ui['myForm'].setValue('received', financial(booking.recordData.received));
