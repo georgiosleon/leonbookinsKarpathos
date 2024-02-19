@@ -90,8 +90,8 @@ public class Booking {
     private String status;
 
 
-    @Column(name = "request_DateTime")
-    private LocalDateTime   requestDateTime;
+//    @Column(name = "request_DateTime")
+//    private LocalDateTime   requestDateTime;
 
 
 }

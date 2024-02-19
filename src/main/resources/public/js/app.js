@@ -1,5 +1,5 @@
 // v1.0.1
-var version = "Beds and Guests Planner - ΚΑΡΠΑΘΟΣ - 2023 by - Leon Solutions - v. 1.0.1 ";
+var version = "Beds and Guests Planner - ΚΑΡΠΑΘΟΣ - 2023 by - Leon - v. 1.0.1 ";
 //////
 //////
 //////
@@ -450,7 +450,33 @@ var roomList = [
     {
         id: 'MER',
         text: 'MERTONAS'
-    }
+    },
+    {
+        id: 'TSI',
+        text: 'TSIGOUNAKI'
+    },
+    {
+        id: 'MYR1',
+        text: 'MYRTHEA 1'
+    },
+     {
+         id: 'MYR2',
+         text: 'MYRTHEA 2'
+     },
+     {
+       id: 'MYR3',
+       text: 'MYRTHEA 3'
+     },
+     {
+         id: 'MYR4',
+         text: 'MYRTHEA 4'
+     }
+
+
+
+
+
+
 
 
 ];  // for the dropdown  select room

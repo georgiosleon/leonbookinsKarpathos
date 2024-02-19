@@ -92,7 +92,7 @@ public class BookingService {
         booking.setReceived(booking.getReceived() == null ? 0.0 : booking.getReceived());
         booking.setBalance(booking.getBalance() == null ? 0.0 : booking.getBalance());
 
-        booking.setRequestDateTime(LocalDateTime.now());
+//        booking.setRequestDateTime(LocalDateTime.now());
 
         booking = bookingRepository.save(booking);
 
