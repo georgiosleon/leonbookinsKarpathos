@@ -110,6 +110,11 @@ function convertDate(str) {
 
 function initForm() {
 
+     $('[name="save"]').hide();
+                        $('[name="reset"]').hide();
+                        w2ui.myForm.hide('name', 'startDate', 'extraInfo');
+
+
     w2ui['myForm'].setValue('startDate', formattedDate(new Date));
     w2ui['myForm'].setValue('endDate', formattedDate(new Date));
     // w2ui['myForm'].setValue('numOfNights', 0);
@@ -122,6 +127,9 @@ function initForm() {
     // w2ui['myForm'].setValue('received', null);
     // w2ui['myForm'].setValue('commission', null);
     w2ui['myForm'].refresh();
+
+
+
 
 }
 function formattedDate(d = new Date) {
@@ -206,6 +214,10 @@ var timelineoOtions = {
 
     onRemove: function (item, callback) {
 
+
+        alert ( 'delete' );
+
+
         var pojo = JSON.stringify(items.get(item.id).recordData);
 
         w2confirm('Delete  '+ items.get(item.id).recordData.name +'    Are you sure?')
@@ -237,81 +249,147 @@ var timelineoOtions = {
 
 var roomList = [
 
-    // 
+
     {
-        id: 'Shopping',
-        text: '🛍️ Shopping'
+            id: 'Dimos',
+            text: '👮🏼 🏛️ Dimos/Government   www.karpathos.gr'
     },
     {
-        id: 'Dine',
-        text: '🍽️ Dine'
+        id: 'Church',
+        text: '⛪ Εκκλησία'
     },
     {
-        id: 'Wine',
-        text: '🍷 Wine Drinking'
+            id: 'ChurchHoliday',
+            text: '⛪🎉 Πανηγύρι/Εορτή'
+    },
+
+     {
+            id: 'Jobs',
+            text: '🛠️  Jobs'
+        },
+        {
+                id: 'Hospital/Pharmacist',
+                text: '🏥 ⚕️ Pharmacist/Φαρμακοποιός/ή'
+        },
+
+
+    // Συγκοινωνίες/Transportation
+    {
+        id: 'Bus',
+        text: '🚌 Bus'
     },
     {
-        id: 'Beer',
-        text: '🍺 Beer Drinking'
+        id: 'Airplane',
+        text: '✈️ Airplane'
     },
     {
+        id: 'Boat',
+        text: '⛴️ Ferry/Boat '
+    },
+    {
+           id: 'Awards',
+           text: '🎖️ Awards'
+    },
+    //   (Θέατρο/Χορός, Μουσική, Σινεμά, Τέχνες, Βιβλίο, Φεστιβάλ, Ομιλίες)
+    {
+        id: 'Theater',
+        text: '🎭 Θέατρο'
+    },
+    {
+        id: 'Music',
+        text: '🎤 Μουσική/Χορός '
+    },
+
+   {
+        id: 'GreekFood',
+        text: '🧿 Traditional Food '
+   },
+
+   {
         id: 'Drinks',
-        text: '🍹 Drinks'
-    },
-    {
+        text: '🍷🍹🍺 Drinks/Bar/NightClub'
+   },
+
+   {
         id: 'Cafe',
         text: '☕ Cafe'
-    },
+   },
 
-    // {
-    //     id: 'FastFood',
-    //     text: '🌯🍕🍔 FastFood'
-    // },
-    {
-        id: 'Pizza',
-        text: '🍕 Pizza'
-    },
-    {
-        id: 'Burger',
-        text: '🍔 Burger'
-    },
-    {
-        id: 'Souvlaki',
-        text: '🌯 Souvlaki'
-    },
 
-    // {
-    //      id: 'Sweets',
-    //     text: '🧁🍦 Sweets'
-    // },
+    //
+        {
+            id: 'Shopping',
+            text: '🛍️ Shopping'
+        },
+        {
+            id: 'Dine',
+            text: '🍽️ Food Dine'
+        },
 
-    {
-        id: 'Sweets',
-        text: '🧁 Sweets '
-    },
-    {
-        id: 'IceCream',
-        text: '🍦 Ice Cream'
-    },
-   
-    // Αθλητικά   
-   
-   
-    {
-        id: 'Sports',
-        text: '⚽️🏄 Sports'
-    },
-   
-   
-    {
-        id: 'Walking',
-        text: '🚶🏻 Walking'
-    },
+        {
+             id: 'FastFood',
+             text: '🌯🍕🍔 FastFood'
+        },
+        {
+            id: 'Pizza',
+            text: '🍕 Pizza'
+        },
+        {
+            id: 'Burger',
+            text: '🍔 Burger'
+        },
+        {
+            id: 'Souvlaki',
+            text: '🌯 Souvlaki'
+        },
+        {
+            id: 'Sweets',
+            text: '🧁 Sweets '
+        },
+        {
+            id: 'IceCream',
+            text: '🍦 Ice Cream'
+        },
+
+
+
 
     {
-        id: 'Biking',
-        text: '🚴 Biking'
+        id: 'Cinema',
+        text: '🎥 Σινεμά'
     },
+    {
+        id: 'Arts',
+        text: '🎨 Τέχνες/Arts'
+    },
+    {
+        id: 'Book',
+        text: '📖 Βιβλίο'
+    },
+    {
+        id: 'Talk',
+        text: '💬 Ομιλία'
+    },
+    {
+        id: 'Museum',
+        text: '🏺 Museum'
+    },
+    {
+        id: 'AnimalLovers',
+        text: '🐾 AnimalLovers'
+    },
+
+
+
+
+    // Αθλητικά
+
+
+    {
+        id: 'Swimming',
+        text: '🏊 Swimming '
+    },
+
 
     {
         id: 'Soccer',
@@ -321,6 +399,22 @@ var roomList = [
         id: 'Basket',
         text: '🏀 Μπάσκετ'
     },
+
+    {
+        id: 'Walking',
+        text: '🚶🏻 Walking'
+    },
+
+    {
+        id: 'Climbing',
+        text: '🧗‍♀️ Climbing '
+    },
+
+    {
+        id: 'Biking',
+        text: '🚴 Biking'
+    },
+
     {
         id: 'Surfing',
         text: '🏄 Surfing'
@@ -332,18 +426,8 @@ var roomList = [
     },
 
     {
-        id: 'Swimming',
-        text: '🏊 Swimming '
-    },
-
-    {
         id: 'Yoga',
         text: '🧘‍♀️ Yoga '
-    },
-    
-    {
-        id: 'Climbing',
-        text: '🧗‍♀️ Climbing '
     },
 
     {
@@ -396,109 +480,38 @@ var roomList = [
         id: 'KidsActivities',
         text: '🎠 Kids Activities'
     },
-    
-    
 
 
 
-  //   (Θέατρο/Χορός, Μουσική, Σινεμά, Τέχνες, Βιβλίο, Φεστιβάλ, Ομιλίες)
 
-//    {
-//      id: 'Festival',
-//      text: '🎉 Φεστιβάλ'
-//     },
+     // Κοινωνικά/Social
+        //     (Αργίες, Γιορτές, Κηδεία, Μνημόσυνο)
 
-    {
-        id: 'Awards',
-        text: '🎖️ Awards'
-    },
-    {
-        id: 'Theater',
-        text: '🎭 Θέατρο'
-    },
-    {
-        id: 'Music',
-        text: '🎤 Μουσική/Χορός '
-    },
-    {
-        id: 'Cinema',
-        text: '🎥 Σινεμά'
-    },
-    {
-        id: 'Arts',
-        text: '🎨 Τέχνες/Arts'
-    },
-    {
-        id: 'Book',
-        text: '📖 Βιβλίο'
-    },
-    {
-        id: 'Festival',
-        text: '🎉 Φεστιβάλ'
-    },
-    {
-        id: 'Talk',
-        text: '💬 Ομιλία'
-    },
-    {
-        id: 'Museum',
-        text: '🏺 Museum'
-    },
-    {
-        id: 'AnimalLovers',
-        text: '🐾 AnimalLovers'
-    },
-    
+        {
+            id: 'WeedingUnion',
+            text: '💒 Γάμος'
+        },
+        {
+            id: 'Engagement',
+            text: '❤️ Αρραβώνας'
+        },
+        {
+            id: 'BAPTISM',
+            text: '👼 Βάπτιση'
+        },
 
-    // Κοινωνικά/Social  
-    //     (Αργίες, Γιορτές, Κηδεία, Μνημόσυνο) 
-    
-    {
-        id: 'Church',
-        text: '⛪ Εκκλησία'
-    },
-    {
-        id: 'WeedingUnion',
-        text: '💒 Γάμος'
-    },
-    {
-        id: 'Engagement',
-        text: '❤️ Αρραβώνας'
-    },
-    {
-        id: 'BAPTISM',
-        text: '👼 Βάπτιση'
-    },
-    {
-        id: 'ChurchHoliday',
-        text: '⛪🎉 Πανηγύρι/Εορτή'
-    },
-    {
-        id: 'FUNERAL',
-        text: '⚰️ Κηδεία'
-    },
-    {
-        id: 'Memorial',
-        text: '🕯️ Μνημόσυνο'
-    },
-   
-
-    // Συγκοινωνίες/Transportation
-//    {
-//        id: 'Bus',
-//        text: '🚌 Bus'
-//    },
-//    {
-//        id: 'Airplane',
-//        text: '✈️ Airplane'
-//    },
-//    {
-//        id: 'Boat',
-//        text: '⛴️ Ferry/Boat '
-//    }
+        {
+            id: 'FUNERAL',
+            text: '⚰️ Κηδεία'
+        },
+        {
+            id: 'Memorial',
+            text: '🕯️ Μνημόσυνο'
+        }
 
 
-];  
+];
+
 
 
 // for the dropdown  select room
@@ -573,8 +586,8 @@ $(function () {
                 var descVal = roomList[i].text;
                 groups.add({
                     id: idVal,
-                    content: descVal
-                    // , order: 1
+                    content: descVal,
+                    order: i+1
                 });
             }
 
@@ -584,7 +597,7 @@ $(function () {
                     // $("#save").hide();
                     $('[name="save"]').hide();
                     $('[name="reset"]').hide();
-                    w2ui.myForm.hide('name', 'startDate', 'extraInfo')
+                    w2ui.myForm.hide('name', 'startDate', 'extraInfo');
 
                 });
             $("#show").click(function () {
@@ -1108,7 +1121,7 @@ $(function () {
 
             });
             // //  Timeline
-            timeline.on('click', function (properties) {
+            timeline.on('doubleClick', function (properties) {
 
 //                 alert(  JSON.stringify( properties , null, 4)) ;
 

@@ -7,11 +7,12 @@ import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
+import org.jsoup.Jsoup;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -72,9 +73,46 @@ public class BookingService {
 
     }
 
+    boolean validateBooking(Booking booking) {
+
+        if (booking.getName() == null) {
+            return false;
+        }
+        if (booking.getExtraInfo() == null) {
+            return false;
+        }
+
+//
+//        booking.setName( Jsoup.clean( booking.getName() , Safelist.basic() ) );
+//        booking.setExtraInfo( Jsoup.clean( booking.getExtraInfo() , Safelist.basic() ) );
+
+        booking.setExtraInfo(Jsoup.parse(booking.getExtraInfo()).text());
+        booking.setName(Jsoup.parse(booking.getName()).text());
+
+        return true;
+    }
+
 
     public Booking create(Booking booking) {
 
+        if (!validateBooking(booking)) {
+            return null;
+        }
+
+        booking = fillBooking(booking);
+
+        return booking;
+    }
+
+
+    public Booking getBookingFDatabase(String id) {
+        Optional<Booking> obj = bookingRepository.findById(id);
+        return obj.orElse(null);
+
+    }
+
+
+    private Booking fillBooking(Booking booking) {
         booking.setId(UUID.randomUUID().toString());
 
         log.debug(" SAVE   {}  ", booking);
@@ -92,14 +130,11 @@ public class BookingService {
         booking.setReceived(booking.getReceived() == null ? 0.0 : booking.getReceived());
         booking.setBalance(booking.getBalance() == null ? 0.0 : booking.getBalance());
 
-//        booking.setRequestDateTime(LocalDateTime.now());
-
         booking = bookingRepository.save(booking);
 
         // send back EURO format
         booking.setStartDate(DateTimeService.formatterEURO.format(stDate));
         booking.setEndDate(DateTimeService.formatterEURO.format(edDate));
-
         return booking;
     }
 

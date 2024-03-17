@@ -38,19 +38,19 @@ public class BookingRestController {
 
     @GetMapping(value = "/booking/report", produces = MediaType.TEXT_PLAIN_VALUE)
     String report(
-          @RequestParam( name = "name", required = false ) String name,
-          @RequestParam(name = "fromDate" ) String fromDateEuroFmt,
+          @RequestParam(name = "name", required = false) String name,
+          @RequestParam(name = "fromDate") String fromDateEuroFmt,
           @RequestParam(name = "toDate") String toDateEuroFmt) {
         log.info("/booking/report");
         log.info("fromDate param  " + fromDateEuroFmt);
         log.info("toDate param  " + toDateEuroFmt);
         log.info("name param  " + name);
 
-        if ( name != null ) {
+        if (name != null) {
 //            name = name.replaceAll("\\s+", "");
             name = name.trim();
         }
-        return bookingService.report( name, fromDateEuroFmt, toDateEuroFmt);
+        return bookingService.report(name, fromDateEuroFmt, toDateEuroFmt);
 
     }
 
@@ -64,10 +64,28 @@ public class BookingRestController {
 
 
     @PostMapping(value = "/booking/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    Boolean deleteObject(@RequestBody Booking booking) {
-        log.debug(" Delete    {}", booking.getId());
-        return  bookingService.deleteObject(booking);
+    Boolean deleteObject(
+          @RequestBody Booking input) {
+        log.info("==============    getBookingFDatabase");
+
+        Booking bookingFromDatabase = bookingService.getBookingFDatabase(input.getId());
+        log.info("==============    getBookingFDatabase   found in database ");
+
+        if (bookingFromDatabase != null
+              && input.getPassword()!= null
+              && !    input.getPassword().isEmpty()    //  NOT_NULL_OR_EMPTY
+              && input.getPassword().equals(bookingFromDatabase.getPassword())) {
+
+            log.info("==============    getBookingFDatabase   delete it ");
+            log.info(" ============ Delete    {}", input.getId());
+
+            return bookingService.deleteObject(input);
+        }
+        log.info("==============    getBookingFDatabase   NOT found ");
+        return false;
     }
+
+
 
 //    @GetMapping(value = "/booking/del")
 //    void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {
