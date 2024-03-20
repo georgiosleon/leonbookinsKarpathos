@@ -215,7 +215,7 @@ var timelineoOtions = {
     onRemove: function (item, callback) {
 
 
-        alert ( 'delete' );
+//        alert ( 'delete' );
 
 
         var pojo = JSON.stringify(items.get(item.id).recordData);
@@ -252,7 +252,7 @@ var roomList = [
 
     {
             id: 'Dimos',
-            text: '👮🏼 🏛️ Dimos/Government   www.karpathos.gr'
+            text: '👮🏼 🏛️ Dimos/Government'
     },
     {
         id: 'Church',
@@ -718,8 +718,9 @@ $(function () {
                     // line
                     {
                         field: 'extraInfo', type: 'textarea',
+                        required: true,
                         html: {
-                            label: 'Εxtra Info ',
+                            label: 'Extra Information ',
                             attr: 'style="width: 600px; height: 60px; resize: none" '
                         }
                     },
@@ -801,58 +802,33 @@ $(function () {
 
                             if (w2ui.myForm.validate().length == 0) {
 
+                               var a_start = convertDate(w2ui.myForm.getValue('startDate')).setHours(0, 0, 0) ;
+                               var a_end = convertDate(w2ui.myForm.getValue('endDate')).setHours(23, 59, 59);
 
-                                // retrieve a filtered subset of the data
-                                var fItems = items.get({
-                                    filter: function (item) {
-                                        
+                               var errors = false;
+                               if (a_end  < a_start) return errors = true ;
 
-                                        var a_start = convertDate(w2ui.myForm.getValue('startDate'))  .setHours(0, 0, 0) ;
-                                        var a_end = convertDate(w2ui.myForm.getValue('endDate'))  .setHours(23, 59, 59); ;
-
-                                        var b_start = item.start;
-                                        var b_end = item.end;
-
-
-
-                                        // if (w2ui.myForm.getValue('room').id == item.group) {
-                                        //     if (a_start <= b_start && b_start < a_end) return true;    // b starts in a
-                                        //     if (a_start < b_end && b_end < a_end) return true;       // b ends in a
-                                        //     if (b_start < a_start && a_end <= b_end) return true;     // a in b
-                                        // }
-
-                                        
-                                        return false;
-
-                                    }
-                                });
-
-                                if (fItems != null && fItems.length > 0 ) {
-
+                                if ( errors  ) {
                                     w2popup.open({
                                         title: 'Message',
                                         with: 300,
                                         height: 150,
-                                        body: ' 🚗|🛵  Object  is NOT available',
+                                        body: ' Check your start and end dates. Start date must be smaller than end date.',
                                         actions: { Ok: w2popup.close }
                                     });
 
                                 }
                                 else {
                                     // do save
-
-
-
                                     // var newId = JSON.stringify(w2ui.myForm.getValue('room').id + '_' + w2ui.myForm.getValue('startDate') + '_' + w2ui.myForm.getValue('endDate'))
-
                                     var newItem = {
                                         id: null,
                                         // type: 'range',
                                         group: w2ui.myForm.getValue('room').id,
                                         // start: w2ui.myForm.getValue('startDate'),
                                         // end: w2ui.myForm.getValue('endDate'),
-                                        start: convertDate(w2ui.myForm.getValue('startDate')).setHours(0, 0, 0),
-                                        end: convertDate(w2ui.myForm.getValue('endDate')).setHours(23, 59, 59),
+                                        start: a_start,
+                                        end: a_end,
 
                                         content:  w2ui.myForm.getValue('name'),
 
@@ -868,7 +844,7 @@ $(function () {
                                     // end: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59),
                                     // this.save();// todo
 
-                                    timeline.moveTo(convertDate(w2ui.myForm.getValue('startDate')).setHours(12, 0, 0), { animation: true });
+                                    timeline.moveTo(a_start, { animation: true });
 
                                     var pojo = JSON.stringify(newItem.recordData);
 
@@ -884,15 +860,10 @@ $(function () {
                                                     id: element.id,
                                                     type: 'range',
                                                     group: element.room,
-                                                    // start: element.startDate,
-                                                    // end: element.endDate,
-
-                                                    start: convertDate(element.startDate).setHours(0, 0, 0),
-                                                    end: convertDate(element.endDate).setHours(23, 59, 59),
-
+                                                    start: a_start,
+                                                    end: a_end,
                                                     // title: element.title,
                                                     content: element.name,
-
                                                     className: element.agency,
                                                     recordData: element,
                                                 });
@@ -1034,9 +1005,12 @@ $(function () {
 
                 }
             });
-             w2ui.myForm.on('*', function (event) {
-                 console.log('Event: ' + event.type, 'Target: ' + event.target, event);
-             });
+
+            // debug events
+//             w2ui.myForm.on('*', function (event) {
+//                 console.log('Event: ' + event.type, 'Target: ' + event.target, event);
+//             });
+
             w2ui.myForm.on('change', function (event) {
 
 

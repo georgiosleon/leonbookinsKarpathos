@@ -66,21 +66,24 @@ public class BookingRestController {
     @PostMapping(value = "/booking/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     Boolean deleteObject(
           @RequestBody Booking input) {
-        log.info("==============    getBookingFDatabase");
+        log.info("==============    delete input request object " + input );
+
 
         Booking bookingFromDatabase = bookingService.getBookingFDatabase(input.getId());
-        log.info("==============    getBookingFDatabase   found in database ");
+        log.info("==============  to delete db object  " + input );
 
         if (bookingFromDatabase != null
-              && input.getPassword()!= null
-              && !    input.getPassword().isEmpty()    //  NOT_NULL_OR_EMPTY
-              && input.getPassword().equals(bookingFromDatabase.getPassword())) {
+            // todo  see about password per  booking and user management
 
+            //  && input.getPassword()!= null
+            //  && !  input.getPassword().isEmpty()    //  NOT_NULL_OR_EMPTY
+            //  && input.getPassword().equals(bookingFromDatabase.getPassword())
+        ) {
             log.info("==============    getBookingFDatabase   delete it ");
             log.info(" ============ Delete    {}", input.getId());
-
             return bookingService.deleteObject(input);
         }
+
         log.info("==============    getBookingFDatabase   NOT found ");
         return false;
     }
