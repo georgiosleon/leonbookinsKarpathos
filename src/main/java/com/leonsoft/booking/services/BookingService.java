@@ -13,6 +13,7 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -81,13 +82,17 @@ public class BookingService {
         if (booking.getExtraInfo() == null) {
             return false;
         }
+        if (booking.getPassword() == null ||  booking.getPassword().length() < 3 )  {
+            return false;
+        }
 
 //
-//        booking.setName( Jsoup.clean( booking.getName() , Safelist.basic() ) );
-//        booking.setExtraInfo( Jsoup.clean( booking.getExtraInfo() , Safelist.basic() ) );
+        //  TODO  add as parameters  in applications.props
+        booking.setName( Jsoup.clean( booking.getName() , Safelist.basic() ) );
+        booking.setExtraInfo( Jsoup.clean( booking.getExtraInfo() , Safelist.basic() ) );
+        // option 1        booking.setExtraInfo(Jsoup.parse(booking.getExtraInfo()).text());
+        // option 2       booking.setName(Jsoup.parse(booking.getName()).text());
 
-        booking.setExtraInfo(Jsoup.parse(booking.getExtraInfo()).text());
-        booking.setName(Jsoup.parse(booking.getName()).text());
 
         return true;
     }
@@ -156,6 +161,10 @@ public class BookingService {
             booking.setStartDate(DateTimeService.formatterEURO.format(stDt));
             LocalDate edDt = LocalDate.parse(booking.getEndDate(), DateTimeService.formatterISO);
             booking.setEndDate(DateTimeService.formatterEURO.format(edDt));
+
+            // todo fix
+            booking.setPassword("Dummy");
+
         }
         return all;
     }

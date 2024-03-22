@@ -13,43 +13,15 @@ window.onload = function() {
         alert("jQuery Doesn't Work");
     }
 }// window.onload
+//////
+//////
+//////
+// FUNCTIONS
 
-
-
-// function delAction(id) {
-
-
-//     w2confirm(
-//     'Delete Cancelled   '+ id +'  Are you sure?')
-//         .yes(() => {
-//             delActionAjaxCall(id)
-//         })
-//         .no(() => {
-//             w2alert('Nothing changed or deleted ');
-//         })
-// }
-
-// function  delActionAjaxCall(id){
-//  // console.log('Yes')
-
-//             // String delUrl = "/booking/del?bid=" + booking.getId();
-//             $.ajax({
-//                 type: 'GET',
-//                 url: '/booking/del',
-//                 data: {
-//                     bid: id
-//                 },
-//                 contentType: 'application/json',
-//                 success: function (data, status, xhr) {
-//                     w2alert('Deleted a cancelled booking - all good re-run the report to confirm');
-//                 }
-//             });  // ajax
-
-// }
-
-
-
-// functions
+/***************************************************
+    Updates the clock running in the html page
+****************************************************
+*/
 function updateClock (){
  	var currentTime = new Date ( );
   	var currentHours = currentTime.getHours ( );
@@ -76,21 +48,6 @@ function updateClock (){
    	$("#clock").html(currentTimeString);
  }
 
-
-
-
-
-
-// function financial(x) {
-//     if (x) {
-//         return Number.parseFloat(x).toFixed(2);
-//         // .replace('.', ',');
-//     }
-//     return Number.parseFloat(0).toFixed(2);
-//     // .replace('.', ',');
-// }
-
-
 function convertDate(str) {
     var parts = str.split("/");
     var dt = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
@@ -98,21 +55,16 @@ function convertDate(str) {
 
     return dt;
 }
+/**********************************************************************************
 
-// function convertDate_00_00_00(str) {
-//     var parts = str.split("/");
-//     var dt = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
-//     dt.setHours(0, 0, 0);
+        StART GUI   FRONTEND   HERE
 
-//     return dt;
-// }
-
-
+***********************************************************************************/
 function initForm() {
 
      $('[name="save"]').hide();
-                        $('[name="reset"]').hide();
-                        w2ui.myForm.hide('name', 'startDate', 'extraInfo');
+     $('[name="reset"]').hide();
+     w2ui.myForm.hide('name', 'startDate', 'extraInfo');
 
 
     w2ui['myForm'].setValue('startDate', formattedDate(new Date));
@@ -143,14 +95,16 @@ function formattedDate(d = new Date) {
     return `${day}/${month}/${year}`;
 }
 
-// vars
+/**********************************************************************************
+
+    GLOBAL    VARIABLES
+
+***********************************************************************************/
 var nowISOString = new Date().toISOString().substring(0, 10);
 var moveToDate = new Date();// set to current date
-// initialise vis timeline componenet
+                                                                                                // initialise vis timeline
 var groups = new vis.DataSet();
 // var items = new vis.DataSet();
-
-
 
 
 var items = new vis.DataSet({type: { start: "ISODate", end: "ISODate" }});   
@@ -214,11 +168,12 @@ var timelineoOtions = {
 
     onRemove: function (item, callback) {
 
-
-//        alert ( 'delete' );
-
-
-        var pojo = JSON.stringify(items.get(item.id).recordData);
+        var data   =  items.get(item.id).recordData  ;
+//        alert ( w2ui.myForm.getValue('password') ) ;
+        data.password   =  w2ui.myForm.getValue('password');
+//        alert('   data    '+   data  );
+        var pojo = JSON.stringify( data );
+//        alert('   pojo   '+   pojo  );
 
         w2confirm('Delete  '+ items.get(item.id).recordData.name +'    Are you sure?')
             .yes(() => {
@@ -228,10 +183,19 @@ var timelineoOtions = {
                     url: '/booking/delete',
                     contentType: 'application/json',
                     data: pojo,
+                    dataType :'json',
+
                     success: function (data, status, xhr) {
-                        // alert('status: ' + status + ', data: ' + data);
-                        callback(item); // do remove
+                        //  GOT    REPLY       alert('status: ' + status + ', data: ' + data);
+                        if ( data == true ){
+                            callback(item); // do remove
+                            alert(' Delete success     ');
+                        } else {
+                            alert ('Delete failed. Need to give correct password. ');
+                        }
+
                     }
+
                 });
 
             })
@@ -724,7 +688,15 @@ $(function () {
                             attr: 'style="width: 600px; height: 60px; resize: none" '
                         }
                     },
+                    {
+                        field: 'password', type: 'text',
+                        required: true,
+                        html: {
+                            label: 'Password',
+                            attr: 'style="  text-transform: uppercase; width: 300px; font-weight: bold; text-align:center; "'
 
+                        }
+                    },
 
 
                 ],
@@ -854,6 +826,10 @@ $(function () {
                                         contentType: 'application/json',
                                         data: pojo,
                                         success: function (element, status, xhr) {
+
+
+
+
 
 
                                                 items.add({
@@ -1076,44 +1052,30 @@ $(function () {
                 //     var receivedVal = financial(w2ui['myForm'].getValue('received'));
                 //     var commissionVal = financial(w2ui['myForm'].getValue('commission'));
                 //     w2ui['myForm'].refresh();
-
                 //     var newBalance = chargeVal - receivedVal;
                 //     var newBalance = newBalance - commissionVal;
-
                 //     w2ui['myForm'].setValue('charge', chargeVal);
                 //     w2ui['myForm'].setValue('received', receivedVal);
                 //     w2ui['myForm'].setValue('commission', commissionVal);
                 //     w2ui['myForm'].setValue('balance', financial(newBalance));
-
                 //     w2ui['myForm'].refresh();
-
                 // }
-
-
                 w2ui['myForm'].refresh();
-
 
             });
             // //  Timeline
             timeline.on('doubleClick', function (properties) {
-
 //                 alert(  JSON.stringify( properties , null, 4)) ;
-
                 if (properties != null && properties.item != null) {
 
                     var booking = items.get(properties.item);
-
-
                     var pBody = '' ;
                     pBody =  pBody +  '<br><br> &nbsp;&nbsp;&nbsp;&nbsp; ' +    booking.recordData.startDate;
                     pBody =  pBody +  ' &nbsp;&nbsp;&nbsp;&nbsp; -  &nbsp;&nbsp;&nbsp;&nbsp;  ' +    booking.recordData.endDate;
-
                     pBody =  pBody + '<br><br> &nbsp;&nbsp;&nbsp;&nbsp; '+  booking.recordData.name;
-
                     if (  booking.recordData.extraInfo  != null ){
                         pBody = pBody + '<br> <br> &nbsp;&nbsp;&nbsp;&nbsp; ' +  booking.recordData.extraInfo
                     }
-
                     w2popup.open({
                          title: ' Selected ',
                          with: 300,
@@ -1121,43 +1083,28 @@ $(function () {
                          body:  pBody,
                          actions: { Ok: w2popup.close }
                     });
-
-
                     w2ui['myForm'].setValue('name', booking.recordData.name);
                     // w2ui['myForm'].setValue('country', booking.recordData.country);
-
                     w2ui['myForm'].setValue('startDate', booking.recordData.startDate);
                     w2ui['myForm'].setValue('endDate', booking.recordData.endDate);
                     // w2ui['myForm'].setValue('numOfNights', booking.recordData.numOfNights);
-
                     // w2ui['myForm'].setValue('balance', financial(booking.recordData.balance));
                     // w2ui['myForm'].setValue('charge', financial(booking.recordData.charge));
                     // w2ui['myForm'].setValue('received', financial(booking.recordData.received));
                     // w2ui['myForm'].setValue('commission', financial(booking.recordData.commission));
-
                     // w2ui['myForm'].setValue('numOfGuests', booking.recordData.numOfGuests);
-
                     w2ui['myForm'].setValue('agency', booking.recordData.agency);
                     w2ui['myForm'].setValue('room', booking.recordData.room);
-
                     // w2ui['myForm'].setValue('voucher', booking.recordData.voucher);
                     // w2ui['myForm'].setValue('email', booking.recordData.email);
                     // w2ui['myForm'].setValue('tel', booking.recordData.tel);
                     // w2ui['myForm'].setValue('identification', booking.recordData.identification);
-
                     // w2ui['myForm'].setValue('invoiceNumber', booking.recordData.invoiceNumber);
                     // w2ui['myForm'].setValue('taxRefNumber', booking.recordData.taxRefNumber);
-
                     // w2ui['myForm'].setValue('afm', booking.recordData.afm);
-
                     w2ui['myForm'].setValue('extraInfo', booking.recordData.extraInfo);
-
-
                     w2ui['myForm'].refresh();
-
-
                     // todo  load the form with the selected item from the timeline
-
                 }
 
             });
@@ -1168,12 +1115,72 @@ $(function () {
 
 
 
-
-
-
-
-
-
-
 });// on ready
 //////
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// function delAction(id) {
+//     w2confirm(
+//     'Delete Cancelled   '+ id +'  Are you sure?')
+//         .yes(() => {
+//             delActionAjaxCall(id)
+//         })
+//         .no(() => {
+//             w2alert('Nothing changed or deleted ');
+//         })
+// }
+
+// function  delActionAjaxCall(id){
+//  // console.log('Yes')
+//             // String delUrl = "/booking/del?bid=" + booking.getId();
+//             $.ajax({
+//                 type: 'GET',
+//                 url: '/booking/del',
+//                 data: {
+//                     bid: id
+//                 },
+//                 contentType: 'application/json',
+//                 success: function (data, status, xhr) {
+//                     w2alert('Deleted a cancelled booking - all good re-run the report to confirm');
+//                 }
+//             });  // ajax
+// }
+
+
+
+// function financial(x) {
+//     if (x) {
+//         return Number.parseFloat(x).toFixed(2);
+//         // .replace('.', ',');
+//     }
+//     return Number.parseFloat(0).toFixed(2);
+//     // .replace('.', ',');
+// }
+
+
+
+// function convertDate_00_00_00(str) {
+//     var parts = str.split("/");
+//     var dt = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10));
+//     dt.setHours(0, 0, 0);
+
+//     return dt;
+// }

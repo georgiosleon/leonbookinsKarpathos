@@ -11,9 +11,6 @@ public interface BookingRepository extends CrudRepository<Booking, String> {
     //public List<Booking> findAllByOrderByIdAsc();
     List<Booking> findAllByOrderByStartDateAsc();
 
-
-
-
 //    select start_date, end_date, name from Booking
 //    WHERE ( DATE(start_date) BETWEEN '2024-02-18' AND '2024-02-19')   OR  ( DATE(end_date) BETWEEN '2024-02-18' AND '2024-02-19' )
 //    OR    (DATE(start_date) <  '2024-02-18'  AND DATE(end_date) >  '2024-02-19'   )
@@ -26,15 +23,11 @@ public interface BookingRepository extends CrudRepository<Booking, String> {
           + " OR ( DATE(start_date) < :startDate AND DATE(end_date) >  :endDate ) "
           + " ORDER BY start_date ASC",
           nativeQuery = true)
-    List<Booking> findAllBookingsForReport( @Param("startDate") String startDate, @Param("endDate") String endDate);
+    List<Booking> findAllBookingsForReport(@Param("startDate") String startDate, @Param("endDate") String endDate);
 
+    List<Booking> findByNameLike(String name);
 
-
-
-//    List<Booking> findByNameLike( String name);
-
-    List<Booking> findByNameContainingIgnoreCase( String name);
-
+    List<Booking> findByNameContainingIgnoreCase(String name);
 
 //
 //    @Query(value = "select * from Booking "
@@ -46,7 +39,6 @@ public interface BookingRepository extends CrudRepository<Booking, String> {
 //          + " ORDER BY  start_date ASC",
 //          nativeQuery = true)
 //    List<Booking> findAllBookingsForReportWithName( @Param("name") String name ,  @Param("startDate") String startDate, @Param("endDate") String endDate);
-
 
 
 }

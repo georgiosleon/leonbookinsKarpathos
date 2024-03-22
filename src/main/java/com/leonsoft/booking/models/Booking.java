@@ -93,8 +93,6 @@ public class Booking {
     @Column(name = "password")
     private String password;
 
-//    @Column(name = "request_DateTime")
-//    private LocalDateTime   requestDateTime;
 
 
 }

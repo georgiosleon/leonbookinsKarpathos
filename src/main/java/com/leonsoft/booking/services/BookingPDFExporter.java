@@ -168,24 +168,16 @@ public class BookingPDFExporter {
 //        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
 //        font.setSize(7);
 //        font.setColor(Color.BLUE);
-
 //        Paragraph p = new Paragraph("Bookings", font);
 //        p.setAlignment(Paragraph.ALIGN_CENTER);
-//
 //        document.add(p);
-
         PdfPTable table = new PdfPTable(18);
         table.setWidthPercentage(100f);
-
 //        table.setWidths(new float[]{1.5f, 3.5f, 3.0f, 3.0f, 1.5f});
         table.setSpacingBefore(1);
-
         writeTableHeader(table);
         writeTableData(table);
-
         document.add(table);
-
         document.close();
-
     }
 }

@@ -59,25 +59,42 @@ public class BookingRestController {
     Booking create(@RequestBody Booking booking) {
         booking.setId(UUID.randomUUID().toString());
         log.debug(" SAVE   {}  ", booking);
-        return bookingService.create(booking);
+
+
+
+        Booking bookingSaved = bookingService.create(booking);
+
+        bookingSaved.setPassword("dummy");
+        return bookingSaved;
+
+
+
     }
 
 
     @PostMapping(value = "/booking/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     Boolean deleteObject(
           @RequestBody Booking input) {
-        log.info("==============    delete input request object " + input );
 
 
+
+        log.info("============== DTO DELETE_OP_INPUT_REQUEST_OBJECT >>> " + input );
         Booking bookingFromDatabase = bookingService.getBookingFDatabase(input.getId());
-        log.info("==============  to delete db object  " + input );
+//        log.info("==============  DB  OBJECT   IF FOUND  SQL_CMD >>> DELETE FROM table_name WHERE condition;     " + bookingFromDatabase );
+        log.info("============== DBO SELECT_OP_INPUT_DATABASE_OBJECT   \nSELECT \n     IF FOUND  SQL_CMD >>> SELECT FROM Booking  WHERE id = '" + bookingFromDatabase.getId()   +"';" );
+        log.info("============== DBO DELETE_OP_INPUT_DATABASE_OBJECT   \nDELETE \n     IF FOUND  SQL_CMD >>> DELETE FROM Booking  WHERE id = '" + bookingFromDatabase.getId()   +"';" );
+
+        ///////
+        // todo write to seperate file  to build scrit to check if it was deleted
+        //////////
+
 
         if (bookingFromDatabase != null
             // todo  see about password per  booking and user management
 
-            //  && input.getPassword()!= null
-            //  && !  input.getPassword().isEmpty()    //  NOT_NULL_OR_EMPTY
-            //  && input.getPassword().equals(bookingFromDatabase.getPassword())
+             && input.getPassword()!= null
+             && ! input.getPassword().isEmpty()    //  NOT_NULL_OR_EMPTY
+             && input.getPassword().equals(bookingFromDatabase.getPassword())
         ) {
             log.info("==============    getBookingFDatabase   delete it ");
             log.info(" ============ Delete    {}", input.getId());
