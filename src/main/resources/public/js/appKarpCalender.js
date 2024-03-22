@@ -62,13 +62,14 @@ function convertDate(str) {
 ***********************************************************************************/
 function initForm() {
 
-     $('[name="save"]').hide();
-     $('[name="reset"]').hide();
-     w2ui.myForm.hide('name', 'startDate', 'extraInfo');
+//     $('[name="save"]').hide();
+//     $('[name="reset"]').hide();
+//     w2ui.myForm.hide('name', 'startDate', 'extraInfo');
 
 
-    w2ui['myForm'].setValue('startDate', formattedDate(new Date));
-    w2ui['myForm'].setValue('endDate', formattedDate(new Date));
+//    w2ui['myForm'].setValue('startDate', formattedDate(new Date));
+//    w2ui['myForm'].setValue('endDate', formattedDate(new Date));
+
     // w2ui['myForm'].setValue('numOfNights', 0);
 
     // w2ui['myForm'].setValue('status', { id: 'active', text: 'Active' });
@@ -105,9 +106,7 @@ var moveToDate = new Date();// set to current date
                                                                                                 // initialise vis timeline
 var groups = new vis.DataSet();
 // var items = new vis.DataSet();
-
-
-var items = new vis.DataSet({type: { start: "ISODate", end: "ISODate" }});   
+var items = new vis.DataSet({type: { start: "ISODate", end: "ISODate" }});
 var timelineoOtions = {
 
     locale: 'en',
@@ -208,9 +207,6 @@ var timelineoOtions = {
 
 };
 // add some rooms
-
-
-
 var roomList = [
 
 
@@ -475,12 +471,8 @@ var roomList = [
 
 
 ];
-
-
-
 // for the dropdown  select room
 // roomList.push({id: idVal,  text: descVal});
-
 //todo  check that the css ids ate updated
 var agencyList = [
     { id: 'bookingcom', text: 'Πολιτιστικά/Cultural' },
@@ -489,38 +481,9 @@ var agencyList = [
     { id: 'walkin',     text: 'Συγκοινωνίες/Transportation' },
     { id: 'closed',     text: 'Dine/Wine' },
 ];
-
-
-// var roomList = [
-
-//     // 
-//     {
-//         id: 'Cultural',
-//         text: 'Πολιτιστικά/Cultural'
-//     },
-  
-//     {
-//         id: 'Sport',
-//         text: 'Αθλητικά/Sport'
-//     },
-//     {
-//         id: 'Social',
-//         text: '🛍️ Κοινωνικά/Social'
-//     },
-//     {
-//         id: 'Transportation',
-//         text: '🛍️ Συγκοινωνίες/Transportation'
-//     }
-
-// ];  // for the dropdown  select room
-
-
 // var agencyList = [
 //     { id: 'other',      text: 'default' },
 // ];
-
-
-
 // docOnReady
 $(function () {
 
@@ -573,27 +536,24 @@ $(function () {
             });
             $('#myForm').w2form({
                 name: 'myForm',
+                 header: 'Form with Toolbar',
+                 toolbar: {
+                     items: [
+                         { id: 'bt1', type: 'button', text: 'Button 1', img: 'icon-folder' },
+                         { id: 'bt2', type: 'button', text: 'Button 2', img: 'icon-folder' },
+                         { id: 'bt3', type: 'spacer' },
+                         { id: 'bt4', type: 'button', text: 'GotoToday', img: 'icon-page' },
+                         { id: 'bt5', type: 'button', text: 'Save', img: 'icon-page' }
+                     ],
+                     onClick(event) {
+                         if (event.target == 'bt4') {
 
-                // header: 'Form with Toolbar',
-
-
-                // toolbar: {
-                //     items: [
-                //         { id: 'bt1', type: 'button', text: 'Button 1', img: 'icon-folder' },
-                //         { id: 'bt2', type: 'button', text: 'Button 2', img: 'icon-folder' },
-                //         { id: 'bt3', type: 'spacer' },
-                //         { id: 'bt4', type: 'button', text: 'GotoToday', img: 'icon-page' },
-                //         { id: 'bt5', type: 'button', text: 'Save', img: 'icon-page' }
-                //     ],
-                //     onClick(event) {
-                //         if (event.target == 'bt4') {
-
-                //         }
+                         }
 
 
-                //         if (event.target == 'bt5') alert('save test');
-                //     }
-                // },
+                         if (event.target == 'bt5') alert('save test');
+                     }
+                 },
 
 
                 // url      : {
@@ -685,15 +645,19 @@ $(function () {
                         required: true,
                         html: {
                             label: 'Extra Information ',
-                            attr: 'style="width: 600px; height: 60px; resize: none" '
+//                            attr: 'style="width: 600px; height: 60px; resize: none" '
+
+                             attr: 'style="width: 600px; height: 120px; " '
+
                         }
                     },
                     {
                         field: 'password', type: 'text',
                         required: true,
+
                         html: {
-                            label: 'Password',
-                            attr: 'style="  text-transform: uppercase; width: 300px; font-weight: bold; text-align:center; "'
+                            label: 'Password_to_Delete',
+                            attr: 'style=" text-transform: uppercase; width: 300px; font-weight: bold; text-align:center; "'
 
                         }
                     },
