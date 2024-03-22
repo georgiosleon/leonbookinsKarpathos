@@ -60,15 +60,13 @@ public class BookingRestController {
         booking.setId(UUID.randomUUID().toString());
         log.debug(" SAVE   {}  ", booking);
 
-
-
         Booking bookingSaved = bookingService.create(booking);
-
-        bookingSaved.setPassword("dummy");
-        return bookingSaved;
-
-
-
+        if (bookingSaved != null) {
+            bookingSaved.setPassword("*******"); // todo fix if needed serach for ??????
+            return bookingSaved;
+        } else {
+            return null;
+        }
     }
 
 
@@ -76,25 +74,24 @@ public class BookingRestController {
     Boolean deleteObject(
           @RequestBody Booking input) {
 
-
-
-        log.info("============== DTO DELETE_OP_INPUT_REQUEST_OBJECT >>> " + input );
+        log.info("============== DTO DELETE_OP_INPUT_REQUEST_OBJECT >>> " + input);
         Booking bookingFromDatabase = bookingService.getBookingFDatabase(input.getId());
 //        log.info("==============  DB  OBJECT   IF FOUND  SQL_CMD >>> DELETE FROM table_name WHERE condition;     " + bookingFromDatabase );
-        log.info("============== DBO SELECT_OP_INPUT_DATABASE_OBJECT   \nSELECT \n     IF FOUND  SQL_CMD >>> SELECT FROM Booking  WHERE id = '" + bookingFromDatabase.getId()   +"';" );
-        log.info("============== DBO DELETE_OP_INPUT_DATABASE_OBJECT   \nDELETE \n     IF FOUND  SQL_CMD >>> DELETE FROM Booking  WHERE id = '" + bookingFromDatabase.getId()   +"';" );
+        log.info("============== DBO SELECT_OP_INPUT_DATABASE_OBJECT   \nSELECT \n     IF FOUND  SQL_CMD >>> SELECT FROM Booking  WHERE id = '"
+              + bookingFromDatabase.getId() + "';");
+        log.info("============== DBO DELETE_OP_INPUT_DATABASE_OBJECT   \nDELETE \n     IF FOUND  SQL_CMD >>> DELETE FROM Booking  WHERE id = '"
+              + bookingFromDatabase.getId() + "';");
 
         ///////
         // todo write to seperate file  to build scrit to check if it was deleted
         //////////
 
-
         if (bookingFromDatabase != null
-            // todo  see about password per  booking and user management
+              // todo  see about password per  booking and user management
 
-             && input.getPassword()!= null
-             && ! input.getPassword().isEmpty()    //  NOT_NULL_OR_EMPTY
-             && input.getPassword().equals(bookingFromDatabase.getPassword())
+              && input.getPassword() != null
+              && !input.getPassword().isEmpty()    //  NOT_NULL_OR_EMPTY
+              && input.getPassword().equals(bookingFromDatabase.getPassword())
         ) {
             log.info("==============    getBookingFDatabase   delete it ");
             log.info(" ============ Delete    {}", input.getId());
@@ -104,8 +101,6 @@ public class BookingRestController {
         log.info("==============    getBookingFDatabase   NOT found ");
         return false;
     }
-
-
 
 //    @GetMapping(value = "/booking/del")
 //    void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {

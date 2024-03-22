@@ -161,9 +161,8 @@ public class BookingService {
             booking.setStartDate(DateTimeService.formatterEURO.format(stDt));
             LocalDate edDt = LocalDate.parse(booking.getEndDate(), DateTimeService.formatterISO);
             booking.setEndDate(DateTimeService.formatterEURO.format(edDt));
-
             // todo fix
-            booking.setPassword("Dummy");
+            booking.setPassword("??????");
 
         }
         return all;

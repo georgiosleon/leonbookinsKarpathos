@@ -9,6 +9,40 @@
     <meta name="description" content=""/>
     <meta name="viewport" content="width=device-width"/>
     <!-- css -->
+
+    <style>
+        body{
+        padding:3% 3% 10% 3%;
+        text-align:left;
+        }
+        img{
+            height:140px;
+                width:140px;
+        }
+        h1{
+        color: #32a852;
+        }
+        .mode {
+            float:right;
+        }
+        .change {
+            cursor: pointer;
+            border: 1px solid #555;
+            border-radius: 40%;
+            width: 20px;
+            text-align: center;
+            padding: 5px;
+            margin-left: 8px;
+        }
+        .dark{
+            background-color: #222;
+            color: #e6e6e6;
+        }
+    </style>
+
+
+
+
     <link href="css/w2ui.css" rel="stylesheet" type="text/css"/>
     <link href="css/vis-timeline-graph2d.min.css" rel="stylesheet" type="text/css"/>
     <link href="css/app.css" rel="stylesheet" type="text/css"/>
@@ -20,11 +54,20 @@
 </head>
 
 <body>
-    <button id="hide">Hide</button>
-    <button id="show">Show</button>
 
-    <div id="tid">app-title-KCAL</div>
+<div class="mode">
+    Dark mode:
+    <span class="change">OFF</span>
+</div>
+
+
+
+
+    <div id="tid"   style=" text-align: center; ">app-title-KCAL</div>
     <div id="clock"></div>
+
+<button id="hide">Hide</button>
+<button id="show">Show</button>
 
     <button  onclick="openInNewTab('https://www.timeanddate.com/worldclock');">Time</button >
     <button  onclick="openInNewTab('https://www.accuweather.com/en/gr/messochori/2282597/weather-forecast/2282597?city=dimos%20karpathos');">KAIROS</button >
@@ -33,16 +76,31 @@
     <button  onclick="openInNewTab('https://www.karpathos.gr') ;">  Karpathos.gr/Government  -  </button >
     <button  onclick="openInNewTab('https://www.astynomia.gr/?lang=en') ;">  Police  -  </button >
 
-
-
     <br><br>
 
-    <div id="myForm" style="width:'100%';height:'100%'"></div><br>
-
-
-    <div id="visualization"></div><br>
+    <div id="parent">
+        <div id="myForm"></div> <br> | <br> <div id="visualization"></div>
+    </div>
 
     <script src="js/appKarpCalender.js"></script>
+
+
+
+
+<script>
+    $( ".change" ).on("click", function() {
+        if( $( "body" ).hasClass( "dark" )) {
+            $( "body" ).removeClass( "dark" );
+            $( ".change" ).text( "OFF" );
+        } else {
+            $( "body" ).addClass( "dark" );
+            $( ".change" ).text( "ON" );
+        }
+    });
+</script>
+
+
+
 </body>
 
 </html>

@@ -21,7 +21,7 @@
         <maven.compiler.target>21</maven.compiler.target>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <start-class>com.leonsoft.Application</start-class>
+        <start-class>com.leonsoft.KarpathosApplication</start-class>
         <openpdf.version>1.3.33</openpdf.version>
         <lombok.version>1.18.30</lombok.version>
         <jsoup.version>1.17.2</jsoup.version>
@@ -38,7 +38,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.leonsoft.Application</mainClass>
+                            <mainClass>com.leonsoft.KarpathosApplication</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

@@ -1,4 +1,30 @@
 
+/*
+div {
+  border: 1px solid black;
+}
+*/
+/*.w2ui-page page-0 {
+  min-height: 30px;
+  min-width: 30px;
+  resize: both;
+  overflow: auto;
+  max-height: fit-content;
+  max-width: fit-content;
+}
+
+#w2ui-form-box {
+ min-height: 30px;
+  min-width: 30px;
+  resize: both;
+  overflow: auto;
+  max-height: fit-content;
+  max-width: fit-content;
+}
+*/
+
+
+
 .vis-item.bookingcom {
     background-color: rgb(196, 221, 253);
     border-color: rgb(22, 2, 59);

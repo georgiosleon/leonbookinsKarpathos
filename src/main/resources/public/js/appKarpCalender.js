@@ -4,10 +4,16 @@ var version = "ΚΑΡΠΑΘΟΣ planner - 2023 by ΓΕΩΡΓΙΟΣ ΛΕΟΥ ΟΘ
 //////
 //////
 //////
+
+function openInNewTab(url) {
+  window.open(url, '_blank').focus();
+}
+
 window.onload = function() {
     if (window.jQuery) {
         // jQuery is loaded
-        // alert("Yeah!");
+         alert("Yeah!");
+
     } else {
         // jQuery is not loaded
         alert("jQuery Doesn't Work");
@@ -15,6 +21,17 @@ window.onload = function() {
 }// window.onload
 //////
 //////
+
+
+
+
+
+
+
+
+
+
+
 //////
 // FUNCTIONS
 
@@ -81,6 +98,7 @@ function initForm() {
     // w2ui['myForm'].setValue('commission', null);
     w2ui['myForm'].refresh();
 
+    //w2ui['myForm'].resize();
 
 
 
@@ -188,9 +206,9 @@ var timelineoOtions = {
                         //  GOT    REPLY       alert('status: ' + status + ', data: ' + data);
                         if ( data == true ){
                             callback(item); // do remove
-                            alert(' Delete success     ');
+//                            alert(' Delete success     ');
                         } else {
-                            alert ('Delete failed. Need to give correct password. ');
+                            w2alert ('Delete failed. Need to give correct password. ');
                         }
 
                     }
@@ -494,9 +512,9 @@ $(function () {
             w2utils.settings.dateFormat = 'yyyy-mm-dd';
             
             // w2utils.settings.currencyPrefix = '€';
-            $("#tid").html(""+ version );;
+            $("#tid").html(""+ version );
             $("#tid").css({ 'color': 'blue', 'font-size': '150%' });
-            $("#tid").css('text-align', 'left');
+            $("#tid").css('text-align', 'center');
             $("#clock").css('text-align', 'left');
             // CLOCK
             setInterval('updateClock()', 1000);
@@ -534,27 +552,58 @@ $(function () {
                 $('[name="reset"]').show();
                 w2ui.myForm.show('name', 'startDate', 'extraInfo')
             });
-            $('#myForm').w2form({
+
+
+
+
+
+
+
+
+
+
+
+
+
+            $('#myForm')
+            .w2form({
+
+                box: '#myForm',
                 name: 'myForm',
-                 header: 'Form with Toolbar',
-                 toolbar: {
-                     items: [
-                         { id: 'bt1', type: 'button', text: 'Button 1', img: 'icon-folder' },
-                         { id: 'bt2', type: 'button', text: 'Button 2', img: 'icon-folder' },
-                         { id: 'bt3', type: 'spacer' },
-                         { id: 'bt4', type: 'button', text: 'GotoToday', img: 'icon-page' },
-                         { id: 'bt5', type: 'button', text: 'Save', img: 'icon-page' }
-                     ],
-                     onClick(event) {
-                         if (event.target == 'bt4') {
-
-                         }
 
 
-                         if (event.target == 'bt5') alert('save test');
-                     }
-                 },
 
+
+// resize: both;
+//  overflow-y: auto;
+//  border: 2px solid black;
+//  margin: 10px;
+//  height: 100px;
+//  width: 100px;
+
+
+//                 pageStyle: 'border: 1px solid red;    resize: both;     overflow-y: auto;    margin: 10px; ',
+                    pageStyle: ' resize: both;  ',
+
+                 header: '     (?) What will you enter something informal for Karpathos (?)',
+//                 toolbar: {
+//                     items: [
+//                         { id: 'bt1', type: 'button', text: 'Button 1', img: 'icon-folder' },
+//                         { id: 'bt2', type: 'button', text: 'Button 2', img: 'icon-folder' },
+//                         { id: 'bt3', type: 'spacer' },
+//                         { id: 'bt4', type: 'button', text: 'GotoToday', img: 'icon-page' },
+//                         { id: 'bt5', type: 'button', text: 'Save', img: 'icon-page' }
+//                     ],
+//                     onClick(event) {
+//                         if (event.target == 'bt4') {
+//                            moveToDate = new Date();
+//                            timeline.moveTo(moveToDate, { animation: true });
+//                         }
+//                         if (event.target == 'bt5') {
+//                            alert('save test');
+//                         }
+//                     }
+//                 },
 
                 // url      : {
                 //     get  : '/server/url/to/get',
@@ -571,7 +620,7 @@ $(function () {
                         html: {
                             label: 'Name',
                             text: '&nbsp; &nbsp;   %anchorAgency%  &nbsp; &nbsp;   %anchorRoom%   ',
-                            attr: 'style="  text-transform: uppercase; width: 300px; font-weight: bold; text-align:center; "'
+                            attr: 'style="  width: 300px; font-weight: bold; text-align:center; "'
                         }
                     },
                     
@@ -645,10 +694,8 @@ $(function () {
                         required: true,
                         html: {
                             label: 'Extra Information ',
-//                            attr: 'style="width: 600px; height: 60px; resize: none" '
-
-                             attr: 'style="width: 600px; height: 120px; " '
-
+//resize     example                                   attr: 'style="width: 600px; height: 60px; resize: none" '
+                             attr: 'style="width: 390px; height: 99px; resize: none; " '
                         }
                     },
                     {
@@ -656,8 +703,8 @@ $(function () {
                         required: true,
 
                         html: {
-                            label: 'Password_to_Delete',
-                            attr: 'style=" text-transform: uppercase; width: 300px; font-weight: bold; text-align:center; "'
+                            label: ' DeletePassword',
+                            attr: 'style=" width: 300px; font-weight: bold; text-align:center; "'
 
                         }
                     },
@@ -791,11 +838,6 @@ $(function () {
                                         data: pojo,
                                         success: function (element, status, xhr) {
 
-
-
-
-
-
                                                 items.add({
                                                     id: element.id,
                                                     type: 'range',
@@ -890,8 +932,21 @@ $(function () {
 
 
                 }
+
+
+
+
             });
+
+
+
+
+
             initForm();
+
+
+
+            // get data ajax call to back end
 
             $.ajax({
                 type: 'GET',
@@ -947,9 +1002,11 @@ $(function () {
             });
 
             // debug events
-//             w2ui.myForm.on('*', function (event) {
-//                 console.log('Event: ' + event.type, 'Target: ' + event.target, event);
-//             });
+            //             w2ui.myForm.on('*', function (event) {
+            //                 console.log('Event: ' + event.type, 'Target: ' + event.target, event);
+            //             });
+
+
 
             w2ui.myForm.on('change', function (event) {
 
@@ -1028,6 +1085,8 @@ $(function () {
 
             });
             // //  Timeline
+
+
             timeline.on('doubleClick', function (properties) {
 //                 alert(  JSON.stringify( properties , null, 4)) ;
                 if (properties != null && properties.item != null) {
@@ -1079,21 +1138,13 @@ $(function () {
 
 
 
+
+
+
+
+
 });// on ready
 //////
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
