@@ -6,13 +6,14 @@ var version = "ΚΑΡΠΑΘΟΣ planner - 2023 by ΓΕΩΡΓΙΟΣ ΛΕΟΥ ΟΘ
 //////
 
 function openInNewTab(url) {
-  window.open(url, '_blank').focus();
+//  window.open(url, '_blank').focus();
+   window.open(url, '_self').focus();
 }
 
 window.onload = function() {
     if (window.jQuery) {
         // jQuery is loaded
-         alert("Yeah!");
+//         alert("Yeah!");
 
     } else {
         // jQuery is not loaded
@@ -618,8 +619,9 @@ $(function () {
                         field: 'name', type: 'text',
                         required: true,
                         html: {
-                            label: 'Name',
-                            text: '&nbsp; &nbsp;   %anchorAgency%  &nbsp; &nbsp;   %anchorRoom%   ',
+                            label: 'Something:',
+//                          text: '&nbsp; &nbsp;   %anchorAgency%  &nbsp; &nbsp;   %anchorRoom%   ',
+//                            text: ' ',
                             attr: 'style="  width: 300px; font-weight: bold; text-align:center; "'
                         }
                     },
@@ -628,8 +630,8 @@ $(function () {
                         field: 'agency', type: 'list',
                         required: true,
                         html: {
-                            label: '&nbsp; &nbsp;  Kατηγορία  &nbsp;  &nbsp; ',
-                            anchor: '%anchorAgency%',
+                            label: 'Kατηγορία/Category',
+//                            anchor: '%anchorAgency%',
                             // text: '&nbsp;  %anchorVoucher% &nbsp; &nbsp;',
                             attr: 'style=" width: 200px;  font-weight: bold;  text-align:center;"'
                         },
@@ -640,8 +642,8 @@ $(function () {
                         field: 'room', type: 'list',
                         required: true,
                         html: {
-                            label: '&nbsp; &nbsp; Υπό-Kατηγορία &nbsp;',
-                            anchor: '%anchorRoom%',
+                            label: 'Υπό-Kατηγορία/Type',
+//                            anchor: '%anchorRoom%',
                             attr: 'style="  width: 300px; font-weight: bold; text-align:center; "'
                         },
                         options: { items: roomList }
@@ -652,8 +654,8 @@ $(function () {
                         field: 'startDate', type: 'date',
                         required: true,
                         html: {
-                            label: '&nbsp;&nbsp;&nbsp; Από ',
-                            text: '&nbsp;  &nbsp;  &nbsp;    %anchorEndDate%  &nbsp;  &nbsp;',
+                            label: 'Από/FROM ',
+//                            text: '&nbsp;  &nbsp;  &nbsp;    %anchorEndDate%  &nbsp;  &nbsp;',
                             attr: 'style="  width: 250px; font-weight: bold; text-align:center;"'
                         },
                         options: {
@@ -673,8 +675,8 @@ $(function () {
                         required: true,
                         // on endDate change  calculate  numOfNights  from start date and endDate
                         html: {
-                            label: '&nbsp;&nbsp;&nbsp; Εώς  &nbsp;&nbsp;&nbsp;&nbsp; ',
-                            anchor: '%anchorEndDate%',
+                            label: 'Εώς/Till:',
+//                            anchor: '%anchorEndDate%',
                             attr: 'style=" width: 250px; font-weight: bold; text-align:center;"'
                         },
                         options: {
