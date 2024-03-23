@@ -585,7 +585,7 @@ $(function () {
 //                 pageStyle: 'border: 1px solid red;    resize: both;     overflow-y: auto;    margin: 10px; ',
                     pageStyle: ' resize: both;  ',
 
-                 header: '     (?) What will you enter something informal for Karpathos (?)',
+//                 header: '     (?) What will you enter something informal for Karpathos (?)',
 //                 toolbar: {
 //                     items: [
 //                         { id: 'bt1', type: 'button', text: 'Button 1', img: 'icon-folder' },
