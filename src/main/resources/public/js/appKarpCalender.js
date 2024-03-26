@@ -1,5 +1,5 @@
 // v1.0.1
-var version = "ΚΑΡΠΑΘΟΣ planner - 2023 by ΓΕΩΡΓΙΟΣ ΛΕΟΥ ΟΘΟΣ ";
+var version = "ΚΑΡΠΑΘΟΣ Planner - (C) 2023 by George Leon (ΟΘΟΣ)";
 //////
 //////
 //////
@@ -229,10 +229,7 @@ var timelineoOtions = {
 var roomList = [
 
 
-    {
-            id: 'Dimos',
-            text: '👮🏼 🏛️ Dimos/Government'
-    },
+
     {
         id: 'Church',
         text: '⛪ Εκκλησία'
@@ -241,7 +238,10 @@ var roomList = [
             id: 'ChurchHoliday',
             text: '⛪🎉 Πανηγύρι/Εορτή'
     },
-
+    {
+            id: 'Dimos',
+            text: '👮🏼 🏛️ Dimos/Government'
+    },
      {
             id: 'Jobs',
             text: '🛠️  Jobs'
@@ -494,11 +494,11 @@ var roomList = [
 // roomList.push({id: idVal,  text: descVal});
 //todo  check that the css ids ate updated
 var agencyList = [
-    { id: 'bookingcom', text: 'Πολιτιστικά/Cultural' },
-    { id: 'other',      text: 'Αθλητικά/Sport' },
-    { id: 'abnb',       text: 'Κοινωνικά/Social' },
-    { id: 'walkin',     text: 'Συγκοινωνίες/Transportation' },
-    { id: 'closed',     text: 'Dine/Wine' },
+    { id: 'bookingcom', text: '🧿 blue' },
+    { id: 'other',      text: '💠 light-blue' },
+    { id: 'abnb',       text: '🌹️‍🔥red' },
+    { id: 'walkin',     text: '🍀 green' },
+    { id: 'closed',     text: '🏴‍☠️black' },
 ];
 // var agencyList = [
 //     { id: 'other',      text: 'default' },
@@ -514,7 +514,7 @@ $(function () {
             
             // w2utils.settings.currencyPrefix = '€';
             $("#tid").html(""+ version );
-            $("#tid").css({ 'color': 'blue', 'font-size': '150%' });
+            $("#tid").css({ 'color': 'blue', 'font-size': '120%' });
             $("#tid").css('text-align', 'center');
             $("#clock").css('text-align', 'left');
             // CLOCK
@@ -1105,6 +1105,7 @@ $(function () {
                          title: ' Selected ',
                          with: 300,
                          height: 350,
+                         showMax : true,
                          body:  pBody,
                          actions: { Ok: w2popup.close }
                     });
