@@ -494,11 +494,11 @@ var roomList = [
 // roomList.push({id: idVal,  text: descVal});
 //todo  check that the css ids ate updated
 var agencyList = [
-    { id: 'bookingcom', text: '🧿 blue' },
-    { id: 'other',      text: '💠 light-blue' },
-    { id: 'abnb',       text: '🌹️‍🔥red' },
-    { id: 'walkin',     text: '🍀 green' },
-    { id: 'closed',     text: '🏴‍☠️black' },
+    { id: 'bookingcom', text: '🧿🌌 Blue' },
+    { id: 'other',      text: '💎🌊 Light-blue' },
+    { id: 'abnb',       text: '🌹️‍🔥 Red' },
+    { id: 'walkin',     text: '🍀👽 Green' },
+    { id: 'closed',     text: '🏴‍☠️🎱️Black' },
 ];
 // var agencyList = [
 //     { id: 'other',      text: 'default' },
