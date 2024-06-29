@@ -1,5 +1,7 @@
 // v1.0.1
-var version = "VASS Rent a Car vassrentcar.gr";
+//var version = "VASS Rent a Car   <a href='https://vassrentacar.gr'>  vassrentacar.gr  </a>    ";
+var version = "";
+
 //////
 //////
 //////
@@ -303,7 +305,7 @@ $(function () {
 
             w2utils.settings.dateFormat = 'yyyy-mm-dd';
             // w2utils.settings.currencyPrefix = '€';
-            $("#tid").html(""+ version );;
+            $("#tid").html("      <img src='/assets/logos/VassRentACarKarpathos.png'>         "+ version );
             $("#tid").css({ 'color': 'blue', 'font-size': '150%' });
             $("#tid").css('text-align', 'right');
             $("#clock").css('text-align', 'right');
@@ -680,12 +682,9 @@ $(function () {
                     //     }
                     // },
 
+  find: {
 
-
-                    report: {
-
-
-                        text: 'report',
+                        text: 'find',
                         class: 'w2ui-btn-blue',
                         style: 'text-transform: uppercase; width: 100px;  color: white ; font-size: 12px;',
                         onClick(event) {
@@ -695,6 +694,7 @@ $(function () {
                                 type: 'GET',
                                 url: '/booking/report',
                                 data: {
+                                    name: w2ui.myForm.getValue('name'),
                                     fromDate: w2ui.myForm.getValue('startDate'),
                                     toDate: w2ui.myForm.getValue('endDate')
                                 },
@@ -719,6 +719,45 @@ $(function () {
 
                         }
                     },
+
+
+//                    report: {
+//
+//
+//                        text: 'report',
+//                        class: 'w2ui-btn-blue',
+//                        style: 'text-transform: uppercase; width: 100px;  color: white ; font-size: 12px;',
+//                        onClick(event) {
+//
+//
+//                            $.ajax({
+//                                type: 'GET',
+//                                url: '/booking/report',
+//                                data: {
+//                                    fromDate: w2ui.myForm.getValue('startDate'),
+//                                    toDate: w2ui.myForm.getValue('endDate')
+//                                },
+//                                contentType: 'application/json',
+//                                success: function (data, status, xhr) {
+//
+//                                    var contentHtml = data;
+//
+//                                    w2popup.open({
+//                                        title: 'Report ',
+//                                        // with: 300,
+//                                        // height: 500,
+//                                        showMax: true,
+//                                        openMaximized: true,
+//                                        body: contentHtml,
+//                                        actions: { Ok: w2popup.close }
+//                                    });
+//
+//                                }
+//                            });  // ajax
+//
+//
+//                        }
+//                    },
 
                     goto: {
                         text: 'goto',
