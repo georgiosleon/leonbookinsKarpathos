@@ -1,5 +1,5 @@
 // v1.0.1
-var version = "Car's and Guests Planner - ΚΑΡΠΑΘΟΣ - 2023 by - Leon Solutions - v. 1.0.1 ";
+var version = "VASS Rent a Car vassrentcar.gr";
 //////
 //////
 //////
@@ -217,63 +217,56 @@ var timelineoOtions = {
 // add some rooms
 var roomList = [
     {
-        id: 'CAR1',
-        text: 'CAR 1 🚗  '
+        id: '1.MG_WHITE_POI_1576',
+        text: '1.MG WHITE POI 1576'
     }
 
     ,{
-        id: 'CAR2',
-        text: 'CAR 2 🚗'
+        id: '2.MG_SILVER_POI_1575',
+        text: '2.MG SILVER POI 1575'
     }
     ,{
-            id: 'CAR3',
-            text: 'CAR 3 🚗'
+            id: '3.PEUGEOT_POI_1577',
+            text: '3.PEUGEOT POI 1577'
      }
      ,{
-          id: 'CAR4',
-          text: 'CAR 4 🚗'
+          id: '4.CITROEN_XHO_3781',
+          text: '4.CITROEN XHO 3781'
      }
      ,{
-           id: 'CAR5',
-           text: 'CAR 5 🚗'
+           id: '5.CITROEN_XHO_3782',
+           text: '5.CITROEN XHO 3782'
      }
      ,{
-           id: 'CAR6',
-           text: 'CAR 6 🚗'
-      } ,{
-         id: 'CAR7',
-         text: 'CAR 7 🚗'
-      } ,{
-        id: 'CAR8',
-       text: 'CAR 8 🚗'
+           id: '6.CITROEN_XHO_3783',
+           text: '6.CITROEN XHO 3783'
       }
 
+      ,{
+           id: '7.CITROEN_XHO_3784',
+           text: '7.CITROEN XHO 3784'
+       }
+       ,{
+          id: '8.CITROEN_XHO_3785',
+          text: '8.CITROEN XHO 3785'
+         }
+        ,{
+              id: '9.CITROEN_XHO_3786',
+              text: '9.CITROEN XHO 3786'
+        }
+        ,{
+             id: '10.CITROEN_XHO_3787',
+             text: '10.CITROEN XHO 3787'
+        }
+       ,{
+             id:   'SISAMIS_STUDIO',
+             text: 'SISAMIS STUDIO'
+        }
+       ,{
+             id:   'ARONIA_STUDIO',
+             text: 'ARONIA STUDIO'
+        }
 
-
-    ,{
-        id: 'BIKE1',
-        text: 'BIKE 1 🛵'
-    }
-,{
-        id: 'BIKE2',
-        text: 'BIKE 2 🛵'
-    }
-,{
-        id: 'BIKE3',
-        text: 'BIKE 3 🛵'
-    }
-,{
-        id: 'BIKE4',
-        text: 'BIKE 4 🛵'
-    }
-,{
-        id: 'BIKE5',
-        text: 'BIKE 5 🛵'
-    }
-,{
-        id: 'BIKE6',
-        text: 'BIKE 6 🛵'
-    }
 
 
 
@@ -422,7 +415,7 @@ $(function () {
                         html: {
                             label: '&nbsp; &nbsp;  🚗|🛵  &nbsp;',
                             anchor: '%anchorRoom%',
-                            attr: 'style="  width: 100px; font-weight: bold; text-align:center; "'
+                            attr: 'style="  width: 250px; font-weight: bold; text-align:center; "'
                         },
                         options: { items: roomList }
                     },
@@ -1160,6 +1153,47 @@ $(function () {
                 }
 
             });
+
+
+
+             timeline.on('doubleClick', function (properties) {
+
+                            // alert(  JSON.stringify( properties , null, 4)) ;
+
+                            if (properties != null && properties.item != null) {
+
+                                var booking = items.get(properties.item);
+                                // JSON.stringify(booking.recordData)
+
+
+                          var bookingPopText =
+                   "<br> FROM:<b>"+ booking.recordData.startDate   +   "</b>    TO:<b>"+ booking.recordData.endDate+"</b>"  +  "  &nbsp;&nbsp;&nbsp;&nbsp;    Status: " + ( booking.recordData.status == "paid" ?   " ⁉️ "+ booking.recordData.status + " 💲 " : booking.recordData.status )
+                +  "<br><br> Room:  <b>"+ booking.recordData.room      + " </b>   numOfNights:  <b>" + booking.recordData.numOfNights +"</b>"
+                +  "<br> Guest Name:  <b>"+ booking.recordData.name      + " </b>  numOfGuests  ‍👦 <b>" +  booking.recordData.numOfGuests +"</b>"
+                +  "<br><br> ============================"
+                +  "<br> Extra Info:  <b>"+ ( booking.recordData.extraInfo != null ?    booking.recordData.extraInfo  : "" )    + " </b>"
+                +  "<br> ============================"
+                +  "<br> Charge:  "+  financial(booking.recordData.charge)
+                +  "<br> ============================"
+                +  "<br> (-)  commission :  "+  financial(booking.recordData.commission)
+                +  "<br> (-)  received :  "+  financial(booking.recordData.received)
+                +  "<br> ============================"
+                +  "<br> (+)  Balance :  "+  financial(booking.recordData.balance)
+                +  "<br> ============================"
+                                                      ;
+
+                                  w2popup.open({
+                                     title: 'The Selected booking is ',
+                                     with: 250,
+                                     height: 363,
+                                     body: bookingPopText,
+                                     actions: { Ok: w2popup.close }
+                                 })
+
+                            }
+
+                        });
+
             // timeline.on('doubleClick', function (properties) {
             //     console.log("Double click event fired");
             //     w2alert('Not me!! The other button');

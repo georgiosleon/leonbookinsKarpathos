@@ -84,7 +84,7 @@ public class BookingHtmlTemplate {
 //                status = statusCancelled;
 //            }
 
-            if (booking.getStatus().equals("paid")) {
+            if ( null != booking.getStatus() && booking.getStatus().equals("paid")) {
                 /////Calc totals
                 totals.setTotBalance(totals.getTotBalance() + booking.getBalance());
                 totals.setTotCharge(totals.getTotCharge() + booking.getCharge());

@@ -75,11 +75,14 @@ public class BookingService {
 
     boolean validateBooking(Booking booking) {
 
+//todo   fix  validation for Karp Calender
+
         if (booking.getName() == null) {
-            return false;
+            booking.setName("Item_"+UUID.randomUUID());
         }
+
         if (booking.getExtraInfo() == null) {
-            return false;
+            booking.setExtraInfo("");
         }
 
 //
@@ -96,10 +99,11 @@ public class BookingService {
     public Booking create(Booking booking) {
 
         if (!validateBooking(booking)) {
+            log.error("   Validation FAILURE  for "  + booking );
             return null;
         }
 
-        booking = fillBooking(booking);
+        booking = saveBooking(booking);
 
         return booking;
     }
@@ -112,7 +116,7 @@ public class BookingService {
     }
 
 
-    private Booking fillBooking(Booking booking) {
+    private Booking saveBooking(Booking booking) {
         booking.setId(UUID.randomUUID().toString());
 
         log.debug(" SAVE   {}  ", booking);
