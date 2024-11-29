@@ -32,20 +32,20 @@
 <!--        <finalName>${project.artifactId}</finalName>-->
 
         <plugins>
-            <plugin>
-                <artifactId>maven-assembly-plugin</artifactId>
+<!--            <plugin>-->
+<!--                <artifactId>maven-assembly-plugin</artifactId>-->
 <!--                <version>3.7.0</version>-->
-                <configuration>
-                    <archive>
-                        <manifest>
-                            <mainClass>com.leonsoft.Application</mainClass>
-                        </manifest>
-                    </archive>
-                    <descriptorRefs>
-                        <descriptorRef>jar-with-dependencies</descriptorRef>
-                    </descriptorRefs>
-                </configuration>
-            </plugin>
+<!--                <configuration>-->
+<!--                    <archive>-->
+<!--                        <manifest>-->
+<!--                            <mainClass>com.leonsoft.Application</mainClass>-->
+<!--                        </manifest>-->
+<!--                    </archive>-->
+<!--                    <descriptorRefs>-->
+<!--                        <descriptorRef>jar-with-dependencies</descriptorRef>-->
+<!--                    </descriptorRefs>-->
+<!--                </configuration>-->
+<!--            </plugin>-->
 
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -58,6 +58,32 @@
     </build>
 
     <dependencies>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.14.0</version>
+        </dependency>
+
+<!--        <dependency>-->
+<!--            <groupId>pl.jalokim.propertiestojson</groupId>-->
+<!--            <artifactId>java-properties-to-json</artifactId>-->
+<!--            <version>5.3.0</version>-->
+<!--        </dependency>-->
+
+
+        <!-- https://mvnrepository.com/artifact/org.apache.pdfbox/pdfbox -->
+        <dependency>
+            <groupId>org.apache.pdfbox</groupId>
+            <artifactId>pdfbox</artifactId>
+            <version>2.0.3</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/com.itextpdf/itextpdf -->
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>itextpdf</artifactId>
+            <version>5.5.13.2</version>
+        </dependency>
 
 
         <!-- https://mvnrepository.com/artifact/org.jsoup/jsoup -->

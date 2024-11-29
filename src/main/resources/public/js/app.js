@@ -484,6 +484,7 @@ var roomList = [
 var agencyList = [
     { id: 'abnb', text: 'AirBnB' },
     { id: 'bookingcom', text: 'Booking.com' },
+    { id: 'sunweb', text: 'SunwebGroup' },
     { id: 'walkin', text: 'Walk-in' },
     { id: 'closed', text: 'Closed' },
 ];
