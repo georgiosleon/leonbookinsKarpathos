@@ -54,6 +54,23 @@ window.onload = function() {
 //}
 
 // functions
+
+function hide (elements) {
+  elements = elements.length ? elements : [elements];
+  for (var index = 0; index < elements.length; index++) {
+
+
+    if (typeof elements[index].style  !== 'undefined') {
+        elements[index].style.display = 'none';
+    }
+
+  }
+}
+//// Usage:
+//hide(document.querySelectorAll('.target'));
+//hide(document.querySelector('.target'));
+//hide(document.getElementById('target'));
+
 function updateClock (){
  	var currentTime = new Date ( );
   	var currentHours = currentTime.getHours ( );
@@ -1039,7 +1056,13 @@ $(function () {
                         style: 'text-transform: uppercase; color: white; width: 200px;  font-size: 12px; ',
                         onClick(event) {
 
-                            if (w2ui.myForm.validate().length == 0) {
+
+//                              w2ui['myForm'].validate(false);
+
+                           let   formErrors =  w2ui.myForm.validate();
+
+
+                            if (formErrors.length == 0) {
 
 
                                 // retrieve a filtered subset of the data
@@ -1128,6 +1151,7 @@ $(function () {
                                     timeline.moveTo(convertDate(w2ui.myForm.getValue('startDate')).setHours(12, 0, 0), { animation: true });
 
                                     var pojo = JSON.stringify(newItem.recordData);
+alert( pojo );
 
                                     $.ajax({
                                         type: 'POST',
@@ -1223,10 +1247,45 @@ $(function () {
                             }
                             else {
                                 w2alert("Fix problems then do save");
-                                setTimeout(function () { w2ui['myForm'].clear();
-                                    timeline.setSelection([]); // unselect timeline item
-                                    cancelledTimeline.setSelection([]); // unselect timeline item
-                                    initForm();
+                                setTimeout(function () {
+
+//JSON.stringify(  w2ui['myForm'] )
+//                                    formErrors
+
+//                                     let   errors =  w2ui.myForm.validate(false);
+
+                                console.log( formErrors   );
+
+// Usage:
+hide(document.querySelectorAll('.w2ui-arrow-right'));
+hide(document.querySelectorAll('.w2ui-arrow-left'));
+
+//w2ui-overlay-body w2ui-light w2ui-arrow-left
+
+//class="w2ui-overlay-body w2ui-light w2ui-arrow-right"
+
+//hide(document.querySelector('.target'));
+//hide(document.getElementById('target'));
+
+
+
+                              //   w2ui['myForm'].reload();
+
+//    w2ui['myForm'].last.errors  =  [] ;
+//                                 w2ui['myForm'].validate(false);
+
+//  w2ui['myForm'].refresh();
+
+
+//                                    let errors =  w2ui['myForm'].validate();
+//                                                                    console.log(errors)
+//                                                                    alert(errors);
+
+
+                                    //w2ui['myForm'].clear();
+                                    //timeline.setSelection([]); // unselect timeline item
+                                    //cancelledTimeline.setSelection([]); // unselect timeline item
+                                    //initForm();
                                  }, 3000);
 
                             }
