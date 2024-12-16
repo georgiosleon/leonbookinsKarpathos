@@ -54,18 +54,28 @@ window.onload = function() {
 //}
 
 // functions
-
-function hide (elements) {
+//function sleepFor(sleepDuration){
+//    var now = new Date().getTime();
+//    while(new Date().getTime() < now + sleepDuration){ /* Do nothing */ }
+//}
+function hideCss (elements) {// todo  use  jquery
   elements = elements.length ? elements : [elements];
   for (var index = 0; index < elements.length; index++) {
-
-
     if (typeof elements[index].style  !== 'undefined') {
         elements[index].style.display = 'none';
     }
-
   }
 }
+function showCss (elements) { // todo  use  jquery
+  elements = elements.length ? elements : [elements];
+  for (var index = 0; index < elements.length; index++) {
+    if (typeof elements[index].style  !== 'undefined') {
+        elements[index].style.display = 'block';
+    }
+  }
+}
+
+
 //// Usage:
 //hide(document.querySelectorAll('.target'));
 //hide(document.querySelector('.target'));
@@ -133,6 +143,9 @@ function initForm() {
     w2ui['myForm'].setValue('charge', null);
     w2ui['myForm'].setValue('received', null);
     w2ui['myForm'].setValue('commission', null);
+
+    w2ui['myForm'].setValue('dailyTax', 1);
+
     w2ui['myForm'].refresh();
 
 
@@ -687,7 +700,7 @@ $(function () {
                         required: true,
                         html: {
                             label: '&nbsp;&nbsp;&nbsp; From ',
-                            text: '&nbsp;  &nbsp;  &nbsp;   %anchorEndDate%  %anchorNumOfNights%  🛌 ',
+                            text: '&nbsp;  &nbsp;  &nbsp;   %anchorEndDate%  %anchorNumOfNights%  🛌  &nbsp;&nbsp; %anchorDailyTax%  &nbsp;&nbsp; %anchorDailyTaxTotal% ',
                             attr: 'style="  width: 100px; font-weight: bold; text-align:center;"'
                         },
                         options: {
@@ -726,6 +739,36 @@ $(function () {
                         },
                         options: { min: 1 }
 
+                    },
+
+                     {
+                        field: 'dailyTax', type: 'float',
+                        // required: true,
+                        html: {
+                            label: '&nbsp; &nbsp;  &nbsp; DailyTax &nbsp; &nbsp; ',
+                            anchor: '%anchorDailyTax%',
+                            attr: 'style="width: 80px; font-weight: bold; text-align:center; "'
+                        },
+                        options: {
+                            groupSymbol: ''
+                            // , decimalSymbol:','
+                        }
+                    },
+
+                     // numOfNights * dailyTax
+                     {
+                        field: 'dailyTaxTotal', type: 'float',
+                        // required: true,
+                        disabled: true,
+                        html: {
+                            label: '&nbsp; &nbsp;  Daily Tax Total &nbsp; &nbsp;',
+                            anchor: '%anchorDailyTaxTotal%',
+                            attr: 'style="width: 80px; font-weight: bold; text-align:center;"'
+                        },
+                        options: {
+                            groupSymbol: ''
+                            // ,decimalSymbol:','
+                        }
                     },
 
 
@@ -1247,45 +1290,13 @@ alert( pojo );
                             }
                             else {
                                 w2alert("Fix problems then do save");
+                                showCss(document.querySelectorAll('.w2ui-arrow-right'));
+                                showCss(document.querySelectorAll('.w2ui-arrow-left'));
+
                                 setTimeout(function () {
-
-//JSON.stringify(  w2ui['myForm'] )
-//                                    formErrors
-
-//                                     let   errors =  w2ui.myForm.validate(false);
-
-                                console.log( formErrors   );
-
-// Usage:
-hide(document.querySelectorAll('.w2ui-arrow-right'));
-hide(document.querySelectorAll('.w2ui-arrow-left'));
-
-//w2ui-overlay-body w2ui-light w2ui-arrow-left
-
-//class="w2ui-overlay-body w2ui-light w2ui-arrow-right"
-
-//hide(document.querySelector('.target'));
-//hide(document.getElementById('target'));
-
-
-
-                              //   w2ui['myForm'].reload();
-
-//    w2ui['myForm'].last.errors  =  [] ;
-//                                 w2ui['myForm'].validate(false);
-
-//  w2ui['myForm'].refresh();
-
-
-//                                    let errors =  w2ui['myForm'].validate();
-//                                                                    console.log(errors)
-//                                                                    alert(errors);
-
-
-                                    //w2ui['myForm'].clear();
-                                    //timeline.setSelection([]); // unselect timeline item
-                                    //cancelledTimeline.setSelection([]); // unselect timeline item
-                                    //initForm();
+                                    console.log( formErrors   );
+                                    hideCss(document.querySelectorAll('.w2ui-arrow-right'));
+                                    hideCss(document.querySelectorAll('.w2ui-arrow-left'));
                                  }, 3000);
 
                             }
@@ -1384,11 +1395,31 @@ hide(document.querySelectorAll('.w2ui-arrow-left'));
                 }
 
 
+                if (event != null && event.target == 'dailyTax') {
+                                    //alert('on change  agency ');
+
+                       var numOfNightsFldVal = w2ui['myForm'].getValue('numOfNights');
+                       var dailyTaxFldVal = w2ui['myForm'].getValue('dailyTax');
+
+                      w2ui['myForm'].setValue('dailyTaxTotal', numOfNightsFldVal * dailyTaxFldVal );
+                }
+
+
                 //  Event: change Target: startDate
                 if (event != null && event.target == 'startDate') {
                     w2ui['myForm'].setValue('endDate', event.detail.value.current);
                     w2ui['myForm'].setValue('numOfNights', 0);
+
+
+                    var numOfNightsFldVal = w2ui['myForm'].getValue('numOfNights');
+                    var dailyTaxFldVal = w2ui['myForm'].getValue('dailyTax');
+                    w2ui['myForm'].setValue('dailyTaxTotal', numOfNightsFldVal * dailyTaxFldVal );
+
                     w2ui['myForm'].refresh();
+
+
+
+
                     // console.dir(  w2ui['myForm'].get('endDate')  )  ;
                 }
 
@@ -1413,6 +1444,10 @@ hide(document.querySelectorAll('.w2ui-arrow-left'));
 
                     w2ui['myForm'].setValue('numOfNights', numOfNights.toFixed(0));
 
+                    var numOfNightsFldVal = w2ui['myForm'].getValue('numOfNights');
+                    var dailyTaxFldVal = w2ui['myForm'].getValue('dailyTax');
+                    w2ui['myForm'].setValue('dailyTaxTotal', numOfNightsFldVal * dailyTaxFldVal );
+
                     w2ui['myForm'].refresh();
 
                     //  w2ui['form'].set('field_1', { type: 'int' });
@@ -1428,6 +1463,10 @@ hide(document.querySelectorAll('.w2ui-arrow-left'));
                         });
 
                     }
+
+
+
+
 
                     // else {
                     //     w2alert("Numuber Of Nights is calculated as " + numOfNights + " nigths. <br><br> Start: " + startDateFld + "<br> End: " + endDateFld );
