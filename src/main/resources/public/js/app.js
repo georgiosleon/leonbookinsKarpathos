@@ -133,18 +133,18 @@ function initForm() {
 
     w2ui['myForm'].setValue('startDate', formattedDate(new Date));
     w2ui['myForm'].setValue('endDate', formattedDate(new Date));
+
     w2ui['myForm'].setValue('numOfNights', 0);
 
+    w2ui['myForm'].setValue('dailyTax', financial(2) );
+    w2ui['myForm'].setValue('dailyTaxTotal', financial(0) ); // numOfNights * dailyTax
 
     w2ui['myForm'].setValue('status', { id: 'active', text: 'Active 🟡️' });
-
 
     w2ui['myForm'].setValue('balance', null);
     w2ui['myForm'].setValue('charge', null);
     w2ui['myForm'].setValue('received', null);
     w2ui['myForm'].setValue('commission', null);
-
-    w2ui['myForm'].setValue('dailyTax', 1);
 
     w2ui['myForm'].refresh();
 
@@ -598,7 +598,8 @@ $(function () {
                     // $("#save").hide();
                     $('[name="save"]').hide();
                     $('[name="reset"]').hide();
-                    w2ui.myForm.hide('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email', 'extraInfo', 'country')
+                    w2ui.myForm.hide('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email',
+                     'extraInfo', 'country', 'dailyTax', 'dailyTaxTotal' )
 
                 });
             $("#show").click(function () {
@@ -606,7 +607,8 @@ $(function () {
                 // $("#save").show();
                 $('[name="save"]').show();
                 $('[name="reset"]').show();
-                w2ui.myForm.show('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email', 'extraInfo', 'country')
+                w2ui.myForm.show('name', 'numOfGuests', 'voucher', 'charge', 'identification', 'email',
+                'extraInfo', 'country', 'dailyTax', 'dailyTaxTotal')
             });
 
             $('#myForm').w2form({
@@ -1200,7 +1202,9 @@ alert( pojo );
                                         type: 'POST',
                                         url: '/booking/save',
                                         contentType: 'application/json',
+
                                         data: pojo,
+
                                         success: function (element, status, xhr) {
 
 
@@ -1398,10 +1402,14 @@ alert( pojo );
                 if (event != null && event.target == 'dailyTax') {
                                     //alert('on change  agency ');
 
-                       var numOfNightsFldVal = w2ui['myForm'].getValue('numOfNights');
-                       var dailyTaxFldVal = w2ui['myForm'].getValue('dailyTax');
+                      var numOfNightsFldVal = w2ui['myForm'].getValue('numOfNights');
+                      var dailyTaxFldVal = w2ui['myForm'].getValue('dailyTax');
 
-                      w2ui['myForm'].setValue('dailyTaxTotal', numOfNightsFldVal * dailyTaxFldVal );
+                      w2ui['myForm'].setValue('dailyTaxTotal', financial(numOfNightsFldVal * dailyTaxFldVal) );
+
+                      w2ui['myForm'].setValue('dailyTax', financial( dailyTaxFldVal) );
+
+
                 }
 
 
@@ -1537,6 +1545,10 @@ alert( pojo );
                     w2ui['myForm'].setValue('afm', booking.recordData.afm);
                     w2ui['myForm'].setValue('extraInfo', booking.recordData.extraInfo);
 
+                    w2ui['myForm'].setValue('dailyTax', financial(booking.recordData.dailyTax));
+                    w2ui['myForm'].setValue('dailyTaxTotal',financial(booking.recordData.dailyTaxTotal));
+
+
                     w2ui['myForm'].setValue('status', booking.recordData.status);
 
 
@@ -1562,6 +1574,9 @@ alert( pojo );
        "<br> FROM:<b>"+ booking.recordData.startDate   +   "</b>    TO:<b>"+ booking.recordData.endDate+"</b>"  +  "  &nbsp;&nbsp;&nbsp;&nbsp;    Status: " + ( booking.recordData.status == "paid" ?   " ⁉️ "+ booking.recordData.status + " 💲 " : booking.recordData.status )
     +  "<br><br> Room:  <b>"+ booking.recordData.room      + " </b>   numOfNights: 🛌 <b>" + booking.recordData.numOfNights +"</b>"
     +  "<br> Guest Name:  <b>"+ booking.recordData.name      + " </b>  numOfGuests  👨‍👩‍👦 <b>" +  booking.recordData.numOfGuests +"</b>"
+
+    +  "<br> Daily Tax :  <b>"+ financial(booking.recordData.dailyTax)      + " </b>  Daily Tax Total <b>" +  financial(booking.recordData.dailyTaxTotal) +"</b>"
+
     +  "<br><br> ============================"
     +  "<br> Extra Info:  <b>"+ ( booking.recordData.extraInfo != null ?    booking.recordData.extraInfo  : "" )    + " </b>"
     +  "<br> ============================"
@@ -1641,6 +1656,9 @@ alert( pojo );
                                 w2ui['myForm'].setValue('afm', booking.recordData.afm);
                                 w2ui['myForm'].setValue('extraInfo', booking.recordData.extraInfo);
 
+                               w2ui['myForm'].setValue('dailyTax', financial(booking.recordData.dailyTax));
+                               w2ui['myForm'].setValue('dailyTaxTotal',financial(booking.recordData.dailyTaxTotal));
+
                                 w2ui['myForm'].setValue('status', booking.recordData.status);
 
 
@@ -1678,6 +1696,9 @@ alert( pojo );
                           "<br> FROM:<b>"+ booking.recordData.startDate   +   "</b>    TO:<b>"+ booking.recordData.endDate+"</b>"  +  "  &nbsp;&nbsp;&nbsp;&nbsp;    Status: " + booking.recordData.status + " 🚫 "
                        +  "<br><br> Room:  <b>"+ booking.recordData.room      + " </b>   numOfNights: 🛌 <b>" + booking.recordData.numOfNights +"</b>"
                        +  "<br> Guest Name:  <b>"+ booking.recordData.name      + " </b>  numOfGuests  👨‍👩‍👦 <b>" +  booking.recordData.numOfGuests +"</b>"
+
+                       +  "<br> Daily Tax :  <b>"+ financial(booking.recordData.dailyTax)      + " </b>  Daily Tax Total <b>" +  financial(booking.recordData.dailyTaxTotal)  +"</b>"
+
                        +  "<br><br> ============================"
                        +  "<br> Extra Info:  <b>"+ ( booking.recordData.extraInfo != null ?    booking.recordData.extraInfo  : "" )    + " </b>"
                        +  "<br> ============================"

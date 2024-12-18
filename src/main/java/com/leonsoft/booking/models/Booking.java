@@ -3,13 +3,7 @@ package com.leonsoft.booking.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import java.time.LocalDateTime;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 
 @Getter
 @Setter
@@ -92,6 +86,15 @@ public class Booking {
 
     @Column(name = "password")
     private String password;
+
+
+    @Column(name = "dailyTax")
+    private Double dailyTax;
+
+
+    @Column(name = "dailyTaxTotal")
+    private Double dailyTaxTotal;
+
 
 //    @Column(name = "request_DateTime")
 //    private LocalDateTime   requestDateTime;
