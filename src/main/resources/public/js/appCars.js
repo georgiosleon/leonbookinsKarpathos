@@ -578,7 +578,7 @@ $(function () {
                         field: 'afm', type: 'text',
                         // required: true,
                         html: {
-                            label: 'ΑΦΜ &nbsp;',
+                            label: 'Drivers Lic. &nbsp;',
                             anchor: '%anchorAfm%',
                             attr: 'style="width: 200px; text-transform: uppercase; font-weight: bold;  text-align:center;"'
                         }
