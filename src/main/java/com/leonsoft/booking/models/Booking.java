@@ -3,11 +3,12 @@ package com.leonsoft.booking.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import java.util.StringJoiner;
 import lombok.*;
 
 @Getter
 @Setter
-@ToString
+//@ToString
 @NoArgsConstructor
 @Entity
 @Data
@@ -100,4 +101,34 @@ public class Booking {
 //    private LocalDateTime   requestDateTime;
 
 
+    @Override
+    public String toString() {
+        return new StringJoiner(", ", Booking.class.getSimpleName() + "[", "]")
+              .add("id='" + id + "'")
+              .add("startDate='" + startDate + "'")
+              .add("endDate='" + endDate + "'")
+              .add("numOfNights=" + numOfNights)
+              .add("charge=" + charge)
+              .add("received=" + received)
+              .add("commission=" + commission)
+              .add("balance=" + balance)
+              .add("name='" + name + "'")
+              .add("agency='" + agency + "'")
+              .add("room='" + room + "'")
+              .add("numOfGuests=" + numOfGuests)
+              .add("country='" + country + "'")
+              .add("voucher='" + voucher + "'")
+              .add("identification='" + identification + "'")
+              .add("invoiceNumber='" + invoiceNumber + "'")
+              .add("taxRefNumber='" + taxRefNumber + "'")
+              .add("email='" + email + "'")
+              .add("afm='" + afm + "'")
+              .add("tel='" + tel + "'")
+              .add("extraInfo='" + extraInfo + "'")
+              .add("status='" + status + "'")
+              .add("password='" + password + "'")
+              .add("dailyTax=" + dailyTax)
+              .add("dailyTaxTotal=" + dailyTaxTotal)
+              .toString();
+    }
 }
