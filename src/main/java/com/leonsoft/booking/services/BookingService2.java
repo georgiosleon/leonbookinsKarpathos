@@ -13,12 +13,13 @@ import java.util.Optional;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
+import org.jsoup.safety.Safelist;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
 @Slf4j
-public class BookingService {
+public class BookingService2 {
 
     @Autowired
     protected BookingRepository bookingRepository;
@@ -75,22 +76,23 @@ public class BookingService {
 
     boolean validateBooking(Booking booking) {
 
-//todo   fix  validation for Karp Calender
-
         if (booking.getName() == null) {
-            booking.setName("Item_"+UUID.randomUUID());
+            return false;
         }
-
         if (booking.getExtraInfo() == null) {
-            booking.setExtraInfo("");
+            return false;
+        }
+        if (booking.getPassword() == null ||  booking.getPassword().length() < 3 )  {
+            return false;
         }
 
 //
-//        booking.setName( Jsoup.clean( booking.getName() , Safelist.basic() ) );
-//        booking.setExtraInfo( Jsoup.clean( booking.getExtraInfo() , Safelist.basic() ) );
+        //  TODO  add as parameters  in applications.props
+        booking.setName( Jsoup.clean( booking.getName() , Safelist.basic() ) );
+        booking.setExtraInfo( Jsoup.clean( booking.getExtraInfo() , Safelist.basic() ) );
+        // option 1        booking.setExtraInfo(Jsoup.parse(booking.getExtraInfo()).text());
+        // option 2       booking.setName(Jsoup.parse(booking.getName()).text());
 
-        booking.setExtraInfo(Jsoup.parse(booking.getExtraInfo()).text());
-        booking.setName(Jsoup.parse(booking.getName()).text());
 
         return true;
     }
@@ -103,7 +105,7 @@ public class BookingService {
             return null;
         }
 
-        booking = saveBooking(booking);
+        booking = fillBooking(booking);
 
         return booking;
     }
@@ -116,7 +118,7 @@ public class BookingService {
     }
 
 
-    private Booking saveBooking(Booking booking) {
+    private Booking fillBooking(Booking booking) {
         booking.setId(UUID.randomUUID().toString());
 
         log.debug(" SAVE   {}  ", booking);

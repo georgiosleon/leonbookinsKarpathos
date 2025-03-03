@@ -13,6 +13,12 @@ public class Application {
 	public static void main(String[] args) {
 
 		SpringApplication.run(Application.class, args);
+
+		System.out.println("Started  ... leon    http://localhost:9191/");
+		System.out.println("Started  ... leon    http://localhost:9191/");
+		System.out.println("Started  ... leon    http://localhost:9191/");
+
+
 	}
 
 }
