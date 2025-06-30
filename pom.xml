@@ -11,8 +11,14 @@
     <groupId>leonbookinsKarpathos.dev</groupId>
     <artifactId>leonbookinsKarpathos</artifactId>
     <version>1.0.0</version>
+    <packaging>pom</packaging>
     <name>leonbookinsKarpathos</name>
     <description>Leon Soft</description>
+    <modules>
+        <module>admin</module>
+        <module>applicationBookings</module>
+        <module>applicationBookings/docs</module>
+    </modules>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>21</java.version>
@@ -25,6 +31,12 @@
         <openpdf.version>1.3.33</openpdf.version>
         <lombok.version>1.18.30</lombok.version>
         <jsoup.version>1.17.2</jsoup.version>
+
+
+<!--   todo FIX LEON        Upgrade to version ch.qos.logback:logback-core:1.3.15;ch.qos.logback:logback-core:1.5.13-->
+
+
+
     </properties>
 
     <build>
