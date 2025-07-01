@@ -1,3 +1,14 @@
+#
+# BUILD STAGE
+#
+FROM maven:3.6.0-jdk-11-slim AS build
+WORKDIR /app
+COPY applicationBookings/src /app/src
+COPY applicationBookings/pom.xml /app
+RUN mvn -f /app/pom.xml clean install
+
+
+
 # Step 1: Use an official OpenJDK base image from Docker Hub
 FROM azul/zulu-openjdk:21
 # Step 2: Set the working directory inside the container
@@ -8,6 +19,6 @@ COPY applicationBookings/target/applicationBookings-1.0.0.jar /app/app.jar
 COPY applicationBookings/bookings.db /app/bookings.db
 VOLUME /app
 # Step 4: Expose the port your application runs on
-EXPOSE 8080
+EXPOSE 9191
 # Step 5: Define the command to run your Spring Boot application
 CMD ["java", "-jar", "/app/app.jar"]
