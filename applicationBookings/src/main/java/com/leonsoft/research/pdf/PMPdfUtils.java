@@ -2,75 +2,67 @@ package com.leonsoft.research.pdf;
 
 //package eu.europa.ec.rdg.compass.processes.pm.utils;
 
+import com.itextpdf.text.pdf.AcroFields;
+import com.itextpdf.text.pdf.PdfReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-
+import lombok.extern.slf4j.Slf4j;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.text.PDFTextStripper;
 
-import com.itextpdf.text.pdf.AcroFields;
-import com.itextpdf.text.pdf.PdfReader;
-import org.springframework.core.io.ClassPathResource;
-
 //import eu.europa.ec.rdg.compass.processes.pm.api.exceptions.PMException;
-
+@Slf4j
 public class PMPdfUtils {
 
 
     public static String getDocumentText(InputStream pdfIs) {
 
-        PDDocument doc = null;
-        try {
-            doc = PDDocument.load(pdfIs);
+        try (PDDocument doc = PDDocument.load(pdfIs)) {
             String content = new PDFTextStripper().getText(doc);
-            content = content.replaceAll("[ |\\n|\\r]+", "");
+
+            String regEx = "[ |\\n|\\r]+";
+            content = content.replaceAll(regEx, "");
             return content;
         } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
-            if (doc != null) {
-                try {
-                    doc.close();
-                } catch (IOException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                }
-            }
+            log.error(e.toString());
         }
         return null;
     }
 
     public static boolean doesContainPlaceHolder(InputStream pdfIs, String placeHolderName) {
         String pdfText = getDocumentText(pdfIs);
+        assert pdfText != null;
         return pdfText.contains("TGSMark#"+placeHolderName);
     }
 
-    public static boolean placeholderContained(InputStream pdfIs, String placeHolderName) {
-        PdfReader reader=null;
-        try {
-            reader = new PdfReader(pdfIs);
-        } catch (IOException e) {
-            e.printStackTrace();
-            return false;
-        }
-        AcroFields fields = reader.getAcroFields();
-        boolean hasFormFields = (fields != null && fields.getFields() != null && fields.getFields().size() > 0);
-        if (hasFormFields) {
-            for (String acrofieldKey:fields.getFields().keySet()){
-                if (acrofieldKey.equals(placeHolderName)) {
-                    return true;
-                }
-            }
-        }
-        return false;
-    }
+//    public static boolean placeholderContained(InputStream pdfIs, String placeHolderName) {
+//        PdfReader reader=null;
+//        try {
+//            reader = new PdfReader(pdfIs);
+//        } catch (IOException e) {
+//            log.error(e.toString());
+//            return false;
+//        }
+//        AcroFields fields = reader.getAcroFields();
+//        boolean hasFormFields = (fields != null && fields.getFields() != null && !fields.getFields().isEmpty());
+//        if (hasFormFields) {
+//            for (String acrofieldKey:fields.getFields().keySet()){
+//                if (acrofieldKey.equals(placeHolderName)) {
+//                    return true;
+//                }
+//            }
+//        }
+//        return false;
+//    }
 
 
     private static InputStream getInputStreamFromFullFilePath(String fullFilePath) throws FileNotFoundException {
-        String log = "readFile(fullFilePath"+fullFilePath+")";
+        String msg = "readFile(fullFilePath"+fullFilePath+")";
+        log.error(msg);
+
         File f = new File(fullFilePath);
         return new FileInputStream(f);
     }

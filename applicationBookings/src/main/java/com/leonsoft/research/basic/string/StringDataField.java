@@ -1,7 +1,6 @@
 package com.leonsoft.research.basic.string;
 
 import com.leonsoft.research.basic.AbstractDataField;
-import jakarta.persistence.Column;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 

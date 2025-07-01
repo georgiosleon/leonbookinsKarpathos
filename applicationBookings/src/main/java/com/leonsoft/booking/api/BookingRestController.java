@@ -5,14 +5,17 @@ import com.leonsoft.booking.models.Booking;
 import com.leonsoft.booking.services.BookingService;
 import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.UUID;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
@@ -24,25 +27,25 @@ public class BookingRestController {
 
     @GetMapping("/booking/export/pdf")
     public void exportToPDF(HttpServletResponse response,
-                            @RequestParam(name = "fromDate") String fromDateEuroFmt,
-                            @RequestParam(name = "toDate") String toDateEuroFmt
+          @RequestParam(name = "fromDate") String fromDateEuroFmt,
+          @RequestParam(name = "toDate") String toDateEuroFmt
     ) throws DocumentException, IOException {
         log.debug("/booking/export/pdf");
-        log.debug("fromDate param  " + fromDateEuroFmt);
-        log.debug("toDate param  " + toDateEuroFmt);
+        log.debug("fromDate param  {}", fromDateEuroFmt);
+        log.debug("toDate param  {}", toDateEuroFmt);
         bookingService.exportToPDF(response, fromDateEuroFmt, toDateEuroFmt);
     }
 
 
     @GetMapping(value = "/booking/report", produces = MediaType.TEXT_PLAIN_VALUE)
     String report(
-            @RequestParam(name = "name", required = false) String name,
-            @RequestParam(name = "fromDate") String fromDateEuroFmt,
-            @RequestParam(name = "toDate") String toDateEuroFmt) {
+          @RequestParam(name = "name", required = false) String name,
+          @RequestParam(name = "fromDate") String fromDateEuroFmt,
+          @RequestParam(name = "toDate") String toDateEuroFmt) {
         log.info("/booking/report");
-        log.info("fromDate param  " + fromDateEuroFmt);
-        log.info("toDate param  " + toDateEuroFmt);
-        log.info("name param  " + name);
+        log.info("fromDate param  {}", fromDateEuroFmt);
+        log.info("toDate param  {}", toDateEuroFmt);
+        log.info("name param  {}", name);
 
         if (name != null) {
 //            name = name.replaceAll("\\s+", "");
@@ -70,11 +73,18 @@ public class BookingRestController {
 
     @PostMapping(value = "/booking/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     Boolean deleteObject(
-            @RequestBody Booking input) {
+          @RequestBody Booking input) {
 
         log.info("============== DTO DELETE_OP_INPUT_REQUEST_OBJECT >>> " + input);
         Booking bookingFromDatabase = bookingService.getBookingFDatabase(input.getId());
+
+        if (bookingFromDatabase == null) {
+            String msg = " bookingFromDatabase = null ";
+            log.error(msg);
+        }
+
 //        log.info("==============  DB  OBJECT   IF FOUND  SQL_CMD >>> DELETE FROM table_name WHERE condition;     " + bookingFromDatabase );
+        assert bookingFromDatabase != null;
         log.info("============== DBO SELECT_OP_INPUT_DATABASE_OBJECT   \nSELECT \n     IF FOUND  SQL_CMD >>> SELECT FROM Booking  WHERE id = '"
               + bookingFromDatabase.getId() + "';");
         log.info("============== DBO DELETE_OP_INPUT_DATABASE_OBJECT   \nDELETE \n     IF FOUND  SQL_CMD >>> DELETE FROM Booking  WHERE id = '"
@@ -84,12 +94,9 @@ public class BookingRestController {
         // todo write to seperate file  to build scrit to check if it was deleted
         //////////
 
-        if (bookingFromDatabase != null
-              // todo  see about password per  booking and user management
-
-              && input.getPassword() != null
-              && !input.getPassword().isEmpty()    //  NOT_NULL_OR_EMPTY
-              && input.getPassword().equals(bookingFromDatabase.getPassword())
+        // todo  see about password per  booking and user management
+        //  NOT_NULL_OR_EMPTY
+        if (input.getPassword() != null && !input.getPassword().isEmpty() && input.getPassword().equals(bookingFromDatabase.getPassword())
         ) {
             log.info("==============    getBookingFDatabase   delete it ");
             log.info(" ============ Delete    {}", input.getId());
@@ -106,9 +113,9 @@ public class BookingRestController {
 //        bookingService.delCancelledBooking(bookingId);
 //    }
 
-    @GetMapping(value = "/booking/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
-    List<Booking> getAll() {
-        return bookingService.getAll();
-    }
+//    @GetMapping(value = "/booking/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
+//    List<Booking> getAll() {
+//        return bookingService.getAll();
+//    }
 
 }

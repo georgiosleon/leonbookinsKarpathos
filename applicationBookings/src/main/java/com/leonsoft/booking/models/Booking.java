@@ -3,16 +3,21 @@ package com.leonsoft.booking.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import java.util.Objects;
 import java.util.StringJoiner;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+//import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+import org.hibernate.proxy.HibernateProxy;
 
 @Getter
 @Setter
-//@ToString
+
 @NoArgsConstructor
 @Entity
-@Data
-@EqualsAndHashCode
+
+//@RequiredArgsConstructor
 
 public class Booking {
 
@@ -130,5 +135,31 @@ public class Booking {
               .add("dailyTax=" + dailyTax)
               .add("dailyTaxTotal=" + dailyTaxTotal)
               .toString();
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null) {
+            return false;
+        }
+        Class<?> oEffectiveClass =
+              o instanceof HibernateProxy ? ((HibernateProxy) o).getHibernateLazyInitializer().getPersistentClass()
+                    : o.getClass();
+        Class<?> thisEffectiveClass =
+              this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass()
+                    : this.getClass();
+        if (thisEffectiveClass != oEffectiveClass) {
+            return false;
+        }
+        Booking booking = (Booking) o;
+        return getId() != null && Objects.equals(getId(), booking.getId());
+    }
+
+    @Override
+    public final int hashCode() {
+        return this instanceof HibernateProxy ? ((HibernateProxy) this).getHibernateLazyInitializer().getPersistentClass().hashCode() : getClass().hashCode();
     }
 }

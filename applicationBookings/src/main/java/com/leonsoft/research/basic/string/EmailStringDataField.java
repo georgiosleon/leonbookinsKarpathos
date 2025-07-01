@@ -1,6 +1,5 @@
 package com.leonsoft.research.basic.string;
 
-import com.leonsoft.research.basic.string.StringDataField;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import lombok.Data;
