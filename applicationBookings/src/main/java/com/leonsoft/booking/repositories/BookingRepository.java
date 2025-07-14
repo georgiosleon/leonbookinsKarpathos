@@ -2,11 +2,11 @@ package com.leonsoft.booking.repositories;
 
 import com.leonsoft.booking.models.Booking;
 import java.util.List;
-import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.query.Param;
 
-public interface BookingRepository extends CrudRepository<Booking, String> {
+public interface BookingRepository extends CrudRepository<Booking, String>,JpaSpecificationExecutor<Booking> {
 
     //public List<Booking> findAllByOrderByIdAsc();
     List<Booking> findAllByOrderByStartDateAsc();
