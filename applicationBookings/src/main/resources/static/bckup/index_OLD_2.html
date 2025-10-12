@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>Demo</title>
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width" />
+    <base href="/" />
+
+    <title>Bookings Leon</title>
+    <link href="https://rawgit.com/vitmalina/w2ui/master/dist/w2ui.css" rel="stylesheet" type="text/css" />
+    <link href="https://unpkg.com/vis-timeline@latest/styles/vis-timeline-graph2d.min.css" rel="stylesheet"
+        type="text/css" />
+
+    <style>
+        .vis-item.blue {
+            background-color: blue;
+            border-color: darkblue;
+            color: white;
+        }
+
+        .vis-item.red {
+            background-color: red;
+            border-color: red;
+            color: white;
+        }
+
+        .vis-item.vis-selected {
+            color: black;
+        }
+    </style>
+
+
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.5.0/jquery.min.js" type="text/javascript"></script>
+    <script src="https://rawgit.com/vitmalina/w2ui/master/dist/w2ui.js" type="text/javascript"></script>
+    <script src="https://unpkg.com/vis-timeline@latest/standalone/umd/vis-timeline-graph2d.min.js"
+        type="text/javascript"></script>
+</head>
+
+<body>
+    <div id="myForm" style="width:'100%';height:'100%'"></div>
+
+    <br>
+    <div id="visualization"></div>
+    <br>
+
+    <script>
+
+        var nowISOString = new Date().toISOString().substring(0, 10);
+
+
+        // initialise vis timeline componenet 
+        var groups = new vis.DataSet();
+        var items = new vis.DataSet();
+        var container = document.getElementById('visualization');
+
+        var options = {
+            stack: true,
+            maxHeight: 640,
+            horizontalScroll: false,
+            verticalScroll: true,
+            zoomKey: "ctrlKey",
+
+            start: Date.now() - 1000 * 60 * 60 * 24 * 3, // minus 3 days
+            end: Date.now() + 1000 * 60 * 60 * 24 * 14, // plus 1 months aprox.
+
+            zoomMin: 1000 * 60 * 60 * 24 * 10,             // 7  day in milliseconds
+            zoomMax: 1000 * 60 * 60 * 24 * 31 * 1,        // about 1  months in milliseconds
+
+
+            clickToUse: true,
+            editable: true,
+            stack: false,
+
+            // editable: {
+            //     add: false,
+            //     remove: true
+            // },
+
+            orientation: {
+                axis: "both",
+                item: "top"
+            }
+
+        };
+        timeline = new vis.Timeline(container, null, options);
+        timeline.setGroups(groups);
+        timeline.setItems(items);
+
+
+        // start: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0),
+        // end: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59),
+
+        // add some rooms   
+        groups.add({
+            id: 'r1',
+            content: 'Room ' + 1,
+            order: 1
+        });
+        groups.add({
+            id: 'r2',
+            content: 'Room ' + 2,
+            order: 1
+        });
+
+
+        // add soem initial bookings 
+        var today = new Date();
+        var start = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0);
+        var end = new Date(today.getFullYear(), today.getMonth(), today.getDate(), 23, 59, 59);
+
+        items.add({
+            id: 1,
+            group: 'r1',
+            start: start,
+            end: end,
+            type: 'range',
+            content: 'Booking ' + 1,
+            // horizontal : -25,
+            className: "blue"
+        });
+
+
+        var start = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1, 0, 0, 0);
+        var end = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 2, 23, 59, 59);
+
+        items.add({
+            id: 3,
+            group: 'r1',
+            start: start,
+            end: end,
+            type: 'range',
+            content: 'Booking ' + 3,
+            // horizontal : -25,
+            className: "red"
+        });
+
+        items.add({
+            id: 2,
+            group: 'r2',
+            start: start,
+            end: end,
+            type: 'range',
+            content: 'Booking ' + 2,
+            // horizontal : -25,
+            className: "red"
+        });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        var roomList = [{ id: 'r1', text: 'Room 1' },
+        { id: 'r2', text: 'Room 2' }];
+
+        // set globals 
+        w2utils.settings.dateFormat = 'yyyy-mm-dd';
+        w2utils.settings.currencyPrefix = '€';
+
+
+
+        // setup form with w2ui 
+        $(function () {
+
+
+            $('#myForm').w2form({
+                name: 'myForm',
+                // need to set url  for save  and get 
+                fields: [
+                    // line 1  Customer Info 
+                    {
+                        field: 'name', type: 'text', required: true,
+                        html: {
+                            label: 'Customer Name',
+                            text: '&nbsp; %line11% &nbsp; &nbsp; %line12% ',
+                            attr: 'placeholder="name"   style="width: 300px"'
+                        }
+                    },
+
+                    {
+                        field: 'afm', type: 'text',
+                        // required: true,
+                        html: {
+                            label: 'Tax Number &nbsp;',
+                            anchor: '%line11%',
+                            attr: 'placeholder="afm"  style="width: 200px"'
+                        }
+                    },
+                    {
+                        field: 'identification', type: 'text',
+                        // required: true,
+                        html: {
+                            label: 'Identification &nbsp;',
+                            text: '&nbsp; ',
+                            anchor: '%line12%',
+                            attr: 'placeholder="identification"  style="width: 200px"'
+                        }
+                    },
+
+
+                    // line 2 
+                    {
+                        field: 'startDate', type: 'date',
+                        // format: 'd.m.yyyy', 
+                        required: true,
+                        html: {
+                            label: 'Start Date',
+                            text: '&nbsp; %line21%  &nbsp; &nbsp; &nbsp; %line22%',
+                            attr: 'placeholder="startDate" style="width: 100px"'
+                        },
+                        options: {
+                            start: new Date().toISOString().substring(0, 10) // nowISOString      e.g. '2023-02-25'  // all dates before start will be unselectable
+                        }
+
+
+                    },
+                    {
+                        field: 'endDate', type: 'date',
+                        required: true,
+                        html: {
+                            label: 'End Date &nbsp; ',
+                            anchor: '%line21%',
+                            attr: 'placeholder="endDate" style="width: 100px"'
+                        }
+                    },
+                    {
+                        field: 'numOfNights', type: 'int',
+                        disabled: true,
+                        html: {
+                            label: 'Nights Of Stay &nbsp; ',
+                            anchor: '%line22%',
+                            attr: 'placeholder="numOfNights" style="width: 30px"'
+                        }
+                    },
+
+                    // line 3 
+                    {
+                        field: 'room', type: 'list',
+                        required: true,
+                        html: {
+                            label: 'Room Number',
+                            text: '%line31%',
+                            attr: 'placeholder="room" style="width: 100px"'
+                        },
+                        options: { items: roomList }
+                    },
+                    {
+                        field: 'voucher', type: 'text',
+                        html: {
+                            label: '&nbsp; &nbsp; Voucher  &nbsp; ',
+                            anchor: '%line31%',
+                            attr: 'placeholder="voucher" style="width: 100px"'
+                        }
+                    },
+
+
+
+
+
+                    // line 4
+                    {
+                        field: 'charge', type: 'money',
+                        // required: true,
+                        html: {
+                            label: 'ΧΡΕΩΣΗ',
+                            text: '&nbsp; &nbsp;  %line41%  &nbsp; &nbsp;    %line42% ',
+                            attr: 'placeholder="charge"   style="width: 80px"'
+                        }
+                    },
+
+
+                    {
+                        field: 'received', type: 'money',
+                        // required: true,
+                        html: {
+                            label: '&nbsp; &nbsp; ΠΙΣΤΩΣΗ &nbsp; &nbsp; ',
+                            anchor: '%line41%',
+                            attr: 'placeholder="received"   style="width: 80px"'
+                        }
+                    },
+
+                    {
+                        field: 'balance', type: 'money',
+                        // required: true,
+                        disabled: true,
+                        html: {
+                            label: '&nbsp; &nbsp; ΥΠΟΛΟΙΠΟ &nbsp; &nbsp;',
+                            anchor: '%line42%',
+                            attr: 'placeholder="balance"   style="width: 80px"'
+                        }
+                       
+                    }
+
+
+
+
+                ],
+                actions: {
+                    Reset() {
+                        this.clear();
+
+                        w2alert('Reset action ');
+
+                    },
+                    Save() {
+
+                        if (w2ui.myForm.validate().length == 0) {
+
+                            w2popup.open({
+                                title: 'Form Data',
+                                with: 600,
+                                height: 550,
+                                body: `<pre>${JSON.stringify(this.getCleanRecord(), null, 4)}</pre>`,
+                                actions: { Ok: w2popup.close }
+                            })
+
+                            items.add({
+                                id: Date.now(),
+
+                                group: w2ui.myForm.getValue('room').id,
+                                start: w2ui.myForm.getValue('startDate'),
+                                end: w2ui.myForm.getValue('endDate'),
+                                type: 'range',
+                                content: w2ui.myForm.getValue('name')
+                            });
+
+
+                            w2alert('Do SAVE Action ');
+                            this.save();// todo 
+
+                        } else {
+                            w2alert("Fix error then do save");
+                        }
+
+                    }
+                }
+            });
+
+
+            w2ui['myForm'].setValue('balance', 0);
+            w2ui['myForm'].setValue('charge',  0);
+            w2ui['myForm'].setValue('received', 0);
+
+            w2ui['myForm'].setValue('numOfNights', 0);
+            w2ui['myForm'].refresh();
+
+
+
+         
+            w2ui.myForm.on('change', function (event) {
+
+
+                //  Event: change Target: startDate 
+                if (event != null && event.target == 'startDate') {
+                    w2ui['myForm'].setValue('endDate', null);
+                    w2ui['myForm'].setValue('numOfNights', 0);
+                    w2ui['myForm'].refresh();
+                }
+
+                //  Event: change Target: endDate 
+                if (event != null && event.target == 'endDate') {
+
+                    var startDateFld = w2ui['myForm'].getValue('startDate');
+                    var endDateFld = w2ui['myForm'].getValue('endDate');
+
+                    var date1 = new Date(startDateFld);
+                    var date2 = new Date(endDateFld);
+
+                    // To calculate the time difference of two dates
+                    var numOfNights = date2.getTime() - date1.getTime();
+
+                    // To calculate the no. of days between two dates
+                    var numOfNights = numOfNights / (1000 * 3600 * 24);
+
+                    // set   numOfNights        
+                    //  $("#numOfNights").val(numOfNights);   
+                    w2ui['myForm'].setValue('numOfNights', numOfNights);
+                    w2ui['myForm'].refresh();
+
+                    //  w2ui['form'].set('field_1', { type: 'int' }); 
+
+                    w2alert("Numuber Of Nights between:<br> Start: " + startDateFld + "<br> End: " + endDateFld + " <br>is calculated = " + numOfNights);
+
+                    if (numOfNights <= 0) {
+
+
+                        w2ui['myForm'].setValue('startDate', nowISOString);
+                        w2ui['myForm'].setValue('endDate', null);
+                        w2ui['myForm'].setValue('numOfNights', 0);
+
+                     
+                        w2alert("<b>Error: </b> Nights must be more than zero please enter correct dates.");
+
+                    }
+                }
+
+                if (event != null && (event.target == 'received' || event.target == 'charge')) {                
+                    
+                   if ( w2ui['myForm'].getValue('charge') < 0 ) {
+
+                        // w2ui['myForm'].setValue('balance', 0);
+                        w2ui['myForm'].setValue('charge',  0);
+                        // w2ui['myForm'].setValue('received', 0);
+                        w2alert("<b>Error: </b> Can't  charge a negative amount. ");
+                    
+                   }
+                   else if (w2ui['myForm'].getValue('received') >= 0  && w2ui['myForm'].getValue('charge') > 0 ) {
+                        var chargeVal = w2ui['myForm'].getValue('charge');
+                        var receivedVal = w2ui['myForm'].getValue('received');
+                        var newBalance = chargeVal - receivedVal;
+                        w2ui['myForm'].setValue('balance', newBalance);
+                        // w2alert("chargeVal: " + chargeVal + "receivedVal: " + receivedVal + " <br> calculated  balance= " + newBalance);
+                    }
+
+                }
+
+
+
+
+
+                w2ui['myForm'].refresh();
+
+            });
+
+            w2ui.myForm.on('*', function (event) {
+                // console.log('Event: ' + event.type, 'Target: ' + event.target, event);
+            });
+
+
+
+
+            //  Timeline
+            timeline.on('click', function (properties) {
+                console.log("Click event fired");
+                // w2alert('Not me!! The other button');
+            });
+
+            // timeline.on('doubleClick', function (properties) {
+            //     console.log("Double click event fired");
+            //     w2alert('Not me!! The other button');
+            // });
+
+        });
+
+
+
+    </script>
+
+
+
+</body>
+
+</html>

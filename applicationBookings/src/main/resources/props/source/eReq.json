@@ -1,0 +1,646 @@
+[
+  {
+    "SYP_ID": 1,
+    "SYP_NAME_NM": "auth.1.user",
+    "SYP_VALUE_NM": "compass_user",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 2,
+    "SYP_NAME_NM": "auth.1.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/mf7gGj42f1Ye8HWjfoyh8fciKmVC83cbKqekZ6Kd6T5Ju4KSZ2QXW2H0LUM=",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 3,
+    "SYP_NAME_NM": "esb.test.server",
+    "SYP_VALUE_NM": "http://158.167.240.93:1041",
+    "SYP_TYPE_NM": "SLOT"
+  },
+  {
+    "SYP_ID": 4,
+    "SYP_NAME_NM": "esb.test.user",
+    "SYP_VALUE_NM": "erequest_user",
+    "SYP_TYPE_NM": "SLOT"
+  },
+  {
+    "SYP_ID": 5,
+    "SYP_NAME_NM": "esb.test.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/VZtgavjvFDW2Ek4Iw4+fwxBiK8k+xd8weFSS0weIVe5YZ8ynY+f7IQMR1J0nyWKSxr94OQ==",
+    "SYP_TYPE_NM": "SLOT"
+  },
+  {
+    "SYP_ID": 6,
+    "SYP_NAME_NM": "esb.server",
+    "SYP_VALUE_NM": "http://10.226.42.31:1088",
+    "SYP_DESCRIPTION_DESC": "esb tng",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 7,
+    "SYP_NAME_NM": "esb.user",
+    "SYP_VALUE_NM": "erequest_user",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 8,
+    "SYP_NAME_NM": "esb.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/gH5eB9lzLW8xNiqOp+0hff2HSFHGvLyPseTgBH8cNOWzn3I0sLeCAlZP",
+    "SYP_DESCRIPTION_DESC": "tng password",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 9,
+    "SYP_NAME_NM": "catalogue.server",
+    "SYP_VALUE_NM": "http://wlmcl00379.cc.cec.eu.int:1042",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 10,
+    "SYP_NAME_NM": "catalogue.user",
+    "SYP_VALUE_NM": "ect_user",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 11,
+    "SYP_NAME_NM": "catalogue.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/ekWkwgXGHnL0ptyvb45gdxu/zuONOxAlqhq1atCVQw+4R3Xsapq+qQ==",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 12,
+    "SYP_NAME_NM": "esb.prod.server",
+    "SYP_VALUE_NM": "http://esb.prod.efp7.cc.cec.eu.int:7011",
+    "SYP_TYPE_NM": "CCM2"
+  },
+  {
+    "SYP_ID": 13,
+    "SYP_NAME_NM": "esb.prod.user",
+    "SYP_VALUE_NM": "erequest_user",
+    "SYP_TYPE_NM": "CCM2"
+  },
+  {
+    "SYP_ID": 14,
+    "SYP_NAME_NM": "esb.prod.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/d2p1eMkLhaJZdK/bLHSwRqGcBAgX1EzYycJg1bt+abQdiJMXBKfXo5/OqwCmwHAFckkCYQ==",
+    "SYP_TYPE_NM": "CCM2"
+  },
+  {
+    "SYP_ID": 15,
+    "SYP_NAME_NM": "tgs.server",
+    "SYP_VALUE_NM": "http://esb.acc.efp7.cc.cec.eu.int:7011",
+    "SYP_TYPE_NM": "TGS"
+  },
+  {
+    "SYP_ID": 16,
+    "SYP_NAME_NM": "tgs.user",
+    "SYP_VALUE_NM": "erequest_user",
+    "SYP_TYPE_NM": "TGS"
+  },
+  {
+    "SYP_ID": 17,
+    "SYP_NAME_NM": "tgs.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/i9w7YxhGVp0l8l2GmGO+m2DD4/brbyXriGlg69NQJ0JtqayIcf60r5qS8+JvKDQC+c6VlA==",
+    "SYP_TYPE_NM": "TGS"
+  },
+  {
+    "SYP_ID": 19,
+    "SYP_NAME_NM": "connector.compass.procurement.baseLink",
+    "SYP_VALUE_NM": "/request/prepare/rfs/:reference/:viewMode/general-information",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 20,
+    "SYP_NAME_NM": "app.openid.clientid",
+    "SYP_VALUE_NM": "9K16lNlCVNbkV6NeOUDfXzyzVVtuZ4WaYMrhQylvf8xFG1JrSpKYQFBWUNjUKqU1sThylK23KbJp2OcW043iOzW-zGrcc7GCOy8WrKRgV40snG",
+    "SYP_DESCRIPTION_DESC": "Backend openid clientid",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 21,
+    "SYP_NAME_NM": "app.openid.clientsecret",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/3V9aW1MUCvYCDcvm3S50/W7EOAOLWEWNoSfR54oF0ewZzuYM3KPsSKc0huODu6+PzlzrcgSWapMFL9v4xVS6FIPtd54WvBz6LAY9N/0D6+GdM5pxdU4jj3LbN5v1jUSVHSGAPzhCoYH3QPFt4qWbD76OkbncTVfYxnhaHyLa2ppUvGGIIVbrBgyAuSEKwsFXciNYxe4LbN69toEX7ivdmIxcPWlJ7vNaOREzhBESP0SV7jKOyrQzjY3IJUIVTcygzAK7FARVtKwCtTI=",
+    "SYP_DESCRIPTION_DESC": "Backend openid clientsecret",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 22,
+    "SYP_NAME_NM": "app.openid.endpoint",
+    "SYP_VALUE_NM": "https://ecasa.cc.cec.eu.int:7002/cas/oauth2/token",
+    "SYP_DESCRIPTION_DESC": "Prod ecas oopen id auth token",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 23,
+    "SYP_NAME_NM": "app.microservice.mwp.users.host",
+    "SYP_VALUE_NM": "https://copprd.tech.ec.europa.eu/cctrai/cc-trai/mywp-user-profile-backend",
+    "SYP_DESCRIPTION_DESC": "MWP microservice endpoint: mywp-user-preferences",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 24,
+    "SYP_NAME_NM": "app.openid.comref.clientid",
+    "SYP_VALUE_NM": "DSj3R1HCTuedSR1Li9IJYHgg2VCiwzuow5V9ZadSOek8Jj7e0sSIl0LgnlaUPWU1wH3EKccgyZfFUJZcIvnTBC-6VkpUanE2j4QjAWenJtqES",
+    "SYP_DESCRIPTION_DESC": "MWP microservice client id: mywp-user-preferences",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 25,
+    "SYP_NAME_NM": "app.openid.service.clientid",
+    "SYP_VALUE_NM": "zjupGVxuVxMc43JZZfwefAEzGo6lEmzwlvYWP1HU0qGQ5u42t1tL3EZfl0xld0QFSnFTy5kSm1MgITudwmjJ7ZG-zGrcc7GCOy8xZnEfVcwDiW",
+    "SYP_DESCRIPTION_DESC": "Backend openid clientid",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 26,
+    "SYP_NAME_NM": "app.openid.service.clientsecret",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/qg60grhSLivJVJdFzkys2anxoqITfZBx8iLs+XQnnYJTU3+fIw6meuhZe6wCcT1kVTSXBgIpSDt5dTr+Doy4NHdEedVZvCjNg1aIDCnKNU/WAcwAD0g3uVl9ZYPmNO9QL7oQuYQ2bixOH7YsnKv15mtMA7WurV7hts7NbQ4LubI868zjpc0EmwMrq+7B2Uv4Y8N6vU9ZSHhDQylrQgjlfJ+8f/40eteReeM2m3kVLxfaBPJzSBW/kCDcHRBsZ5pLr052CmYV2Cm+Whw=",
+    "SYP_DESCRIPTION_DESC": "Backend openid clientsecret",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 27,
+    "SYP_NAME_NM": "app.pm.ws.config.version",
+    "SYP_VALUE_NM": "V3"
+  },
+  {
+    "SYP_ID": 37,
+    "SYP_NAME_NM": "cns.user",
+    "SYP_VALUE_NM": "KEY-EREQUEST-ZaUylRio4M",
+    "SYP_DESCRIPTION_DESC": "app user for cns",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 38,
+    "SYP_NAME_NM": "cns.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/845qtTUVhwd5Yw2ybjq9+mjnjgX6wJ+w209hPdmm+fOtXAHiOajsh9bWMtFhIiR+s587PVxEBBtlijFcmNJv0NLO6cDhRmSpu6v0Bjr8/AvZjWSe/7h0",
+    "SYP_DESCRIPTION_DESC": "",
+    "SYP_TYPE_NM": "DEV"
+  },
+  {
+    "SYP_ID": 39,
+    "SYP_NAME_NM": "cns.notificationService.url",
+    "SYP_VALUE_NM": "https://webgate.acceptance.ec.europa.eu/cns/services/latest/NotificationWebService",
+    "SYP_DESCRIPTION_DESC": "url for the notification service",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 40,
+    "SYP_NAME_NM": "cns.userPreferencesService.url",
+    "SYP_VALUE_NM": "https://webgate.acceptance.ec.europa.eu/cns/services/latest/UserPreferencesWebService",
+    "SYP_DESCRIPTION_DESC": "url for the user preference",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 41,
+    "SYP_NAME_NM": "LDAP_AUTHENTICATION",
+    "SYP_VALUE_NM": "simple",
+    "SYP_DESCRIPTION_DESC": "simple or ",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 42,
+    "SYP_NAME_NM": "LDAP_BASE_DN",
+    "SYP_VALUE_NM": "o=cec.eu.int",
+    "SYP_DESCRIPTION_DESC": "Base Directory Name for LDAP",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 43,
+    "SYP_NAME_NM": "LDAP_PASSWORD",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/qEwUelj+L/OBDvlUVo9ou1qyhUzA+lYx6pXLL2QnepBt6Y0PdWyJk5WB",
+    "SYP_DESCRIPTION_DESC": "Credentials for LDAP connection",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 44,
+    "SYP_NAME_NM": "LDAP_SERVICE_PROTOCOL_HOST_PORT",
+    "SYP_VALUE_NM": "ldap://cedprod.cec.eu.int:11389",
+    "SYP_DESCRIPTION_DESC": "Combined protocol",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 45,
+    "SYP_NAME_NM": "LDAP_USER_DN",
+    "SYP_VALUE_NM": "uid=DIGIT_OPSYS,ou=TrustedApps,o=cec.eu.int",
+    "SYP_DESCRIPTION_DESC": "The full combination for LDAPconnection",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 50,
+    "SYP_NAME_NM": "complete.async",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "Generate documents async",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 51,
+    "SYP_NAME_NM": "complete.notifyOnFail",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "Notify Compass in case of failure",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 52,
+    "SYP_NAME_NM": "complete.linkProcedure",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "complete.linkProcedure",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 53,
+    "SYP_NAME_NM": "complete.linkProcedure.onErrorFailProcess",
+    "SYP_VALUE_NM": "false",
+    "SYP_DESCRIPTION_DESC": "complete.linkProcedure.onErrorFailProcess",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 54,
+    "SYP_NAME_NM": "complete.prevalidate",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "complete.prevalidate",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 55,
+    "SYP_NAME_NM": "data.ccm2.api",
+    "SYP_VALUE_NM": "false",
+    "SYP_DESCRIPTION_DESC": "data.ccm2.api",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 59,
+    "SYP_NAME_NM": "doclist.rest.endpoint",
+    "SYP_VALUE_NM": "https://copprd.tech.ec.europa.eu/cctrai/cc-trai/cc-document-manager-backend/api/v2/documentLists/",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 60,
+    "SYP_NAME_NM": "spring.kafka.consumer.group.id",
+    "SYP_VALUE_NM": "erequest_trai_consumer",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 61,
+    "SYP_NAME_NM": "spring.kafka.topic.name",
+    "SYP_VALUE_NM": "cc-command-documentlist",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 62,
+    "SYP_NAME_NM": "spring.kafka.topic.event",
+    "SYP_VALUE_NM": "cc-event",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 63,
+    "SYP_NAME_NM": "spring.kafka.bootstrap-servers",
+    "SYP_VALUE_NM": "yamagata.cc.cec.eu.int:34192,yamanashi.cc.cec.eu.int:34192,yamaguchi.cc.cec.eu.int:34192",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 64,
+    "SYP_NAME_NM": "kafka.bootstrap.protocol",
+    "SYP_VALUE_NM": "SSL",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 65,
+    "SYP_NAME_NM": "kafka.bootstrap.servers",
+    "SYP_VALUE_NM": "kafka-nonprod.cc.cec.eu.int:9443",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 66,
+    "SYP_NAME_NM": "kafka.transaction.id",
+    "SYP_VALUE_NM": "cc_trai_opsys_erequest",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 67,
+    "SYP_NAME_NM": "kafka.truststore.location",
+    "SYP_VALUE_NM": "classpath:kafka-nonprod-truststore.jks",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 68,
+    "SYP_NAME_NM": "kafka.truststore.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/rZjvgnhliqG2oWOQQqzvgyXGq4iv3esttx/dOIXzSUB2bZb5+DZjKSCq",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 69,
+    "SYP_NAME_NM": "kafka.keystore.location",
+    "SYP_VALUE_NM": "classpath:opsys_trai_erequest_services.jks",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 70,
+    "SYP_NAME_NM": "kafka.keystore.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/Z66oYdgi2F63UOvxj7fscvVGI+u8iGJ44G3WppXhXhpgRtfVF0ymUCl93kI=",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 71,
+    "SYP_NAME_NM": "kafka.cc.documentlist.topic",
+    "SYP_VALUE_NM": "cc_trai_command-participant-documentlist",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 72,
+    "SYP_NAME_NM": "kafka.cc.event.topic",
+    "SYP_VALUE_NM": "cc_trai_event",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 73,
+    "SYP_NAME_NM": "eris.ws.endpointWsdl",
+    "SYP_VALUE_NM": "http://traisb.fp6.cc.cec.eu.int:3121/h2020/eris/gateway/documentManagement-5.0?wsdl",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 74,
+    "SYP_NAME_NM": "eris.http.endpointUrl",
+    "SYP_VALUE_NM": "http://traisb.fp6.cc.cec.eu.int:3121/h2020/eris/servlet/v5",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 75,
+    "SYP_NAME_NM": "eris.username",
+    "SYP_VALUE_NM": "erequest_user",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 76,
+    "SYP_NAME_NM": "eris.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/iv0MuvbepJFIVzofr0n+Qe2h5w32XFcXG5dNXHuj2PShSDbzD7zgsQ==",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 77,
+    "SYP_NAME_NM": "eris.systemName",
+    "SYP_VALUE_NM": "EREQUEST",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 78,
+    "SYP_NAME_NM": "metadata.aresDeepLink",
+    "SYP_VALUE_NM": "https://intragate.test.ec.europa.eu/Ares/documentDirectAccess.do?registrationNumber=",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 79,
+    "SYP_NAME_NM": "kafka.map.event.topic",
+    "SYP_VALUE_NM": "map_tng_contracting_process_event",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 80,
+    "SYP_NAME_NM": "portofolio.prefix",
+    "SYP_VALUE_NM": "PROC-",
+    "SYP_DESCRIPTION_DESC": "Default portofolio prefix",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 81,
+    "SYP_NAME_NM": "feature.portofolio.provideId",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "Provide a portofolio item in the procedure details response",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 82,
+    "SYP_NAME_NM": "feature.portofolio.details.text",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "Provide details as text",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 83,
+    "SYP_NAME_NM": "feature.portofolio.details.ccm2",
+    "SYP_VALUE_NM": "false",
+    "SYP_DESCRIPTION_DESC": "Provide details as ccm2 ids",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 84,
+    "SYP_NAME_NM": "feature.contract.rest",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "Retrieve contract by rest service",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 85,
+    "SYP_NAME_NM": "feature.contract.ws",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "Retrieve contract by rest service",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 86,
+    "SYP_NAME_NM": "feature.procedure.session.reset",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "Allow session reset",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 87,
+    "SYP_NAME_NM": "feature.kafka.contract.listener",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "Allow kafka contract listener",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 88,
+    "SYP_NAME_NM": "feature.doclist.download.native",
+    "SYP_VALUE_NM": "false",
+    "SYP_DESCRIPTION_DESC": "Allow download native documents",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 89,
+    "SYP_NAME_NM": "ignore.ws.catalogueRef",
+    "SYP_VALUE_NM": "false",
+    "SYP_DESCRIPTION_DESC": "ignore catalogueRef",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 90,
+    "SYP_NAME_NM": "feature.global.amount.from.map",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "map global amount from Map",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 91,
+    "SYP_NAME_NM": "feature.event.options.simple",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "define if the Event Options whould contain all possible values, or just the simple case of project start/end dates",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 110,
+    "SYP_NAME_NM": "app.microservice.map.host",
+    "SYP_VALUE_NM": "http://wlmcl00260.cc.cec.eu.int:1042/digit/impl-plan-service",
+    "SYP_DESCRIPTION_DESC": "app.microservice.map.host",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 111,
+    "SYP_NAME_NM": "app.openid.map.clientid",
+    "SYP_VALUE_NM": "hbzszYjHPqg7HxI1zP9wbemenELzPwtnGDiPNoR6ViUEqI1pxQKjbDwzs5PLuWjEBeOOJL5zVKhToVwfHqU9Kfc0-NaAc23CqASedZDPQCX8qni",
+    "SYP_DESCRIPTION_DESC": "app.openid.map.clientid",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 112,
+    "SYP_NAME_NM": "app.microservice.tag.host",
+    "SYP_VALUE_NM": "http://10.226.42.156:1061/digit/tag/manager",
+    "SYP_DESCRIPTION_DESC": "app.microservice.tag.host",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 113,
+    "SYP_NAME_NM": "app.openid.tag.clientid",
+    "SYP_VALUE_NM": "9RAj2Qtd4Wku85pSy2kOc10KMfZ9qT7J0i2GAKPfqvehVmQe6SD1R6sQqLdCLsVukx068etLs9LZf6a2LbmoBm-zGrcc7GCOy8xZnEfVcwDiW",
+    "SYP_DESCRIPTION_DESC": "app.openid.tag.clientid",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 114,
+    "SYP_NAME_NM": "pdm.server",
+    "SYP_VALUE_NM": "http://10.226.42.31:1088/RDGServices/LegalEntityDetails/v11",
+    "SYP_DESCRIPTION_DESC": "pdm.server",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 115,
+    "SYP_NAME_NM": "pdm.user",
+    "SYP_VALUE_NM": "erequest_user",
+    "SYP_DESCRIPTION_DESC": "pdm.user",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 116,
+    "SYP_NAME_NM": "pdm.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/BNJZZCK1AhygYW6WI9naGIcueaLGhh2Pduki7A4H+38f7Y/ybN1OECTD",
+    "SYP_DESCRIPTION_DESC": "pdm.password",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 117,
+    "SYP_NAME_NM": "ccm2.server",
+    "SYP_VALUE_NM": "http://esb.prod.efp7.cc.cec.eu.int:7011",
+    "SYP_DESCRIPTION_DESC": "ccm2.server",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 118,
+    "SYP_NAME_NM": "ccm2.user",
+    "SYP_VALUE_NM": "erequest_user",
+    "SYP_DESCRIPTION_DESC": "ccm2.user",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 119,
+    "SYP_NAME_NM": "ccm2.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/d2p1eMkLhaJZdK/bLHSwRqGcBAgX1EzYycJg1bt+abQdiJMXBKfXo5/OqwCmwHAFckkCYQ==",
+    "SYP_DESCRIPTION_DESC": "ccm2.password",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 120,
+    "SYP_NAME_NM": "shl.server",
+    "SYP_VALUE_NM": "http://10.226.42.31:1088/RDGServices/Shortlist/ShortlistManagement/v1",
+    "SYP_DESCRIPTION_DESC": "shl.server",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 121,
+    "SYP_NAME_NM": "shl.user",
+    "SYP_VALUE_NM": "erequest_user",
+    "SYP_DESCRIPTION_DESC": "shl.user",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 122,
+    "SYP_NAME_NM": "shl.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/BNJZZCK1AhygYW6WI9naGIcueaLGhh2Pduki7A4H+38f7Y/ybN1OECTD",
+    "SYP_DESCRIPTION_DESC": "shl.password",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 123,
+    "SYP_NAME_NM": "iam.server",
+    "SYP_VALUE_NM": "http://10.226.42.31:1088/RDGServices/IAM/SecurityPolicyEnforcementPoint/V2",
+    "SYP_DESCRIPTION_DESC": "iam.server",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 124,
+    "SYP_NAME_NM": "iam.user",
+    "SYP_VALUE_NM": "erequest_user",
+    "SYP_DESCRIPTION_DESC": "iam.user",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 125,
+    "SYP_NAME_NM": "iam.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/BNJZZCK1AhygYW6WI9naGIcueaLGhh2Pduki7A4H+38f7Y/ybN1OECTD",
+    "SYP_DESCRIPTION_DESC": "iam.password",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 126,
+    "SYP_NAME_NM": "app.microservice.action.host",
+    "SYP_VALUE_NM": "http://wlmcl00263.cc.cec.eu.int:1042/digit/track3/resttrack3",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 127,
+    "SYP_NAME_NM": "app.openid.map.action.clientid",
+    "SYP_VALUE_NM": "hryCywglxf4Vp2TjFv9M9S5qUC6v831WVWzrG8TOYj5zUU0NzoQSVXoqtefvvCWyw2d6vIYGZF43j725mYIlxYW-6VkpUanE2j4za4uNdH0TKI",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 128,
+    "SYP_NAME_NM": "data.action.finalExecutionDate",
+    "SYP_VALUE_NM": "true",
+    "SYP_DESCRIPTION_DESC": "Flag to enable finalExecutionDate",
+    "SYP_TYPE_NM": ""
+  },
+  {
+    "SYP_ID": 129,
+    "SYP_NAME_NM": "URL_SENSITIVE_PERSONAL_DATA",
+    "SYP_VALUE_NM": "https://wikis.ec.europa.eu/x/wgL9Aw",
+    "SYP_DESCRIPTION_DESC": "Link to page explaining in detail what is considered sensitive personal data"
+  },
+  {
+    "SYP_ID": 130,
+    "SYP_NAME_NM": "sygma.server",
+    "SYP_VALUE_NM": "http://10.226.42.31:1088/RDGServices/ProjectServices/V5",
+    "SYP_DESCRIPTION_DESC": "sygma project details service server",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 131,
+    "SYP_NAME_NM": "sygma.user",
+    "SYP_VALUE_NM": "erequest_user",
+    "SYP_DESCRIPTION_DESC": "sygma.user",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 132,
+    "SYP_NAME_NM": "sygma.password",
+    "SYP_VALUE_NM": "{5AES256}SafeV70/gH5eB9lzLW8xNiqOp+0hff2HSFHGvLyPseTgBH8cNOWzn3I0sLeCAlZP",
+    "SYP_DESCRIPTION_DESC": "sygma.password",
+    "SYP_TYPE_NM": "TNG"
+  },
+  {
+    "SYP_ID": 149,
+    "SYP_NAME_NM": "timelines.justifiable",
+    "SYP_VALUE_NM": "31102627,31102628",
+    "SYP_DESCRIPTION_DESC": "The list of Timelines which can have a justification for decreasing their value"
+  }
+]
+
