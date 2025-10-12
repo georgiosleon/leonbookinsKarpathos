@@ -6,6 +6,7 @@ import com.leonsoft.booking.services.BookingService;
 import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,7 +97,9 @@ public class BookingRestController {
 
         // todo  see about password per  booking and user management
         //  NOT_NULL_OR_EMPTY
-        if (input.getPassword() != null && !input.getPassword().isEmpty() && input.getPassword().equals(bookingFromDatabase.getPassword())
+        if (input.getPassword() != null
+            && !input.getPassword().isEmpty()
+            && input.getPassword().equals(bookingFromDatabase.getPassword())
         ) {
             log.info("==============    getBookingFDatabase   delete it ");
             log.info(" ============ Delete    {}", input.getId());
@@ -107,15 +110,17 @@ public class BookingRestController {
         return false;
     }
 
+    @GetMapping(value = "/booking/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
+    List<Booking> getAll() {
+        return bookingService.getAll();
+    }
+
 //    @GetMapping(value = "/booking/del")
 //    void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {
 //        log.debug(" Delete  a cancelled   {}", bookingId);
 //        bookingService.delCancelledBooking(bookingId);
 //    }
 
-//    @GetMapping(value = "/booking/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
-//    List<Booking> getAll() {
-//        return bookingService.getAll();
-//    }
+
 
 }
