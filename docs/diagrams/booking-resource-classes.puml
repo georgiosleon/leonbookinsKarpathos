@@ -1,0 +1,36 @@
+@startuml
+title Booking and Resource Classes
+
+class BookingsRestController
+class BookingResourceController
+class BookingRequest
+class BookingResourceRequest
+class BookingsService
+class BookingResourceService
+class BookingRepository
+class BookingResourceRepository
+class Booking <<JPA entity>> {
+  id: String
+  room: String
+  startDate: String
+  endDate: String
+}
+class BookingResource <<JPA entity>> {
+  id: String
+  type: String
+  name: String
+  active: boolean
+}
+
+BookingsRestController --> BookingRequest : validates
+BookingsRestController --> BookingsService
+BookingResourceController --> BookingResourceRequest : validates
+BookingResourceController --> BookingResourceService
+BookingsService --> BookingRepository
+BookingsService --> BookingResourceService : validates assignment
+BookingRepository --> Booking : persists
+BookingResourceService --> BookingResourceRepository
+BookingResourceRepository --> BookingResource : persists
+Booking --> BookingResource : room stores resource ID
+
+@enduml

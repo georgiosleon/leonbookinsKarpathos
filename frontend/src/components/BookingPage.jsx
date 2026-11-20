@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { bookingModes, isBookableStatus } from '../bookingConfig.js';
+import { bookingModes, isBookableStatus, resourcesForMode } from '../bookingConfig.js';
 import {
   getInitialBookingSaveMode,
   storeBookingSaveMode,
@@ -12,13 +12,20 @@ import {
 } from '../bookingLogic.js';
 import {
   deleteBooking as deleteBookingRequest,
+  logout as logoutRequest,
   fetchBookingReport,
   fetchBookings,
+  fetchResources,
   saveBooking,
   updateBooking,
 } from '../bookingApi.js';
 import { BookingForm } from './BookingForm.jsx';
 import { BookingTimeline } from './BookingTimeline.jsx';
+import { ThemeToggle } from './ThemeToggle.jsx';
+import { useTheme } from '../useTheme.js';
+import { reportDocument } from '../reportDocument.js';
+import { formatMoney, useLanguage } from '../i18n.jsx';
+import { LanguageSelector } from './LanguageSelector.jsx';
 
 function todayAsIsoDate() {
   const now = new Date();
@@ -59,43 +66,50 @@ function getMode() {
   return bookingModes[requestedMode] ?? bookingModes.rooms;
 }
 
-function formatClock(date) {
-  return date.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit', second: '2-digit' });
+function formatClock(date, locale) {
+  return date.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit', second: '2-digit' });
 }
 
 export function BookingPage() {
-  const mode = useMemo(getMode, []);
+  const baseMode = useMemo(getMode, []);
   const bookableTimelineRef = useRef(null);
   const cancelledTimelineRef = useRef(null);
   const [form, setForm] = useState(emptyForm);
   const [bookings, setBookings] = useState([]);
+  const [resources, setResources] = useState([]);
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
   const [notice, setNotice] = useState('');
   const [saveMode, setSaveMode] = useState(getInitialBookingSaveMode);
   const [reportHtml, setReportHtml] = useState('');
-  const [clock, setClock] = useState(() => formatClock(new Date()));
+  const { theme, toggleTheme } = useTheme();
+  const { language, locale, t } = useLanguage();
+  const [clock, setClock] = useState(() => formatClock(new Date(), locale));
 
   useEffect(() => {
     let active = true;
-    fetchBookings()
-      .then((loadedBookings) => {
-        if (active) setBookings(loadedBookings);
+    Promise.all([fetchBookings(), fetchResources()])
+      .then(([loadedBookings, loadedResources]) => {
+        if (active) {
+          setBookings(loadedBookings);
+          setResources(loadedResources);
+        }
       })
       .catch((requestError) => {
-        if (active) setError(`Could not load bookings: ${requestError.message}`);
+        if (active) setError(t('Could not load bookings: {error}', { error: requestError.message }));
       });
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [t]);
 
   useEffect(() => {
-    const timerId = window.setInterval(() => setClock(formatClock(new Date())), 1000);
+    document.documentElement.lang = language;
+    const timerId = window.setInterval(() => setClock(formatClock(new Date(), locale)), 1000);
     return () => window.clearInterval(timerId);
-  }, []);
+  }, [language, locale]);
 
   function resetForm() {
     setForm(emptyForm());
@@ -113,20 +127,20 @@ export function BookingPage() {
 
     const payload = toBookingPayload(form);
     if (!payload.name || !payload.room || !payload.agency || !payload.numOfGuests) {
-      setError('Complete the required name, guest, agency, and resource fields.');
+      setError(t('Complete the required name, guest, agency, and resource fields.'));
       return;
     }
     if (!payload.startDate || !payload.endDate || payload.numOfNights <= 0) {
-      setError('The end date must be after the start date.');
+      setError(t('The end date must be after the start date.'));
       return;
     }
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      setError('Enter a valid email address.');
+      setError(t('Enter a valid email address.'));
       return;
     }
     const ignoredBookingId = saveMode === 'edit' ? selectedBooking?.id : null;
     if (hasAvailabilityConflict(payload, bookings, ignoredBookingId)) {
-      setError(mode.unavailableMessage);
+      setError(t(mode.unavailableMessage));
       return;
     }
 
@@ -143,37 +157,42 @@ export function BookingPage() {
       ));
       if (isEditing) setSelectedBooking(savedBooking);
       if (isBookableStatus(savedBooking.status)) {
-        setNotice(isEditing ? 'Booking updated.' : 'Booking saved.');
+        setNotice(t(isEditing ? 'Booking updated.' : 'Booking saved.'));
       } else {
         setNotice(isEditing
-          ? 'Cancelled booking updated.'
-          : 'Cancelled booking saved and shown in the cancelled bookings timeline.');
+          ? t('Cancelled booking updated.')
+          : t('Cancelled booking saved and shown in the cancelled bookings timeline.'));
       }
     } catch (requestError) {
-      setError(`Could not save booking: ${requestError.message}`);
+      setError(t('Could not save booking: {error}', { error: requestError.message }));
     } finally {
       setBusy(false);
     }
   }
 
   async function handleDelete(id) {
-    await deleteBookingRequest(id);
-    setBookings((current) => current.filter((booking) => booking.id !== id));
-    setSelectedBooking((current) => current?.id === id ? null : current);
-    setNotice('Booking deleted.');
+    try {
+      await deleteBookingRequest(id);
+      setBookings((current) => current.filter((booking) => booking.id !== id));
+      setSelectedBooking((current) => current?.id === id ? null : current);
+      setNotice(t('Booking deleted.'));
+    } catch (requestError) {
+      setError(t('Could not delete booking: {error}', { error: requestError.message }));
+      throw requestError;
+    }
   }
 
   async function handleReport() {
     setError('');
     setNotice('');
     if (!form.startDate || !form.endDate || form.startDate > form.endDate) {
-      setError('Choose a valid date range for the report.');
+      setError(t('Choose a valid date range for the report.'));
       return;
     }
     try {
-      setReportHtml(await fetchBookingReport(form.startDate, form.endDate));
+      setReportHtml(await fetchBookingReport(form.startDate, form.endDate, language));
     } catch (requestError) {
-      setError(`Could not load report: ${requestError.message}`);
+      setError(t('Could not load report: {error}', { error: requestError.message }));
     }
   }
 
@@ -207,19 +226,32 @@ export function BookingPage() {
     setNotice('');
   }
 
+  async function handleLogout() {
+    setError('');
+    try {
+      await logoutRequest();
+    } catch (requestError) {
+      setError(t('Could not sign out: {error}', { error: requestError.message }));
+    }
+  }
+
   const balance = calculateBalance(form.charge, form.received, form.commission);
+  const mode = useMemo(() => ({
+    ...baseMode,
+    resources: resourcesForMode(resources, baseMode),
+  }), [baseMode, resources]);
 
   return (
     <main className="app-shell">
       <header className="app-header">
         <div>
-          <p className="eyebrow">Karpathos booking planner</p>
-          <h1>{mode.title}</h1>
+          <p className="eyebrow">{t('Karpathos booking planner')}</p>
+          <h1>{t(mode.title)}</h1>
         </div>
         <div className="header-meta">
-          <nav aria-label="Booking type">
-            <a href="/?type=rooms" aria-current={mode.id === 'rooms' ? 'page' : undefined}>Rooms</a>
-            <a href="/?type=cars" aria-current={mode.id === 'cars' ? 'page' : undefined}>Cars &amp; bikes</a>
+          <nav aria-label={t('Booking type')}>
+            <a href="/?type=rooms" aria-current={mode.id === 'rooms' ? 'page' : undefined}>{t('Rooms')}</a>
+            <a href="/?type=cars" aria-current={mode.id === 'cars' ? 'page' : undefined}>{t('Cars & bikes')}</a>
             <a className="nav-icon-link" href={`/?type=${mode.id}&page=reports`}>
               <svg
                 className="nav-icon"
@@ -236,17 +268,21 @@ export function BookingPage() {
                 <path d="M12 16V5" />
                 <path d="M17 16v-4" />
               </svg>
-              <span>Reports</span>
+              <span>{t('Reports')}</span>
             </a>
+            <a href="/?page=resources">{t('Manage rooms and cars')}</a>
           </nav>
+          <LanguageSelector />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
           <label className="save-mode-toggle">
             <input
               type="checkbox"
               checked={saveMode === 'edit'}
               onChange={handleSaveModeChange}
             />
-            <span>Edit selected booking <small>(testing)</small></span>
+            <span>{t('Edit selected booking')} <small>{t('(testing)')}</small></span>
           </label>
+          <button type="button" className="button button-muted" onClick={handleLogout}>{t('Sign out')}</button>
           <time>{clock}</time>
         </div>
       </header>
@@ -254,10 +290,10 @@ export function BookingPage() {
       <section className="panel" aria-labelledby="booking-form-heading">
         <div className="panel-heading">
           <div>
-            <h2 id="booking-form-heading">Booking details</h2>
-            <p>Enter a new booking or select one on the timeline to review it.</p>
+            <h2 id="booking-form-heading">{t('Booking details')}</h2>
+            <p>{t('Enter a new booking or select one on the timeline to review it.')}</p>
           </div>
-          <strong className="balance-summary">Balance: €{balance.toFixed(2)}</strong>
+          <strong className="balance-summary">{t('Balance: {amount}', { amount: formatMoney(balance, locale) })}</strong>
         </div>
 
         {error && <p className="feedback feedback-error" role="alert">{error}</p>}
@@ -274,14 +310,14 @@ export function BookingPage() {
           busy={busy}
         />
 
-        <div className="toolbar" aria-label="Timeline controls">
-          <button type="button" className="button button-muted" onClick={() => handleDateNavigation('goto')}>Go to start date</button>
-          <button type="button" className="button button-muted" onClick={() => handleDateNavigation('today')}>Today</button>
-          <button type="button" className="button button-muted" onClick={() => handleDateNavigation(-90)}>« 90 days</button>
-          <button type="button" className="button button-muted" onClick={() => handleDateNavigation(-30)}>‹ 30 days</button>
-          <button type="button" className="button button-muted" onClick={() => handleDateNavigation(30)}>30 days ›</button>
-          <button type="button" className="button button-muted" onClick={() => handleDateNavigation(90)}>90 days »</button>
-          <button type="button" className="button button-primary" onClick={handleReport}>Run report</button>
+        <div className="toolbar" aria-label={t('Timeline controls')}>
+          <button type="button" className="button button-muted" onClick={() => handleDateNavigation('goto')}>{t('Go to start date')}</button>
+          <button type="button" className="button button-muted" onClick={() => handleDateNavigation('today')}>{t('Today')}</button>
+          <button type="button" className="button button-muted" onClick={() => handleDateNavigation(-90)}>{t('90 days back')}</button>
+          <button type="button" className="button button-muted" onClick={() => handleDateNavigation(-30)}>{t('30 days back')}</button>
+          <button type="button" className="button button-muted" onClick={() => handleDateNavigation(30)}>{t('30 days forward')}</button>
+          <button type="button" className="button button-muted" onClick={() => handleDateNavigation(90)}>{t('90 days forward')}</button>
+          <button type="button" className="button button-primary" onClick={handleReport}>{t('Run report')}</button>
         </div>
       </section>
 
@@ -290,8 +326,8 @@ export function BookingPage() {
         mode={mode}
         bookings={bookings}
         timelineType="bookable"
-        title={`${mode.resourceLabel} availability`}
-        description="Select a booking to load its details. Drag the timeline to move through dates."
+        title={t(mode.id === 'rooms' ? 'Rooms availability' : 'Vehicle availability')}
+        description={t('Select a booking to load its details. Drag the timeline to move through dates.')}
         onSelect={handleSelect}
         onDelete={handleDelete}
         onError={setError}
@@ -302,8 +338,8 @@ export function BookingPage() {
         mode={mode}
         bookings={bookings}
         timelineType="cancelled"
-        title="Cancelled bookings"
-        description="Cancelled reservations are listed separately and do not block availability."
+        title={t('Cancelled bookings')}
+        description={t('Cancelled reservations are listed separately and do not block availability.')}
         onSelect={handleSelect}
         onDelete={handleDelete}
         onError={setError}
@@ -315,10 +351,10 @@ export function BookingPage() {
         }}>
           <section className="report-dialog" role="dialog" aria-modal="true" aria-labelledby="report-heading">
             <div className="report-heading">
-              <h2 id="report-heading">Booking report</h2>
-              <button type="button" className="button button-muted" onClick={() => setReportHtml('')}>Close</button>
+              <h2 id="report-heading">{t('Booking report')}</h2>
+              <button type="button" className="button button-muted" onClick={() => setReportHtml('')}>{t('Close')}</button>
             </div>
-            <iframe title="Booking report" sandbox="allow-same-origin" srcDoc={reportHtml} />
+            <iframe title={t('Booking report')} sandbox="allow-same-origin" srcDoc={reportDocument(reportHtml, theme, language)} />
           </section>
         </div>
       )}

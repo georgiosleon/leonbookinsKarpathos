@@ -1,0 +1,86 @@
+name: Desktop installers
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: read
+
+jobs:
+  validate-version:
+    name: Validate release version
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+      - name: Check tag matches Maven project version
+        if: github.ref_type == 'tag'
+        shell: bash
+        run: |
+          project_version="$(./mvnw -q -DforceStdout help:evaluate -Dexpression=project.version)"
+          tag_version="${GITHUB_REF_NAME#v}"
+          if [[ "$tag_version" != "$project_version" ]]; then
+            echo "::error::Release tag v${tag_version} does not match pom.xml version ${project_version}."
+            exit 1
+          fi
+
+  build:
+    name: Build ${{ matrix.package }}
+    needs: validate-version
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            package: deb
+          - os: ubuntu-latest
+            package: linux
+          - os: macos-latest
+            package: dmg
+          - os: windows-latest
+            package: msi
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "25"
+          cache: maven
+      - name: Build Linux or macOS installer
+        if: runner.os != 'Windows'
+        run: bash install/package.sh ${{ matrix.package }}
+      - name: Build Windows installer
+        if: runner.os == 'Windows'
+        shell: pwsh
+        run: .\install\package.ps1 ${{ matrix.package }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: leon-bookings-${{ matrix.package }}
+          path: install/dist/${{ matrix.package }}/*
+          if-no-files-found: error
+
+  release:
+    name: Publish GitHub release
+    if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: leon-bookings-*
+          path: release-assets
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          name: Leon Bookings ${{ github.ref_name }}
+          generate_release_notes: true
+          files: release-assets/*

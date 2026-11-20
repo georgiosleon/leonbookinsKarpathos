@@ -3,80 +3,86 @@ package com.leonsoft.api;
 
 import com.leonsoft.models.Booking;
 import com.leonsoft.services.BookingsService;
+import com.leonsoft.services.ReportMessages;
 import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
 import java.io.IOException;
 import java.util.List;
-import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @Slf4j
+@RequestMapping({"/api/v1/booking", "/booking"})
 public class BookingsRestController {
 
-    @Autowired
-    BookingsService bookingsService;
+    private final BookingsService bookingsService;
 
-    @GetMapping("/booking/export/pdf")
+    public BookingsRestController(BookingsService bookingsService) {
+        this.bookingsService = bookingsService;
+    }
+
+    @GetMapping("/export/pdf")
     public void exportToPDF(HttpServletResponse response,
           @RequestParam(name = "fromDate") String fromDateEuroFmt,
-          @RequestParam(name = "toDate") String toDateEuroFmt
+          @RequestParam(name = "toDate") String toDateEuroFmt,
+          @RequestParam(name = "lang", defaultValue = "en") String language
     ) throws DocumentException, IOException {
         log.debug("/booking/export/pdf");
         log.debug("fromDate param  " + fromDateEuroFmt);
         log.debug("toDate param  " + toDateEuroFmt);
-        bookingsService.exportToPDF(response, fromDateEuroFmt, toDateEuroFmt);
+        bookingsService.exportToPDF(response, fromDateEuroFmt, toDateEuroFmt,
+              ReportMessages.supportedLocale(language));
     }
 
 
-    @GetMapping(value = "/booking/report", produces = MediaType.TEXT_PLAIN_VALUE)
+    @GetMapping(value = "/report", produces = MediaType.TEXT_PLAIN_VALUE)
     String report(
           @RequestParam(name = "fromDate") String fromDateEuroFmt,
-          @RequestParam(name = "toDate") String toDateEuroFmt) {
+          @RequestParam(name = "toDate") String toDateEuroFmt,
+          @RequestParam(name = "lang", defaultValue = "en") String language) {
         log.debug("/booking/report");
         log.debug("fromDate param  " + fromDateEuroFmt);
         log.debug("toDate param  " + toDateEuroFmt);
-        return bookingsService.report(fromDateEuroFmt, toDateEuroFmt).toString();
+        return bookingsService.report(
+              fromDateEuroFmt, toDateEuroFmt, ReportMessages.supportedLocale(language));
 
     }
 
 
-    @PostMapping(value = "/booking/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    Booking create(@RequestBody Booking booking) {
-        booking.setId(UUID.randomUUID().toString());
-        log.debug(" SAVE   {}  ", booking);
-        return bookingsService.create(booking);
+    @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
+    Booking create(@Valid @RequestBody BookingRequest request) {
+        return bookingsService.create(request.toBooking());
     }
 
-    @PutMapping(value = "/booking/update", consumes = MediaType.APPLICATION_JSON_VALUE)
-    Booking update(@RequestBody Booking booking) {
-        log.debug(" UPDATE   {}  ", booking);
-        return bookingsService.update(booking);
+    @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE)
+    Booking update(@Valid @RequestBody BookingRequest request) {
+        return bookingsService.update(request.toBooking());
     }
 
 
-    @PostMapping(value = "/booking/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    Boolean deleteObject(@RequestBody Booking booking) {
-        log.debug(" Delete    {}", booking.getId());
-        bookingsService.deleteObject(booking);
+    @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
+    Boolean deleteObject(@Valid @RequestBody BookingDeleteRequest request) {
+        log.debug(" Delete    {}", request.id());
+        bookingsService.deleteObject(request.id());
         return Boolean.TRUE;
     }
 
-    @GetMapping(value = "/booking/del")
+    @GetMapping(value = "/del")
     void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {
         log.debug(" Delete  a cancelled   {}", bookingId);
         bookingsService.delCancelledBooking(bookingId);
     }
 
-    @GetMapping(value = "/booking/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
+    @GetMapping(value = "/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     List<Booking> getAll() {
         return bookingsService.getAll();
     }

@@ -6,6 +6,7 @@ import {
 } from 'react';
 import { bookingsForTimeline } from '../bookingConfig.js';
 import { toTimelineItem } from '../bookingLogic.js';
+import { useLanguage } from '../i18n.jsx';
 
 const timelineOptions = {
   maxHeight: 2000,
@@ -46,6 +47,7 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
   onDelete,
   onError,
 }, ref) {
+  const { language, t } = useLanguage();
   const containerRef = useRef(null);
   const timelineRef = useRef(null);
   const itemsRef = useRef(null);
@@ -77,7 +79,7 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
   useEffect(() => {
     const vis = window.vis;
     if (!vis?.Timeline || !vis?.DataSet) {
-      callbacksRef.current.onError('The timeline library did not load.');
+      callbacksRef.current.onError(t('The timeline library did not load.'));
       return undefined;
     }
 
@@ -101,7 +103,7 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
     const handleRemove = (item, callback) => {
       const timelineItem = items.get(item.id);
       const booking = timelineItem?.recordData;
-      if (!booking || !window.confirm(`Delete booking for ${booking.name}?`)) {
+      if (!booking || !window.confirm(t('Delete booking for {name}?', { name: booking.name }))) {
         callback(null);
         return;
       }
@@ -123,7 +125,7 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
       timelineRef.current = null;
       itemsRef.current = null;
     };
-  }, [mode]);
+  }, [mode, language, t]);
 
   useEffect(() => {
     if (!itemsRef.current) return;
@@ -144,8 +146,8 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
           <p>{description}</p>
         </div>
       </div>
-      {visibleCount === 0 && <p className="timeline-empty">No {timelineType === 'cancelled' ? 'cancelled' : 'active or paid'} bookings.</p>}
-      <div className="timeline-container" ref={containerRef} aria-label={`${mode.resourceLabel} ${title.toLowerCase()} timeline`} />
+      {visibleCount === 0 && <p className="timeline-empty">{t(timelineType === 'cancelled' ? 'No cancelled bookings.' : 'No active or paid bookings.')}</p>}
+      <div className="timeline-container" ref={containerRef} aria-label={`${t(mode.resourceLabel)} ${title.toLowerCase()} timeline`} />
     </section>
   );
 });

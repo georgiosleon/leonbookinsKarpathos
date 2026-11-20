@@ -6,7 +6,7 @@ import {
   resolveBookingSaveMode,
   storeBookingSaveMode,
 } from '../src/appConfig.js';
-import { bookingModes, bookingsForTimeline } from '../src/bookingConfig.js';
+import { bookingModes, bookingsForTimeline, resourcesForMode } from '../src/bookingConfig.js';
 import {
   bookingToForm,
   calculateBalance,
@@ -21,6 +21,17 @@ import {
   selectBookingsForReport,
   summarizeBookings,
 } from '../src/reportLogic.js';
+import { getInitialTheme, resolveTheme, storeTheme } from '../src/theme.js';
+import { reportDocument } from '../src/reportDocument.js';
+
+const managedResources = [
+  { id: 'APT2', type: 'rooms', name: 'APT 2', active: true },
+  { id: 'CAR1', type: 'cars', name: 'CAR 1', active: true },
+];
+const roomMode = {
+  ...bookingModes.rooms,
+  resources: resourcesForMode(managedResources, bookingModes.rooms),
+};
 
 test('converts and validates the API date format', () => {
   assert.equal(isoToEuropeanDate('2026-03-08'), '08/03/2026');
@@ -84,7 +95,7 @@ test('maps API records to form fields and back to the existing create payload sh
   assert.equal(Object.hasOwn(payload, 'id'), false);
 });
 
-test('creates safe timeline labels and the expected resource sets', () => {
+test('creates safe timeline labels and maps managed resources to a mode', () => {
   const item = toTimelineItem({
     id: 'booking-1',
     room: 'APT2',
@@ -94,11 +105,11 @@ test('creates safe timeline labels and the expected resource sets', () => {
     numOfNights: 3,
     numOfGuests: 2,
     status: 'active',
-  }, bookingModes.rooms);
+  }, roomMode);
 
   assert.match(item.content, /&lt;img src=x&gt;/);
-  assert.equal(bookingModes.rooms.resources.length, 11);
-  assert.equal(bookingModes.cars.resources.length, 14);
+  assert.equal(item.group, 'APT2');
+  assert.deepEqual(roomMode.resources, [{ id: 'APT2', text: 'APT 2', active: true }]);
 });
 
 test('separates cancelled records from active and paid timeline bookings', () => {
@@ -166,6 +177,40 @@ test('stores the UI save-mode choice for the current browser session', () => {
   }
 });
 
+test('resolves and persists the theme preference', () => {
+  const previousWindow = globalThis.window;
+  const values = new Map();
+  globalThis.window = {
+    localStorage: {
+      getItem: (key) => values.get(key) ?? null,
+      setItem: (key, value) => values.set(key, value),
+    },
+    matchMedia: () => ({ matches: true }),
+  };
+
+  try {
+    assert.equal(getInitialTheme(), 'dark');
+    assert.equal(resolveTheme('light'), 'light');
+    assert.equal(storeTheme('dark'), 'dark');
+    assert.equal(getInitialTheme(), 'dark');
+    assert.throws(() => resolveTheme('blue'), /Use "light" or "dark"/);
+  } finally {
+    if (previousWindow === undefined) {
+      delete globalThis.window;
+    } else {
+      globalThis.window = previousWindow;
+    }
+  }
+});
+
+test('creates a standalone report document with theme-specific colors', () => {
+  assert.match(reportDocument('<table></table>', 'dark'), /color-scheme: dark/);
+  assert.match(reportDocument('<table></table>', 'dark'), /#151b26/);
+  assert.match(reportDocument('<table></table>', 'light'), /color-scheme: light/);
+  assert.match(reportDocument('<table></table>', 'light'), /#ffffff/);
+  assert.match(reportDocument('<table></table>', 'light', 'el'), /<html lang="el">/);
+});
+
 test('filters report records by selected mode and inclusive arrival-date range', () => {
   const bookings = [
     { id: 'inside', room: 'APT2', startDate: '10/07/2026', status: 'active' },
@@ -175,12 +220,12 @@ test('filters report records by selected mode and inclusive arrival-date range',
   ];
 
   assert.deepEqual(
-    selectBookingsForReport(bookings, bookingModes.rooms, '2026-07-01', '2026-07-31')
+    selectBookingsForReport(bookings, roomMode, '2026-07-01', '2026-07-31')
       .map(({ id }) => id),
     ['inside', 'cancelled'],
   );
   assert.deepEqual(
-    selectBookingsForReport(bookings, bookingModes.rooms, '2026-07-31', '2026-07-01'),
+    selectBookingsForReport(bookings, roomMode, '2026-07-31', '2026-07-01'),
     [],
   );
 });
@@ -217,7 +262,7 @@ test('summarizes active financials by resource and counts cancellations separate
       received: 250,
       balance: 250,
     },
-  ], bookingModes.rooms);
+  ], roomMode);
 
   assert.equal(summary.totalBookings, 3);
   assert.equal(summary.activeBookings, 2);

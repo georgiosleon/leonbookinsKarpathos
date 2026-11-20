@@ -3,6 +3,7 @@ package com.leonsoft.models;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Transient;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -55,6 +56,9 @@ public class Booking {
 
     @Column(name = "room")
     private String room;
+
+    @Transient
+    private String roomName;
 
     @Column(name = "num_of_guests")
     private Integer numOfGuests;

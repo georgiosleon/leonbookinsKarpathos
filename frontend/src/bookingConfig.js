@@ -1,28 +1,3 @@
-const roomResources = [
-  { id: 'APT2', text: 'APT 2' },
-  { id: 'APT5', text: 'APT 5' },
-  { id: 'APT6', text: 'APT 6' },
-  { id: 'STU7', text: 'STU 7' },
-  { id: 'STU8', text: 'STU 8' },
-  { id: 'STU9', text: 'STU 9' },
-  { id: 'STU10', text: 'STU 10' },
-  { id: 'STU11', text: 'STU 11' },
-  { id: 'STU12', text: 'STU 12' },
-  { id: 'POT', text: 'POTIDEION' },
-  { id: 'MER', text: 'MERTONAS' },
-];
-
-const vehicleResources = [
-  ...Array.from({ length: 8 }, (_, index) => ({
-    id: `CAR${index + 1}`,
-    text: `CAR ${index + 1} 🚗`,
-  })),
-  ...Array.from({ length: 6 }, (_, index) => ({
-    id: `BIKE${index + 1}`,
-    text: `BIKE ${index + 1} 🛵`,
-  })),
-];
-
 const roomAgencies = [
   { id: 'abnb', text: 'AirBnB' },
   { id: 'bookingcom', text: 'Booking.com' },
@@ -43,7 +18,7 @@ export const bookingModes = {
     id: 'rooms',
     title: 'Beds and Guests Planner',
     resourceLabel: 'Room',
-    resources: roomResources,
+    resources: [],
     agencies: roomAgencies,
     statuses: [
       { id: 'active', text: 'Active' },
@@ -58,7 +33,7 @@ export const bookingModes = {
     id: 'cars',
     title: 'Cars and Guests Planner',
     resourceLabel: 'Vehicle',
-    resources: vehicleResources,
+    resources: [],
     agencies: vehicleAgencies,
     statuses: [
       { id: 'active', text: 'Active' },
@@ -70,6 +45,16 @@ export const bookingModes = {
     unavailableMessage: 'Vehicle is not available for those dates.',
   },
 };
+
+export function resourcesForMode(resources, mode) {
+  return resources
+    .filter((resource) => resource.type === mode.id)
+    .map((resource) => ({
+      id: resource.id,
+      text: resource.name,
+      active: resource.active,
+    }));
+}
 
 export const guestCounts = [1, 2, 3, 4, 5, 6];
 export const timelineStatuses = {

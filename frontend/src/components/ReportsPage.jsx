@@ -1,7 +1,18 @@
 import { useEffect, useMemo, useState } from 'react';
-import { bookingModes } from '../bookingConfig.js';
-import { fetchBookingReport, fetchBookings, bookingPdfUrl } from '../bookingApi.js';
+import { bookingModes, resourcesForMode } from '../bookingConfig.js';
+import {
+  fetchBookingReport,
+  fetchBookings,
+  fetchResources,
+  bookingPdfUrl,
+  logout,
+} from '../bookingApi.js';
 import { selectBookingsForReport, summarizeBookings } from '../reportLogic.js';
+import { ThemeToggle } from './ThemeToggle.jsx';
+import { useTheme } from '../useTheme.js';
+import { reportDocument } from '../reportDocument.js';
+import { formatMoney, useLanguage } from '../i18n.jsx';
+import { LanguageSelector } from './LanguageSelector.jsx';
 
 function currentMonthRange() {
   const today = new Date();
@@ -16,11 +27,11 @@ function currentMonthRange() {
   };
 }
 
-function formatMoney(value) {
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: 'EUR',
-  }).format(value);
+function formatBookingDate(value, locale) {
+  const match = /^(\d{2})\/(\d{2})\/(\d{4})$/.exec(value ?? '');
+  if (!match) return value ?? '';
+  const [, day, month, year] = match;
+  return new Intl.DateTimeFormat(locale).format(new Date(Number(year), Number(month) - 1, Number(day)));
 }
 
 function getMode() {
@@ -29,21 +40,31 @@ function getMode() {
 }
 
 export function ReportsPage() {
-  const mode = useMemo(getMode, []);
+  const baseMode = useMemo(getMode, []);
   const [bookings, setBookings] = useState([]);
+  const [resources, setResources] = useState([]);
   const [range, setRange] = useState(currentMonthRange);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [reportHtml, setReportHtml] = useState('');
+  const { theme, toggleTheme } = useTheme();
+  const { language, locale, t } = useLanguage();
+
+  useEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   useEffect(() => {
     let active = true;
-    fetchBookings()
-      .then((data) => {
-        if (active) setBookings(data);
+    Promise.all([fetchBookings(), fetchResources()])
+      .then(([data, resourceData]) => {
+        if (active) {
+          setBookings(data);
+          setResources(resourceData);
+        }
       })
       .catch((requestError) => {
-        if (active) setError(`Could not load booking data: ${requestError.message}`);
+        if (active) setError(t('Could not load booking data: {error}', { error: requestError.message }));
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -52,7 +73,12 @@ export function ReportsPage() {
     return () => {
       active = false;
     };
-  }, []);
+  }, [t]);
+
+  const mode = useMemo(() => ({
+    ...baseMode,
+    resources: resourcesForMode(resources, baseMode),
+  }), [baseMode, resources]);
 
   const filteredBookings = useMemo(
     () => selectBookingsForReport(bookings, mode, range.startDate, range.endDate),
@@ -70,32 +96,41 @@ export function ReportsPage() {
   async function showDetailedReport() {
     setError('');
     if (!range.startDate || !range.endDate || range.startDate > range.endDate) {
-      setError('Choose a valid date range.');
+      setError(t('Choose a valid date range.'));
       return;
     }
 
     try {
-      setReportHtml(await fetchBookingReport(range.startDate, range.endDate));
+      setReportHtml(await fetchBookingReport(range.startDate, range.endDate, language));
     } catch (requestError) {
-      setError(`Could not load detailed report: ${requestError.message}`);
+      setError(t('Could not load detailed report: {error}', { error: requestError.message }));
+    }
+  }
+
+  async function handleLogout() {
+    setError('');
+    try {
+      await logout();
+    } catch (requestError) {
+      setError(t('Could not sign out: {error}', { error: requestError.message }));
     }
   }
 
   const reportQueryIsValid = range.startDate && range.endDate && range.startDate <= range.endDate;
   const pdfUrl = reportQueryIsValid
-    ? bookingPdfUrl(range.startDate, range.endDate)
+    ? bookingPdfUrl(range.startDate, range.endDate, language)
     : undefined;
 
   return (
     <main className="app-shell">
       <header className="app-header">
         <div>
-          <p className="eyebrow">Karpathos booking planner</p>
-          <h1>Booking reports</h1>
+          <p className="eyebrow">{t('Karpathos booking planner')}</p>
+          <h1>{t('Booking reports')}</h1>
         </div>
         <div className="header-meta">
-          <nav aria-label="Main navigation">
-            <a href={`/?type=${mode.id}`}>Bookings</a>
+          <nav aria-label={t('Main navigation')}>
+            <a href={`/?type=${mode.id}`}>{t('Bookings')}</a>
             <a className="nav-icon-link" href={`/?type=${mode.id}&page=reports`} aria-current="page">
               <svg
                 className="nav-icon"
@@ -112,26 +147,30 @@ export function ReportsPage() {
                 <path d="M12 16V5" />
                 <path d="M17 16v-4" />
               </svg>
-              <span>Reports</span>
+              <span>{t('Reports')}</span>
             </a>
+            <a href="/?page=resources">{t('Manage rooms and cars')}</a>
           </nav>
-          <span>{mode.title}</span>
+          <span>{t(mode.title)}</span>
+          <LanguageSelector />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          <button type="button" className="button button-muted" onClick={handleLogout}>{t('Sign out')}</button>
         </div>
       </header>
 
       <section className="panel" aria-labelledby="report-filters-heading">
         <div className="panel-heading">
           <div>
-            <h2 id="report-filters-heading">Report period</h2>
-            <p>Bookings are included when their arrival date falls within the selected period.</p>
+            <h2 id="report-filters-heading">{t('Report period')}</h2>
+            <p>{t('Bookings are included when their arrival date falls within the selected period.')}</p>
           </div>
           <div className="report-actions">
             <button type="button" className="button button-muted" onClick={showDetailedReport} disabled={!reportQueryIsValid}>
-              Detailed report
+              {t('Detailed report')}
             </button>
             {pdfUrl && (
               <a className="button button-primary" href={pdfUrl} target="_blank" rel="noreferrer">
-                Export PDF
+                {t('Export PDF')}
               </a>
             )}
           </div>
@@ -139,7 +178,7 @@ export function ReportsPage() {
 
         <div className="report-filters">
           <label className="field">
-            <span>From</span>
+            <span>{t('From')}</span>
             <input
               type="date"
               value={range.startDate}
@@ -147,7 +186,7 @@ export function ReportsPage() {
             />
           </label>
           <label className="field">
-            <span>To</span>
+            <span>{t('To')}</span>
             <input
               type="date"
               value={range.endDate}
@@ -158,39 +197,39 @@ export function ReportsPage() {
         </div>
 
         {error && <p className="feedback feedback-error" role="alert">{error}</p>}
-        {loading && <p className="feedback" role="status">Loading booking data…</p>}
+        {loading && <p className="feedback" role="status">{t('Loading booking data…')}</p>}
       </section>
 
       {!loading && !error && (
         <>
-          <section className="report-summary-grid" aria-label="Period totals">
-            <SummaryCard label="Bookings" value={summary.totalBookings} detail={`${summary.activeBookings} active/paid`} />
-            <SummaryCard label="Cancelled" value={summary.cancelledBookings} detail="Excluded from financial totals" />
-            <SummaryCard label="Guests" value={summary.guests} detail="Active and paid bookings" />
-            <SummaryCard label="Nights" value={summary.nights} detail="Active and paid bookings" />
-            <SummaryCard label="Charge" value={formatMoney(summary.charge)} detail="Active and paid bookings" />
-            <SummaryCard label="Received" value={formatMoney(summary.received)} detail="Active and paid bookings" />
-            <SummaryCard label="Balance" value={formatMoney(summary.balance)} detail="Charge less received and commission" />
+          <section className="report-summary-grid" aria-label={t('Period totals')}>
+            <SummaryCard label={t('Bookings')} value={summary.totalBookings} detail={t('{count} active/paid bookings', { count: summary.activeBookings })} />
+            <SummaryCard label={t('Cancelled bookings')} value={summary.cancelledBookings} detail={t('Excluded from financial totals')} />
+            <SummaryCard label={t('Guests')} value={summary.guests} detail={t('Active and paid bookings')} />
+            <SummaryCard label={t('Nights')} value={summary.nights} detail={t('Active and paid bookings')} />
+            <SummaryCard label={t('Charge')} value={formatMoney(summary.charge, locale)} detail={t('Active and paid bookings')} />
+            <SummaryCard label={t('Received')} value={formatMoney(summary.received, locale)} detail={t('Active and paid bookings')} />
+            <SummaryCard label={t('Balance')} value={formatMoney(summary.balance, locale)} detail={t('Charge less received and commission')} />
           </section>
 
           <section className="panel" aria-labelledby="resource-report-heading">
             <div className="panel-heading">
               <div>
-                <h2 id="resource-report-heading">By {mode.resourceLabel.toLowerCase()}</h2>
-                <p>Cancelled bookings are excluded from occupancy and financial totals.</p>
+                <h2 id="resource-report-heading">{t('By {resource}', { resource: t(mode.resourceLabel).toLocaleLowerCase(locale) })}</h2>
+                <p>{t('Cancelled bookings are excluded from occupancy and financial totals.')}</p>
               </div>
             </div>
-            <div className="report-table-wrap">
+            <div className="report-table-wrap" role="region" aria-label={t('{resource} summary table', { resource: t(mode.resourceLabel) })} tabIndex="0">
               <table className="report-table">
                 <thead>
                   <tr>
-                    <th>{mode.resourceLabel}</th>
-                    <th>Bookings</th>
-                    <th>Guests</th>
-                    <th>Nights</th>
-                    <th>Charge</th>
-                    <th>Received</th>
-                    <th>Balance</th>
+                    <th>{t(mode.resourceLabel)}</th>
+                    <th>{t('Bookings')}</th>
+                    <th>{t('Guests')}</th>
+                    <th>{t('Nights')}</th>
+                    <th>{t('Charge')}</th>
+                    <th>{t('Received')}</th>
+                    <th>{t('Balance')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -200,9 +239,9 @@ export function ReportsPage() {
                       <td>{resource.bookings}</td>
                       <td>{resource.guests}</td>
                       <td>{resource.nights}</td>
-                      <td>{formatMoney(resource.charge)}</td>
-                      <td>{formatMoney(resource.received)}</td>
-                      <td>{formatMoney(resource.balance)}</td>
+                      <td>{formatMoney(resource.charge, locale)}</td>
+                      <td>{formatMoney(resource.received, locale)}</td>
+                      <td>{formatMoney(resource.balance, locale)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -213,46 +252,48 @@ export function ReportsPage() {
           <section className="panel" aria-labelledby="booking-list-heading">
             <div className="panel-heading">
               <div>
-                <h2 id="booking-list-heading">Bookings in period</h2>
-                <p>{filteredBookings.length} record(s) by arrival date, including cancelled bookings.</p>
+                <h2 id="booking-list-heading">{t('Bookings in period')}</h2>
+                <p>{filteredBookings.length === 1
+                  ? t('1 record by arrival date, including cancelled bookings.')
+                  : t('{count} records by arrival date, including cancelled bookings.', { count: filteredBookings.length })}</p>
               </div>
             </div>
-            <div className="report-table-wrap">
+            <div className="report-table-wrap" role="region" aria-label={t('Bookings report table')} tabIndex="0">
               <table className="report-table">
                 <thead>
                   <tr>
-                    <th>Status</th>
-                    <th>Arrival</th>
-                    <th>Departure</th>
-                    <th>{mode.resourceLabel}</th>
-                    <th>Name</th>
-                    <th>Agency</th>
-                    <th>Guests</th>
-                    <th>Nights</th>
-                    <th>Charge</th>
-                    <th>Received</th>
-                    <th>Balance</th>
+                    <th>{t('Status')}</th>
+                    <th>{t('Arrival')}</th>
+                    <th>{t('Departure')}</th>
+                    <th>{t(mode.resourceLabel)}</th>
+                    <th>{t('Name')}</th>
+                    <th>{t('Agency')}</th>
+                    <th>{t('Guests')}</th>
+                    <th>{t('Nights')}</th>
+                    <th>{t('Charge')}</th>
+                    <th>{t('Received')}</th>
+                    <th>{t('Balance')}</th>
                   </tr>
                 </thead>
                 <tbody>
                   {filteredBookings.map((booking) => (
                     <tr key={booking.id} className={booking.status === 'cancelled' ? 'report-row-cancelled' : undefined}>
-                      <td>{booking.status}</td>
-                      <td>{booking.startDate}</td>
-                      <td>{booking.endDate}</td>
-                      <td>{booking.room}</td>
+                      <td>{t(booking.status)}</td>
+                      <td>{formatBookingDate(booking.startDate, locale)}</td>
+                      <td>{formatBookingDate(booking.endDate, locale)}</td>
+                      <td>{booking.roomName ?? booking.room}</td>
                       <td>{booking.name}</td>
-                      <td>{booking.agency}</td>
+                      <td>{t(mode.agencies.find((agency) => agency.id === booking.agency)?.text ?? booking.agency)}</td>
                       <td>{booking.numOfGuests ?? 0}</td>
                       <td>{booking.numOfNights ?? 0}</td>
-                      <td>{formatMoney(Number(booking.charge) || 0)}</td>
-                      <td>{formatMoney(Number(booking.received) || 0)}</td>
-                      <td>{formatMoney(Number(booking.balance) || 0)}</td>
+                      <td>{formatMoney(Number(booking.charge) || 0, locale)}</td>
+                      <td>{formatMoney(Number(booking.received) || 0, locale)}</td>
+                      <td>{formatMoney(Number(booking.balance) || 0, locale)}</td>
                     </tr>
                   ))}
                   {filteredBookings.length === 0 && (
                     <tr>
-                      <td colSpan="11" className="report-empty-row">No bookings start in this period.</td>
+                      <td colSpan="11" className="report-empty-row">{t('No bookings start in this period.')}</td>
                     </tr>
                   )}
                 </tbody>
@@ -268,10 +309,10 @@ export function ReportsPage() {
         }}>
           <section className="report-dialog" role="dialog" aria-modal="true" aria-labelledby="official-report-heading">
             <div className="report-heading">
-              <h2 id="official-report-heading">Detailed report</h2>
-              <button type="button" className="button button-muted" onClick={() => setReportHtml('')}>Close</button>
+              <h2 id="official-report-heading">{t('Detailed report')}</h2>
+              <button type="button" className="button button-muted" onClick={() => setReportHtml('')}>{t('Close')}</button>
             </div>
-            <iframe title="Detailed booking report" sandbox="allow-same-origin" srcDoc={reportHtml} />
+            <iframe title={t('Detailed report')} sandbox="allow-same-origin" srcDoc={reportDocument(reportHtml, theme, language)} />
           </section>
         </div>
       )}

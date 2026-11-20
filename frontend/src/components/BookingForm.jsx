@@ -2,12 +2,13 @@ import { useState } from 'react';
 import { guestCounts } from '../bookingConfig.js';
 import countries from '../countries.json';
 import { nightsBetween } from '../bookingLogic.js';
+import { formatMoney, useLanguage } from '../i18n.jsx';
 
 const detailFields = [
   { name: 'identification', label: 'Passport / ID' },
   { name: 'afm', label: 'Tax number (ΑΦΜ)' },
   { name: 'email', label: 'Email', type: 'email' },
-  { name: 'tel', label: 'Telephone', type: 'tel' },
+  { name: 'tel', label: 'Telephone' },
   { name: 'voucher', label: 'Voucher' },
   { name: 'taxRefNumber', label: 'Tax reference' },
   { name: 'invoiceNumber', label: 'Invoice number' },
@@ -25,6 +26,7 @@ export function BookingForm({
 }) {
   const [showDetails, setShowDetails] = useState(true);
   const nights = nightsBetween(form.startDate, form.endDate);
+  const { locale, t } = useLanguage();
 
   function update(name, value) {
     onChange({ ...form, [name]: value });
@@ -46,7 +48,7 @@ export function BookingForm({
     <form className="booking-form" onSubmit={onSubmit}>
       <div className="form-grid">
         <label className="field field-name">
-          <span>Name *</span>
+          <span>{t('Name *')}</span>
           <input
             required
             autoComplete="name"
@@ -56,13 +58,13 @@ export function BookingForm({
         </label>
 
         <label className="field">
-          <span>Guests *</span>
+          <span>{t('Guests *')}</span>
           <select
             required
             value={form.numOfGuests}
             onChange={(event) => update('numOfGuests', event.target.value)}
           >
-            <option value="">Select</option>
+            <option value="">{t('Select')}</option>
             {guestCounts.map((count) => (
               <option value={count} key={count}>{count}</option>
             ))}
@@ -70,35 +72,35 @@ export function BookingForm({
         </label>
 
         <label className="field">
-          <span>Agency / color *</span>
+          <span>{t('Agency / color *')}</span>
           <select
             required
             value={form.agency}
             onChange={(event) => update('agency', event.target.value)}
           >
-            <option value="">Select</option>
+            <option value="">{t('Select')}</option>
             {mode.agencies.map(({ id, text }) => (
-              <option value={id} key={id}>{text}</option>
+              <option value={id} key={id}>{t(text)}</option>
             ))}
           </select>
         </label>
 
         <label className="field">
-          <span>{mode.resourceLabel} *</span>
+          <span>{t(mode.resourceLabel)} *</span>
           <select
             required
             value={form.room}
             onChange={(event) => update('room', event.target.value)}
           >
-            <option value="">Select</option>
-            {mode.resources.map(({ id, text }) => (
+            <option value="">{t('Select')}</option>
+            {mode.resources.filter(({ active = true }) => active).map(({ id, text }) => (
               <option value={id} key={id}>{text}</option>
             ))}
           </select>
         </label>
 
         <label className="field">
-          <span>Country</span>
+          <span>{t('Country')}</span>
           <input
             list="country-options"
             value={form.country}
@@ -112,7 +114,7 @@ export function BookingForm({
         </label>
 
         <label className="field">
-          <span>From *</span>
+          <span>{t('From *')}</span>
           <input
             required
             type="date"
@@ -122,7 +124,7 @@ export function BookingForm({
         </label>
 
         <label className="field">
-          <span>To *</span>
+          <span>{t('To *')}</span>
           <input
             required
             type="date"
@@ -133,12 +135,12 @@ export function BookingForm({
         </label>
 
         <label className="field">
-          <span>Nights</span>
+          <span>{t('Nights')}</span>
           <input readOnly value={nights} />
         </label>
 
         <label className="field">
-          <span>Total (€)</span>
+          <span>{t('Total (€)')}</span>
           <input
             type="number"
             step="0.01"
@@ -148,7 +150,7 @@ export function BookingForm({
         </label>
 
         <label className="field">
-          <span>Commission (€)</span>
+          <span>{t('Commission (€)')}</span>
           <input
             type="number"
             step="0.01"
@@ -158,7 +160,7 @@ export function BookingForm({
         </label>
 
         <label className="field">
-          <span>Received (€)</span>
+          <span>{t('Received (€)')}</span>
           <input
             type="number"
             step="0.01"
@@ -168,34 +170,34 @@ export function BookingForm({
         </label>
 
         <label className="field">
-          <span>Status *</span>
+          <span>{t('Status *')}</span>
           <select
             required
             value={form.status}
             onChange={(event) => update('status', event.target.value)}
           >
             {mode.statuses.map(({ id, text }) => (
-              <option value={id} key={id}>{text}</option>
+              <option value={id} key={id}>{t(text)}</option>
             ))}
           </select>
         </label>
 
         <label className="field">
-          <span>Balance (€)</span>
+          <span>{t('Balance (€)')}</span>
           <input
             readOnly
-            value={(
+            value={formatMoney((
               (Number(form.charge) || 0) -
               (Number(form.received) || 0) -
               (Number(form.commission) || 0)
-            ).toFixed(2)}
+            ), locale)}
           />
         </label>
       </div>
 
       <div className="form-details-toggle">
         <button type="button" className="button button-muted" onClick={() => setShowDetails(!showDetails)}>
-          {showDetails ? 'Hide details' : 'Show details'}
+          {t(showDetails ? 'Hide details' : 'Show details')}
         </button>
       </div>
 
@@ -203,7 +205,7 @@ export function BookingForm({
         <div className="details-grid">
           {detailFields.map(({ name, label, type = 'text' }) => (
             <label className="field" key={name}>
-              <span>{label}</span>
+              <span>{t(label)}</span>
               <input
                 type={type}
                 value={form[name]}
@@ -212,7 +214,7 @@ export function BookingForm({
             </label>
           ))}
           <label className="field field-notes">
-            <span>Notes</span>
+            <span>{t('Notes')}</span>
             <textarea
               rows="3"
               value={form.extraInfo}
@@ -224,21 +226,21 @@ export function BookingForm({
 
       {selectedBooking && (
         <p className="form-note">
-          Selected booking {selectedBooking.name} ({selectedBooking.id}).{' '}
+          {t('Selected booking {name} ({id}).', { name: selectedBooking.name, id: selectedBooking.id })}{' '}
           {saveMode === 'edit'
-            ? 'Saving updates this booking.'
-            : 'Saving creates a new booking and leaves this one unchanged.'}
+            ? t('Saving updates this booking.')
+            : t('Saving creates a new booking and leaves this one unchanged.')}
         </p>
       )}
 
       <div className="form-actions">
         <button className="button button-primary" type="submit" disabled={busy || nights <= 0}>
           {busy
-            ? (saveMode === 'edit' && selectedBooking ? 'Updating…' : 'Saving…')
-            : (saveMode === 'edit' && selectedBooking ? 'Update booking' : 'Save as new booking')}
+            ? (saveMode === 'edit' && selectedBooking ? t('Updating…') : t('Saving…'))
+            : (saveMode === 'edit' && selectedBooking ? t('Update booking') : t('Save as new booking'))}
         </button>
         <button className="button button-muted" type="button" onClick={onReset} disabled={busy}>
-          New / reset
+          {t('New / reset')}
         </button>
       </div>
     </form>
