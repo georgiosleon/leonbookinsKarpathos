@@ -218,6 +218,10 @@ var roomList = [
         text: 'APT 2'
     },
     {
+        id: 'APT5',
+        text: 'APT 5'
+    },
+    {
         id: 'APT6',
         text: 'APT 6'
     },
