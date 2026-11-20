@@ -13,179 +13,107 @@ import com.lowagie.text.pdf.PdfWriter;
 import jakarta.servlet.http.HttpServletResponse;
 import java.awt.Color;
 import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
-
+import java.util.Locale;
+import java.text.NumberFormat;
 
 public class BookingsPDFExporter {
+    private static final List<String> HEADER_KEYS = List.of(
+            "status", "arrival", "departure", "room", "name", "agency", "guests", "nights",
+            "total", "commission", "received", "balance", "country", "id", "taxNumber",
+            "voucher", "invoice", "taxReference");
 
     private final List<Booking> bookingList;
+    private final Locale locale;
 
-    public BookingsPDFExporter(List<Booking> bookingList) {
+    public BookingsPDFExporter(List<Booking> bookingList, Locale locale) {
         this.bookingList = bookingList;
+        this.locale = locale;
     }
 
     private void writeTableHeader(PdfPTable table) {
-        PdfPCell cell = new PdfPCell();
-
-        cell.setBackgroundColor(Color.WHITE);
-        cell.setPadding(3);
-
-        Font font = FontFactory.getFont(FontFactory.COURIER);
-        font.setSize(8);
-        font.setColor(Color.BLACK);
-
-        cell.setPhrase(new Phrase("Status", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Arrival", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Departure", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Room", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Name", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Agency", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Guests", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Nights", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Total", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Commission", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Received", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Balance", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Country", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("ID", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("AFM", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Voucher", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Invoice", font));
-        table.addCell(cell);
-
-        cell.setPhrase(new Phrase("Tax Ref.", font));
-        table.addCell(cell);
-
-
+        Font font = reportFont(8);
+        for (String key : HEADER_KEYS) {
+            PdfPCell cell = new PdfPCell(new Phrase(ReportMessages.text(locale, "report." + key), font));
+            cell.setBackgroundColor(Color.WHITE);
+            cell.setPadding(3);
+            table.addCell(cell);
+        }
     }
 
     private void writeTableData(PdfPTable table) {
-
-        Font font = FontFactory.getFont(FontFactory.COURIER);
-        font.setSize(7);
+        Font font = reportFont(7);
+        DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", locale);
+        NumberFormat numberFormat = NumberFormat.getNumberInstance(locale);
+        numberFormat.setMinimumFractionDigits(2);
+        numberFormat.setMaximumFractionDigits(2);
 
         for (Booking booking : bookingList) {
-            PdfPCell cell = new PdfPCell();
-
-            cell.setPhrase(new Phrase(booking.getStatus(), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(booking.getStartDate(), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(booking.getEndDate(), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(booking.getRoom(), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(booking.getName(), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(booking.getAgency(), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(String.valueOf(booking.getNumOfGuests()), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(String.valueOf(booking.getNumOfNights()), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(String.valueOf(booking.getCharge()), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(String.valueOf(booking.getCommission()), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(String.valueOf(booking.getReceived()), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(String.valueOf(booking.getBalance()), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(booking.getCountry(), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(booking.getIdentification(), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(booking.getAfm(), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(booking.getVoucher(), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(booking.getInvoiceNumber(), font));
-            table.addCell(cell);
-
-            cell.setPhrase(new Phrase(booking.getTaxRefNumber(), font));
-            table.addCell(cell);
-
-
+            addCell(table, translatedStatus(booking.getStatus()), font);
+            addCell(table, formatDate(booking.getStartDate(), dateFormatter), font);
+            addCell(table, formatDate(booking.getEndDate(), dateFormatter), font);
+            addCell(table, booking.getRoomName() == null ? booking.getRoom() : booking.getRoomName(), font);
+            addCell(table, booking.getName(), font);
+            addCell(table, booking.getAgency(), font);
+            addCell(table, String.valueOf(booking.getNumOfGuests()), font);
+            addCell(table, String.valueOf(booking.getNumOfNights()), font);
+            addCell(table, formatNumber(booking.getCharge(), numberFormat), font);
+            addCell(table, formatNumber(booking.getCommission(), numberFormat), font);
+            addCell(table, formatNumber(booking.getReceived(), numberFormat), font);
+            addCell(table, formatNumber(booking.getBalance(), numberFormat), font);
+            addCell(table, booking.getCountry(), font);
+            addCell(table, booking.getIdentification(), font);
+            addCell(table, booking.getAfm(), font);
+            addCell(table, booking.getVoucher(), font);
+            addCell(table, booking.getInvoiceNumber(), font);
+            addCell(table, booking.getTaxRefNumber(), font);
         }
     }
 
     public void export(HttpServletResponse response) throws DocumentException, IOException {
         Document document = new Document(PageSize.A4.rotate());
-
         document.setMargins(6, 6, 20, 20);
-
         PdfWriter.getInstance(document, response.getOutputStream());
-
         document.open();
-//        Font font = FontFactory.getFont(FontFactory.HELVETICA_BOLD);
-//        font.setSize(7);
-//        font.setColor(Color.BLUE);
 
-//        Paragraph p = new Paragraph("Bookings", font);
-//        p.setAlignment(Paragraph.ALIGN_CENTER);
-//
-//        document.add(p);
-
-        PdfPTable table = new PdfPTable(18);
+        PdfPTable table = new PdfPTable(HEADER_KEYS.size());
         table.setWidthPercentage(100f);
-
-//        table.setWidths(new float[]{1.5f, 3.5f, 3.0f, 3.0f, 1.5f});
         table.setSpacingBefore(1);
-
         writeTableHeader(table);
         writeTableData(table);
-
         document.add(table);
-
         document.close();
+    }
 
+    private static Font reportFont(float size) {
+        Font font = FontFactory.getFont(FontFactory.COURIER, "Cp1253", false);
+        font.setSize(size);
+        font.setColor(Color.BLACK);
+        return font;
+    }
+
+    private static void addCell(PdfPTable table, String text, Font font) {
+        table.addCell(new PdfPCell(new Phrase(text == null ? "" : text, font)));
+    }
+
+    private String translatedStatus(String status) {
+        if (status == null) {
+            return "";
+        }
+        return switch (status) {
+            case "active", "cancelled", "paid" ->
+                    ReportMessages.text(locale, "status." + status);
+            default -> status;
+        };
+    }
+
+    private static String formatDate(String value, DateTimeFormatter formatter) {
+        return value == null ? "" : formatter.format(LocalDate.parse(value, DateTimeFormatter.ISO_LOCAL_DATE));
+    }
+
+    private static String formatNumber(Number value, NumberFormat formatter) {
+        return formatter.format(value == null ? 0 : value);
     }
 }

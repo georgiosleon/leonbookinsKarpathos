@@ -1,0 +1,24 @@
+@startuml
+title Leon Bookings - System Architecture
+
+skinparam componentStyle rectangle
+
+actor "Administrator" as Admin
+component "React frontend\n(Vite build)" as UI
+component "Spring Boot\nREST API + security" as API
+component "Booking services" as Services
+database "SQLite" as DB
+component "Desktop launcher\n(optional)" as Launcher
+
+Admin --> UI
+UI --> API : HTTP / JSON\nsession + CSRF
+API --> Services
+Services --> DB : bookings + resources
+Launcher --> API : starts local app
+Launcher --> Admin : opens browser
+
+note right of UI
+Production frontend assets
+are served by Spring Boot.
+end note
+@enduml
