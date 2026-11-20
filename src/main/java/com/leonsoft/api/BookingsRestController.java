@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -53,6 +54,12 @@ public class BookingsRestController {
         booking.setId(UUID.randomUUID().toString());
         log.debug(" SAVE   {}  ", booking);
         return bookingsService.create(booking);
+    }
+
+    @PutMapping(value = "/booking/update", consumes = MediaType.APPLICATION_JSON_VALUE)
+    Booking update(@RequestBody Booking booking) {
+        log.debug(" UPDATE   {}  ", booking);
+        return bookingsService.update(booking);
     }
 
 

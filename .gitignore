@@ -1,5 +1,7 @@
 HELP.md
 target/
+/frontend/node_modules/
+/src/main/resources/public/react-assets/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

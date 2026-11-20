@@ -12,7 +12,9 @@ import java.util.List;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 @Service
 @Slf4j
@@ -67,12 +69,23 @@ public class BookingsService {
         booking.setId(UUID.randomUUID().toString());
 
         log.debug(" SAVE   {}  ", booking);
+        return saveWithNormalizedValues(booking);
+    }
 
-        // convert from String to localDate
+    public Booking update(Booking booking) {
+        if (booking.getId() == null || booking.getId().isBlank()
+              || !bookingRepository.existsById(booking.getId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found.");
+        }
+
+        log.debug(" UPDATE   {}  ", booking);
+        return saveWithNormalizedValues(booking);
+    }
+
+    private Booking saveWithNormalizedValues(Booking booking) {
         LocalDate stDate = LocalDate.parse(booking.getStartDate(), BookingsUtils.formatterEURO);
         LocalDate edDate = LocalDate.parse(booking.getEndDate(), BookingsUtils.formatterEURO);
 
-        // save  ISO String formate
         booking.setStartDate(stDate.format(DateTimeFormatter.ISO_DATE));
         booking.setEndDate(edDate.format(DateTimeFormatter.ISO_DATE));
 
@@ -83,7 +96,6 @@ public class BookingsService {
 
         booking = bookingRepository.save(booking);
 
-        // send back EURO format
         booking.setStartDate(BookingsUtils.formatterEURO.format(stDate));
         booking.setEndDate(BookingsUtils.formatterEURO.format(edDate));
 
