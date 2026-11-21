@@ -35,7 +35,8 @@ public class SecurityConfig {
               .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(
                           "/booking/**", "/api/v1/booking/**",
-                          "/api/v1/resources", "/api/v1/resources/**")
+                          "/api/v1/resources", "/api/v1/resources/**",
+                          "/api/v1/app-info", "/api/v1/diagnostics")
                     .hasRole("ADMIN")
                     .anyRequest().authenticated())
               .formLogin(form -> form

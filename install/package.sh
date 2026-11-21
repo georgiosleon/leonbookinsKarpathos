@@ -9,7 +9,7 @@ PACKAGE_MANAGER=""
 while (($#)); do
   arg="$1"
   case "$arg" in
-    deb|linux|dmg) TYPE="$arg" ;;
+    deb|linux|dmg|portable) TYPE="$arg" ;;
     --install-deps) INSTALL_DEPS=true ;;
     --manager)
       (($# >= 2)) || { echo "--manager requires dnf, apt-get, or brew." >&2; exit 2; }
@@ -18,7 +18,7 @@ while (($#)); do
       ;;
     --manager=*) PACKAGE_MANAGER="${arg#--manager=}" ;;
     -h|--help)
-      echo "Usage: $0 [deb|linux|dmg] [--install-deps] [--manager dnf|apt-get|brew]"
+      echo "Usage: $0 [deb|linux|dmg|portable] [--install-deps] [--manager dnf|apt-get|brew]"
       echo "  --install-deps  Install missing build dependencies using the selected package manager."
       echo "  --manager       Explicitly select a package manager when distro detection is unavailable."
       exit 0
@@ -66,7 +66,7 @@ if [[ -z "$TYPE" ]]; then
 fi
 
 case "$OS:$TYPE" in
-  Linux:deb|Linux:linux|Darwin:dmg) ;;
+  Linux:deb|Linux:linux|Darwin:dmg|Darwin:portable) ;;
   *) echo "Package type '$TYPE' must be built on its matching operating system." >&2; exit 2 ;;
 esac
 
@@ -166,6 +166,7 @@ case "$TYPE" in
   deb) command -v dpkg-deb >/dev/null 2>&1 || add_missing_tool "dpkg-deb" ;;
   linux) command -v tar >/dev/null 2>&1 || add_missing_tool "tar" ;;
   dmg) command -v hdiutil >/dev/null 2>&1 || add_missing_tool "hdiutil" ;;
+  portable) command -v ditto >/dev/null 2>&1 || add_missing_tool "ditto" ;;
 esac
 
 if ((${#missing_tools[@]})); then
@@ -205,6 +206,10 @@ case "$TYPE" in
     command -v hdiutil >/dev/null 2>&1 || fail \
       "hdiutil is required to build macOS .dmg packages; use the native macOS build."
     ;;
+  portable)
+    command -v ditto >/dev/null 2>&1 || fail \
+      "ditto is required to archive the portable macOS app image."
+    ;;
 esac
 
 VERSION="$(sed -n '/<\/parent>/,$s/.*<version>\([^<]*\)<\/version>.*/\1/p' "$ROOT/pom.xml" | head -n 1)"
@@ -212,6 +217,10 @@ if [[ -z "$VERSION" ]]; then
   echo "Could not read the project version from pom.xml." >&2
   exit 1
 fi
+
+# Keep the runtime small but retain bin/java: the launcher uses it to start Spring Boot.
+RUNTIME_MODULES="java.base,java.desktop,java.instrument,java.logging,java.management,java.naming,java.security.jgss,java.sql,java.xml,jdk.crypto.ec,jdk.unsupported"
+JLINK_OPTIONS="--strip-debug --no-man-pages --no-header-files --compress=2"
 
 cd "$ROOT"
 ./mvnw -B package
@@ -235,21 +244,26 @@ cp "$APP_JAR" "$PACKAGE_INPUT/leonbookinsKarpathos.jar"
 PACKAGE_ARGS=()
 case "$TYPE" in
   deb)
-    PACKAGE_ARGS+=(--linux-package-name leon-bookings --linux-app-category Office --linux-shortcut)
+    PACKAGE_ARGS+=(--linux-package-name leon-bookings --linux-app-category Office)
     ;;
   linux)
     ;;
   dmg)
     PACKAGE_ARGS+=(--mac-package-name LeonBookings --mac-package-identifier com.leonsoft.leonbookings)
     ;;
+  portable)
+    PACKAGE_ARGS+=(--mac-package-name LeonBookings --mac-package-identifier com.leonsoft.leonbookings)
+    ;;
   *)
-    echo "Supported package types on this platform: deb, linux, dmg." >&2
+    echo "Supported package types on this platform: deb, linux, dmg, portable." >&2
     exit 2
     ;;
 esac
 
 jpackage_type="$TYPE"
 if [[ "$TYPE" == linux ]]; then
+  jpackage_type=app-image
+elif [[ "$TYPE" == portable ]]; then
   jpackage_type=app-image
 fi
 
@@ -260,15 +274,26 @@ jpackage \
   --input "$PACKAGE_INPUT" \
   --main-jar desktop-launcher.jar \
   --main-class com.leonsoft.desktop.DesktopLauncher \
-  --add-modules ALL-MODULE-PATH \
+  --add-modules "$RUNTIME_MODULES" \
+  --jlink-options "$JLINK_OPTIONS" \
   --dest "$OUTPUT" \
   "${PACKAGE_ARGS[@]}"
 
 if [[ "$TYPE" == linux ]]; then
+  [[ -x "$OUTPUT/LeonBookings/lib/runtime/bin/java" ]] || fail \
+    "The bundled runtime is missing bin/java, which the launcher needs to start the Spring application."
   archive="install/dist/linux/LeonBookings-${VERSION}-linux-$(uname -m).tar.gz"
   mkdir -p install/dist/linux
   tar -C "$OUTPUT" -czf "$archive" .
   echo "Portable Linux application created at $archive"
+elif [[ "$TYPE" == portable ]]; then
+  app_image="$OUTPUT/LeonBookings.app"
+  [[ -d "$app_image" ]] || fail "The portable macOS app image was not created."
+  [[ -x "$app_image/Contents/MacOS/LeonBookings" ]] || fail "The portable macOS launcher was not created."
+  [[ -x "$app_image/Contents/runtime/Contents/Home/bin/java" ]] || fail "The portable app is missing its bundled Java runtime."
+  archive="install/dist/portable/LeonBookings-${VERSION}-macos-$(uname -m).zip"
+  ditto -c -k --sequesterRsrc --keepParent "$app_image" "$archive"
+  echo "Portable macOS application created at $archive"
 else
   mkdir -p "install/dist/$TYPE"
   cp "$OUTPUT"/* "install/dist/$TYPE/"

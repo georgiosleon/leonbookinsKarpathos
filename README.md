@@ -1,8 +1,21 @@
 
+
+install
+
+```sh
+cd ~/dev/leonbookinsKarpathos
+./install/package.sh linux
+tar -xzf install/dist/linux/LeonBookings-1.0.0-linux-x86_64.tar.gz -C "$PWD"
+cd LeonBookings
+./bin/LeonBookings
+```
+
+
 # Leon Bookings (Karpathos)
 
 Room and vehicle booking management with a React interface, Spring Boot backend,
-and SQLite storage. The UI is available in English and Greek.
+and SQLite storage. The UI is available in English, Greek, German, Dutch,
+Danish, and French.
 
 ## Quick start for users (Docker)
 
@@ -14,8 +27,9 @@ username and password. The password must be 12–72 UTF-8 bytes:
 cp .env.example .env
 ```
 
-Edit `.env` and replace `CHANGE_ME` with a private password, then build and
-start the application:
+Edit `.env` and replace the sample username and `CHANGE_ME` with your own
+administrator credentials. Use a unique password of 12–72 UTF-8 bytes, then
+build and start the application:
 
 ```sh
 docker compose up --build -d
@@ -34,6 +48,41 @@ Keep `.env` private and make regular database backups.
 
 The project currently provides a Docker build, not a published container
 registry image; the first start builds the image locally.
+
+LAN access is opt-in for the desktop launcher and Docker Compose. The desktop
+launcher listens only on this computer by default; set
+`SERVER_ADDRESS=0.0.0.0` before launching to allow LAN devices to connect to
+`http://<host-computer-LAN-IP>:8080`. For Docker Compose, set
+`BOOKING_HOST_ADDRESS=0.0.0.0` in `.env`. Direct runs with the `prod` profile
+bind to loopback by default; set `SERVER_ADDRESS=0.0.0.0` to opt in to remote
+access. Enabling LAN access exposes the app on all host network
+interfaces: use a strong administrator password and restrict port 8080 with
+the host firewall to your trusted LAN. The app does not provide HTTPS itself.
+
+For a desktop portable app, set the variable in the same terminal before
+starting the launcher:
+
+```powershell
+$env:SERVER_ADDRESS = "0.0.0.0"
+.\LeonBookings.exe
+```
+
+```sh
+# Linux
+SERVER_ADDRESS=0.0.0.0 ./bin/LeonBookings
+
+# macOS
+SERVER_ADDRESS=0.0.0.0 ./LeonBookings.app/Contents/MacOS/LeonBookings
+```
+
+For Docker Compose, set `BOOKING_HOST_ADDRESS=0.0.0.0` in `.env` and run
+`docker compose up -d`. To return to local-only access, remove the desktop
+environment override or restore `BOOKING_HOST_ADDRESS=127.0.0.1` and restart.
+
+The SQLite database remains on the computer running the application. To share
+or move its data, stop the app and use the documented backup/restore commands;
+do not have multiple computers open the same live `bookings.db` file from a
+network share.
 
 Docker Compose explicitly activates the Spring `prod` profile. Direct
 development runs use the `dev` profile by default; override it with
@@ -107,12 +156,15 @@ npm test
 ## Desktop installers
 
 Self-contained desktop installers and their build scripts live in `install/`.
-They include a small launcher that prompts for administrator credentials,
-starts the local service, and opens the app in the browser. The installer
-bundles its Java runtime; end users do not need Java, Maven, Node.js, npm, or
-Docker. Installer build scripts check for JDK 25 and native
-packaging tools before starting; see [`install/README.md`](install/README.md)
-for setup instructions for Linux, macOS, and Windows. On Fedora, Debian-based
+They include a command-line launcher that prompts for administrator credentials,
+starts the local service, and opens the app in the browser. Run the launcher
+from a terminal; it keeps the service running until you press Enter or
+interrupt it. Each installer bundles only the Java 25 runtime modules needed
+to run the app; end users do not need a system Java installation, Maven,
+Node.js, npm, or Docker. Installer build scripts check for JDK 25
+and native packaging tools before starting; see
+[`install/README.md`](install/README.md) for setup instructions for Linux,
+macOS, and Windows. On Fedora, Debian-based
 Linux, and macOS, `./install/package.sh --install-deps` can install missing
 build prerequisites through the system package manager. If Linux detection
 fails, pass the manager explicitly, for example
@@ -124,6 +176,58 @@ self-contained runtime; the installer preflight checks for it.
 Build each native package on its matching operating system; see
 [`install/README.md`](install/README.md) for requirements and output locations.
 macOS releases need signing and notarization for a smooth first launch.
+
+#### Run the portable Linux archive
+
+The archive includes the application and its Java runtime. From the directory
+where you downloaded `LeonBookings-1.0.0-linux-x86_64.tar.gz`, extract and run
+it:
+
+```sh
+tar -xzf LeonBookings-1.0.0-linux-x86_64.tar.gz
+cd LeonBookings
+./bin/LeonBookings
+```
+
+Replace the filename with the version and architecture you downloaded. The
+launcher asks for the administrator credentials, starts the service, and opens
+the app in your browser. Keep the terminal open while using the app; pressing
+Enter stops the service. The database is `bookings.db` in the launcher's
+current working directory. An existing database is retained and receives any
+missing tables; a new database is initialized with one sample booking. Logs
+are stored under `${XDG_DATA_HOME:-~/.local/share}/leon-bookings`.
+
+#### Portable Windows and macOS apps
+
+The Windows and macOS portable builds are ZIP archives with the application
+and Java runtime bundled. Build on the target operating system:
+
+```powershell
+# Windows PowerShell
+.\install\package.ps1 portable
+```
+
+```sh
+# macOS
+./install/package.sh portable
+```
+
+Extract the archive, then start the app from a terminal in its extracted
+directory. This keeps `bookings.db` in that directory:
+
+```powershell
+cd .\LeonBookings
+.\LeonBookings.exe
+```
+
+```sh
+./LeonBookings.app/Contents/MacOS/LeonBookings
+```
+
+The macOS ZIP matches the architecture of the build machine. These portable
+archives are not signed or notarized, so Windows SmartScreen or macOS
+Gatekeeper may show warnings. The existing Windows MSI and macOS DMG builds
+remain available.
 
 ## API versioning
 
@@ -149,6 +253,15 @@ variables. The desktop launcher asks for the username and password on every
 launch and passes them to the application process; it does not save them to
 the database or configuration files.
 Active/paid bookings and cancelled bookings appear in separate timeline panels.
+Cancelled entries are stacked in their panel so overlapping cancellations,
+including multiple records for the same guest, remain individually visible.
+Overlap prevention for active/paid reservations is enabled separately for
+rooms and vehicles by default. Override either global application setting
+with `BOOKING_AVAILABILITY_ROOMS_PREVENT_OVERLAP` or
+`BOOKING_AVAILABILITY_CARS_PREVENT_OVERLAP`; these are deployment environment
+settings, not switches in the application UI. When enabled, overlapping
+active/paid bookings for the same resource are rejected, while cancelled
+bookings do not block availability.
 The administrator can add rooms and vehicles from the **Manage rooms and cars**
 screen. Existing bookings keep their stored resource assignments.
 
@@ -158,13 +271,16 @@ screen. Existing bookings keep their stored resource assignments.
   The backend validates required values, dates, status, email, and financial
   amounts, then calculates nights and balance itself.
 - Admin-only booking and report endpoints use a single in-memory administrator
-  account. Browser writes include CSRF protection; no user table or database
-  schema changes were added.
+  account. Browser writes include CSRF protection; user accounts are not
+  persisted. The `booking_resources` table stores the admin-managed room and
+  vehicle catalog; the existing bookings table and its resource assignments
+  are preserved.
 - The detailed HTML report escapes booking data before rendering. The SPA
   fallback reads the entry page from the classpath, and static assets are
   configured for packaged applications.
-- Local application runs bind to `127.0.0.1`. For Docker, the documented
-  command overrides the bind address inside the container.
+- Development and desktop application runs bind to `127.0.0.1` by default.
+  Docker Compose publishes the port on loopback by default. Optional LAN
+  access is documented above and in the in-app Help.
 - Booking and report screens support responsive layouts, keyboard-accessible
   report tables, and a persistent light/dark theme preference.
 
@@ -172,7 +288,8 @@ Open `/?type=rooms&page=reports` or `/?type=cars&page=reports` for the reports
 page. It summarizes bookings from the database-backed
 `GET /api/v1/booking/getAll` endpoint, filters by arrival date and resource
 type, and provides detailed HTML and PDF exports using the versioned report
-endpoints.
+endpoints. The PDF export follows the selected type and arrival-date range and
+includes the on-screen totals, per-resource breakdown, and booking columns.
 
 The global frontend save behavior defaults to creating a new booking when
 `VITE_BOOKING_SAVE_MODE` is unset. Set it to `edit` at build time to default to
@@ -189,11 +306,16 @@ VITE_BOOKING_SAVE_MODE=edit ./mvnw package
 The interface supports light and dark themes. Use the theme button in the
 header to switch; the preference is saved in the current browser.
 
-The booking and reports interfaces support English and Greek. Use the language
-selector in the header; the choice is saved in the current browser. Dates and
-currency follow that language's locale, and HTML/PDF reports use the selected
-language. The sign-in page offers the same languages. Booking values and API
-status codes remain language-neutral.
+The booking and reports interfaces support English, Greek, German, Dutch,
+Danish, and French. Use the language selector in the header; the choice is
+saved in the current browser. English is the default and fallback. Dates and
+currency follow that language's locale, and detailed reports use the selected
+language. The reports screen's Export PDF action exports the selected resource
+type and date range, including the displayed summaries and resource breakdown.
+The sign-in page offers the same languages. Booking values and API
+status codes remain language-neutral. Frontend translation catalogs are in
+`frontend/src/locales/`; the build validates catalog keys and interpolation
+placeholders.
 
 In edit mode, the frontend uses `PUT /api/v1/booking/update`. When user
 management is added, a user's preference can override this global frontend
@@ -207,12 +329,39 @@ runtime as the application. The database path defaults to `bookings.db` in the
 current working directory, matching the application's relative SQLite URL.
 Pass `--database` if the application uses another path.
 
+Before installing an update, stop the application and create an encrypted
+backup outside the application folder. Keep the existing database at the same
+path and check the path printed at startup; after updating, confirm that recent
+bookings and resources are present before removing the previous application
+copy. Current SQL initialization creates missing tables but does not migrate
+changed columns, so test updates against a copy of the customer database and
+keep the backup until the update is verified.
+
 Create a timestamped backup in `backups/`:
 
 ```sh
 VERSION="$(./mvnw -q -DforceStdout help:evaluate -Dexpression=project.version)"
 java -jar "target/leonbookinsKarpathos-${VERSION}.jar" db backup
 ```
+
+The plain backup command creates an unencrypted file; do not email or otherwise
+share that file. For a support copy, create an encrypted backup instead. The command prompts
+for a passphrase twice without echoing it and writes a timestamped
+`*.sqlite3.enc` file:
+
+```sh
+VERSION="$(./mvnw -q -DforceStdout help:evaluate -Dexpression=project.version)"
+java -jar "target/leonbookinsKarpathos-${VERSION}.jar" db backup --encrypt
+```
+
+Choose a long, unique passphrase (at least 12 characters). The backup uses
+AES-256-GCM with a random salt and nonce. Keep the passphrase separate from the
+backup file and share it with support through a different trusted channel.
+There is no passphrase recovery; losing it makes the backup unusable. The app
+does not email or upload backups. Send the encrypted file through your approved
+support channel and communicate the passphrase separately. The application
+detects encrypted backups automatically during restore and prompts for the
+passphrase. Restore only after stopping the application.
 
 Choose a destination or database explicitly:
 
@@ -223,18 +372,25 @@ java -jar "target/leonbookinsKarpathos-${VERSION}.jar" db backup \
   --output /path/to/backup.sqlite3
 ```
 
+The same options work with `--encrypt`; use an output filename ending in
+`.sqlite3.enc`.
+
 Restore a backup after stopping the application. The CLI asks for confirmation;
 type `RESTORE` to continue. Before replacing an existing database, it validates
 the restore file and writes a timestamped pre-restore backup to `backups/`.
+Encrypted backups are detected automatically; the CLI asks for their
+passphrase before validating and restoring them.
 
 ```sh
 VERSION="$(./mvnw -q -DforceStdout help:evaluate -Dexpression=project.version)"
 java -jar "target/leonbookinsKarpathos-${VERSION}.jar" db restore \
-  --input backups/bookings-YYYYMMDD-HHMMSS.sqlite3
+  --input backups/bookings-YYYYMMDD-HHMMSS.sqlite3.enc
 ```
 
-For automation, explicitly confirm with `--yes` and select a backup directory
-if needed:
+Use the `.sqlite3` filename for an unencrypted backup.
+
+For an unencrypted backup, explicitly confirm with `--yes` and select a backup
+directory if needed:
 
 ```sh
 VERSION="$(./mvnw -q -DforceStdout help:evaluate -Dexpression=project.version)"
@@ -249,8 +405,9 @@ overwrite an existing output file. Restore replaces the target only after
 validating a staged copy. If SQLite WAL, shared-memory, or journal sidecars
 remain beside the database, restore stops rather than risk discarding pending
 data; resolve the sidecars before retrying. Restore the pre-restore backup if
-you need to undo it. Keep backup files in a secure location because they
-contain booking data.
+you need to undo it. Encrypted restore requires an interactive terminal for
+passphrase entry even when `--yes` is used. Keep all backup files in a secure
+location because they contain booking data.
 
 ### Tests
 
@@ -270,9 +427,9 @@ npm test
 
 Frontend tests cover booking/date logic, timeline filtering, reports, and theme
 preferences. Backend tests cover request validation, booking service behavior,
-report HTML escaping, authentication/authorization/CSRF behavior, and SQLite
-backup/restore safety. These tests do not replace a full browser/device
-usability check.
+report HTML escaping and paginated PDF contents, authentication/authorization/
+CSRF behavior, and SQLite backup/restore safety. These tests do not replace a
+full browser/device usability check.
 
 ### Docker details
 

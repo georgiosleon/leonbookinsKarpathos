@@ -4,6 +4,9 @@ import { LanguageSelector } from './LanguageSelector.jsx';
 import { useLanguage } from '../i18n.jsx';
 import { ThemeToggle } from './ThemeToggle.jsx';
 import { useTheme } from '../useTheme.js';
+import { FeedbackDialog } from './FeedbackDialog.jsx';
+import { HelpButton } from './HelpButton.jsx';
+import { AppSupportActions } from './AppSupportActions.jsx';
 
 export function ResourcesPage() {
   const [resources, setResources] = useState([]);
@@ -14,9 +17,15 @@ export function ResourcesPage() {
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [errorPopupOpen, setErrorPopupOpen] = useState(false);
   const [notice, setNotice] = useState('');
   const { language, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+
+  function showError(message) {
+    setError(message);
+    setErrorPopupOpen(Boolean(message));
+  }
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -29,7 +38,7 @@ export function ResourcesPage() {
         if (active) setResources(data);
       })
       .catch((requestError) => {
-        if (active) setError(t('Could not load resources: {error}', { error: requestError.message }));
+        if (active) showError(t('Could not load resources: {error}', { error: requestError.message }));
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -42,10 +51,10 @@ export function ResourcesPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setError('');
+    showError('');
     setNotice('');
     if (!name.trim()) {
-      setError(t('Enter a resource name.'));
+      showError(t('Enter a resource name.'));
       return;
     }
 
@@ -58,18 +67,18 @@ export function ResourcesPage() {
       setName('');
       setNotice(t('Resource added.'));
     } catch (requestError) {
-      setError(t('Could not add resource: {error}', { error: requestError.message }));
+      showError(t('Could not add resource: {error}', { error: requestError.message }));
     } finally {
       setBusy(false);
     }
   }
 
   async function handleLogout() {
-    setError('');
+    showError('');
     try {
       await logout();
     } catch (requestError) {
-      setError(t('Could not sign out: {error}', { error: requestError.message }));
+      showError(t('Could not sign out: {error}', { error: requestError.message }));
     }
   }
 
@@ -87,8 +96,10 @@ export function ResourcesPage() {
             <a href="/?type=rooms&page=reports">{t('Reports')}</a>
             <a href="/?page=resources" aria-current="page">{t('Manage rooms and cars')}</a>
           </nav>
+          <HelpButton />
           <LanguageSelector />
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          <AppSupportActions />
           <button type="button" className="button button-muted" onClick={handleLogout}>{t('Sign out')}</button>
         </div>
       </header>
@@ -156,6 +167,10 @@ export function ResourcesPage() {
             </div>
           )}
       </section>
+      <FeedbackDialog
+        message={errorPopupOpen ? error : ''}
+        onClose={() => setErrorPopupOpen(false)}
+      />
     </main>
   );
 }

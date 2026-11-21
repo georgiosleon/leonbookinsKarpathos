@@ -70,3 +70,7 @@ export function bookingsForTimeline(bookings, timelineType) {
   }
   return bookings.filter((booking) => statuses.includes(booking.status));
 }
+
+export function shouldStackTimeline(timelineType) {
+  return timelineType === 'cancelled';
+}

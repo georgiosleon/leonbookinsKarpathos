@@ -46,6 +46,18 @@ textarea {
   margin-bottom: 20px;
 }
 
+.app-support-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.app-version {
+  color: #657187;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
 .app-header h1,
 .panel h2,
 .report-heading h2 {
@@ -152,9 +164,23 @@ textarea {
   margin-bottom: 18px;
 }
 
+.booking-form-heading-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
 .panel-heading p {
   margin: 5px 0 0;
   color: #657187;
+}
+
+.panel-heading .booking-details-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 14px;
 }
 
 .balance-summary {
@@ -421,6 +447,123 @@ textarea {
   place-items: center;
 }
 
+.help-backdrop {
+  z-index: 30;
+  padding: 0;
+  place-items: stretch;
+}
+
+.help-dialog {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  flex-direction: column;
+  overflow: hidden;
+  background: #f3f6fb;
+  color: #172033;
+}
+
+.help-dialog-heading {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 20px max(24px, calc((100vw - 1100px) / 2));
+  border-bottom: 1px solid #dfe5ef;
+  background: #fff;
+}
+
+.help-dialog-heading h2 {
+  margin: 0;
+}
+
+.help-dialog-heading .eyebrow {
+  margin-bottom: 4px;
+}
+
+.help-tabs {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 8px;
+  padding: 12px max(24px, calc((100vw - 1100px) / 2));
+  border-bottom: 1px solid #dfe5ef;
+  background: #fff;
+}
+
+.help-tabs button {
+  min-height: 42px;
+  padding: 8px 16px;
+  border: 1px solid #cbd4e1;
+  border-radius: 8px;
+  background: #fff;
+  color: #33415a;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+
+.help-tabs button[aria-selected="true"] {
+  border-color: #1769aa;
+  background: #e8f2fc;
+  color: #174e7e;
+}
+
+.help-dialog-content {
+  width: min(100%, 1100px);
+  margin: 0 auto;
+  padding: 24px;
+  overflow-y: auto;
+}
+
+.help-dialog-content [hidden] {
+  display: none;
+}
+
+.help-dialog-content section {
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid #dfe5ef;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.help-dialog-content h3 {
+  margin: 0 0 12px;
+}
+
+.help-dialog-content h4 {
+  margin: 18px 0 8px;
+}
+
+.help-dialog-content li {
+  margin: 8px 0;
+  line-height: 1.5;
+}
+
+.help-dialog-content p {
+  line-height: 1.6;
+}
+
+.help-dialog-content pre {
+  margin: 0;
+  padding: 14px;
+  overflow-x: auto;
+  border-radius: 8px;
+  background: #172033;
+  color: #f3f6fb;
+  line-height: 1.5;
+}
+
+.help-dialog-content code {
+  white-space: pre;
+}
+
+.help-dialog-content .help-warning {
+  border-left: 5px solid #b7791f;
+  background: #fff9e8;
+}
+
 .report-dialog {
   display: flex;
   width: min(1200px, 100%);
@@ -429,6 +572,39 @@ textarea {
   padding: 16px;
   border-radius: 10px;
   background: #fff;
+}
+
+.feedback-dialog {
+  width: min(480px, 100%);
+  padding: 20px;
+  border: 1px solid #dfe5ef;
+  border-left: 5px solid #b42318;
+  border-radius: 10px;
+  background: #fff;
+  color: #172033;
+  box-shadow: 0 16px 48px rgb(0 0 0 / 24%);
+}
+
+.feedback-dialog-warning {
+  border-left-color: #b7791f;
+}
+
+.feedback-dialog-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.feedback-dialog-heading h2 {
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.feedback-dialog p {
+  margin: 16px 0 0;
+  overflow-wrap: anywhere;
+  line-height: 1.5;
 }
 
 .report-heading {
@@ -491,10 +667,48 @@ textarea {
 
 [data-theme="dark"] .panel,
 [data-theme="dark"] .report-summary-card,
-[data-theme="dark"] .report-dialog {
+[data-theme="dark"] .report-dialog,
+[data-theme="dark"] .feedback-dialog,
+[data-theme="dark"] .help-dialog-content section {
   border-color: #303b4d;
   background: #1a2230;
   box-shadow: 0 4px 16px rgb(0 0 0 / 18%);
+}
+
+[data-theme="dark"] .help-dialog {
+  background: #10151e;
+  color: #e7edf7;
+}
+
+[data-theme="dark"] .feedback-dialog {
+  color: #e7edf7;
+}
+
+[data-theme="dark"] .help-dialog-heading {
+  border-color: #303b4d;
+  background: #1a2230;
+}
+
+[data-theme="dark"] .help-tabs {
+  border-color: #303b4d;
+  background: #1a2230;
+}
+
+[data-theme="dark"] .help-tabs button {
+  border-color: #4a586d;
+  background: #151c27;
+  color: #e7edf7;
+}
+
+[data-theme="dark"] .help-tabs button[aria-selected="true"] {
+  border-color: #79b4ff;
+  background: #233750;
+  color: #d7e9ff;
+}
+
+[data-theme="dark"] .help-dialog-content .help-warning {
+  border-left-color: #d69e2e;
+  background: #3a321b;
 }
 
 [data-theme="dark"] .field input,
@@ -537,6 +751,10 @@ textarea {
 [data-theme="dark"] .feedback-error {
   background: #3a2024;
   color: #ffb6ad;
+}
+
+[data-theme="dark"] .feedback-dialog-warning {
+  border-left-color: #d69e2e;
 }
 
 [data-theme="dark"] .feedback-success {

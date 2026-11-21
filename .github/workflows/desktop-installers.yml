@@ -43,8 +43,12 @@ jobs:
             package: linux
           - os: macos-latest
             package: dmg
+          - os: macos-latest
+            package: portable
           - os: windows-latest
             package: msi
+          - os: windows-latest
+            package: portable
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -60,9 +64,43 @@ jobs:
         if: runner.os == 'Windows'
         shell: pwsh
         run: .\install\package.ps1 ${{ matrix.package }}
+      - name: Smoke test bundled Linux runtime
+        if: matrix.package == 'linux'
+        shell: bash
+        run: |
+          set -euo pipefail
+          version="$(./mvnw -q -DforceStdout help:evaluate -Dexpression=project.version)"
+          app_dir="$RUNNER_TEMP/leon-bookings-runtime-smoke"
+          mkdir -p "$app_dir"
+          tar -xzf "install/dist/linux/LeonBookings-${version}-linux-$(uname -m).tar.gz" -C "$app_dir"
+          java="$app_dir/LeonBookings/lib/runtime/bin/java"
+          app="$app_dir/LeonBookings/lib/app/leonbookinsKarpathos.jar"
+          test -x "$java"
+
+          APP_ADMIN_USERNAME=runtime-smoke \
+          APP_ADMIN_PASSWORD=runtime-smoke-password \
+          APP_DB_URL="jdbc:sqlite:$RUNNER_TEMP/leon-bookings-runtime-smoke.db" \
+          SERVER_PORT=18080 \
+            "$java" -jar "$app" >"$RUNNER_TEMP/leon-bookings-runtime-smoke.log" 2>&1 &
+          app_pid=$!
+          trap 'kill "$app_pid" 2>/dev/null || true; wait "$app_pid" 2>/dev/null || true' EXIT
+
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent http://127.0.0.1:18080/login >/dev/null; then
+              exit 0
+            fi
+            if ! kill -0 "$app_pid" 2>/dev/null; then
+              cat "$RUNNER_TEMP/leon-bookings-runtime-smoke.log"
+              exit 1
+            fi
+            sleep 1
+          done
+          cat "$RUNNER_TEMP/leon-bookings-runtime-smoke.log"
+          echo "Bundled runtime did not start the application." >&2
+          exit 1
       - uses: actions/upload-artifact@v4
         with:
-          name: leon-bookings-${{ matrix.package }}
+          name: leon-bookings-${{ matrix.package }}-${{ runner.os }}
           path: install/dist/${{ matrix.package }}/*
           if-no-files-found: error
 

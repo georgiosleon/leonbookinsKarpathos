@@ -29,18 +29,11 @@ public class BookinsHtmlTemplate {
         numberFormat.setMinimumFractionDigits(2);
         numberFormat.setMaximumFractionDigits(2);
 
-        String pdfUrl = "/api/v1/booking/export/pdf?fromDate=" + htmlEscape(fromDateEuroFmt)
-              + "&amp;toDate=" + htmlEscape(toDateEuroFmt)
-              + "&amp;lang=" + ("el".equals(locale.getLanguage()) ? "el" : "en");
-
-
         report
               .append("<h3>").append("  ").append(htmlEscape(ReportMessages.text(locale, "report.from")))
               .append(":  ").append(htmlEscape(fromDateEuroFmt))
               .append("  ").append(htmlEscape(ReportMessages.text(locale, "report.to")))
               .append(":  ").append(htmlEscape(toDateEuroFmt))
-              .append("        <a href=\"").append(pdfUrl).append("\">")
-              .append(htmlEscape(ReportMessages.text(locale, "report.export"))).append("</a>  ")
               .append("</h3>")
 
            .append("<table>")

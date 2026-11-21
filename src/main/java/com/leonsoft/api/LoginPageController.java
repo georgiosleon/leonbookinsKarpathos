@@ -54,6 +54,10 @@ public class LoginPageController {
                         <select id="language" aria-label="Language">
                           <option value="en">English</option>
                           <option value="el">Ελληνικά</option>
+                          <option value="de">Deutsch</option>
+                          <option value="nl">Nederlands</option>
+                          <option value="da">Dansk</option>
+                          <option value="fr">Français</option>
                         </select>
                       </label>
                       <button type="submit" data-message="submit">Sign in</button>
@@ -66,15 +70,27 @@ public class LoginPageController {
                         username: 'Username', password: 'Password', language: 'Language', submit: 'Sign in' },
                       el: { brand: 'Σύστημα κρατήσεων Καρπάθου', title: 'Σύνδεση',
                         invalid: 'Λανθασμένο όνομα χρήστη ή κωδικός πρόσβασης.', signedOut: 'Έχετε αποσυνδεθεί.',
-                        username: 'Όνομα χρήστη', password: 'Κωδικός πρόσβασης', language: 'Γλώσσα', submit: 'Σύνδεση' }
+                        username: 'Όνομα χρήστη', password: 'Κωδικός πρόσβασης', language: 'Γλώσσα', submit: 'Σύνδεση' },
+                      de: { brand: 'Karpathos Buchungsplaner', title: 'Anmelden',
+                        invalid: 'Ungültiger Benutzername oder ungültiges Passwort.', signedOut: 'Sie wurden abgemeldet.',
+                        username: 'Benutzername', password: 'Passwort', language: 'Sprache', submit: 'Anmelden' },
+                      nl: { brand: 'Boekingsplanner Karpathos', title: 'Aanmelden',
+                        invalid: 'Ongeldige gebruikersnaam of wachtwoord.', signedOut: 'U bent afgemeld.',
+                        username: 'Gebruikersnaam', password: 'Wachtwoord', language: 'Taal', submit: 'Aanmelden' },
+                      da: { brand: 'Bookingplanlægger for Karpathos', title: 'Log ind',
+                        invalid: 'Ugyldigt brugernavn eller adgangskode.', signedOut: 'Du er logget ud.',
+                        username: 'Brugernavn', password: 'Adgangskode', language: 'Sprog', submit: 'Log ind' },
+                      fr: { brand: 'Gestion des réservations de Karpathos', title: 'Connexion',
+                        invalid: 'Nom d’utilisateur ou mot de passe invalide.', signedOut: 'Vous êtes déconnecté.',
+                        username: 'Nom d’utilisateur', password: 'Mot de passe', language: 'Langue', submit: 'Se connecter' }
                     };
                     const selector = document.getElementById('language');
                     let language = 'en';
                     try {
                       const saved = localStorage.getItem('booking-language');
-                      language = saved === 'el' || saved === 'en'
-                        ? saved
-                        : (navigator.language.toLowerCase().startsWith('el') ? 'el' : 'en');
+                      const detected = navigator.language.toLowerCase().split('-')[0];
+                      language = Object.prototype.hasOwnProperty.call(copy, saved) ? saved
+                        : (Object.prototype.hasOwnProperty.call(copy, detected) ? detected : 'en');
                     } catch {}
                     function applyLanguage(value) {
                       language = value;

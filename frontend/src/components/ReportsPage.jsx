@@ -13,6 +13,9 @@ import { useTheme } from '../useTheme.js';
 import { reportDocument } from '../reportDocument.js';
 import { formatMoney, useLanguage } from '../i18n.jsx';
 import { LanguageSelector } from './LanguageSelector.jsx';
+import { FeedbackDialog } from './FeedbackDialog.jsx';
+import { HelpButton } from './HelpButton.jsx';
+import { AppSupportActions } from './AppSupportActions.jsx';
 
 function currentMonthRange() {
   const today = new Date();
@@ -46,9 +49,15 @@ export function ReportsPage() {
   const [range, setRange] = useState(currentMonthRange);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [errorPopupOpen, setErrorPopupOpen] = useState(false);
   const [reportHtml, setReportHtml] = useState('');
   const { theme, toggleTheme } = useTheme();
   const { language, locale, t } = useLanguage();
+
+  function showError(message) {
+    setError(message);
+    setErrorPopupOpen(Boolean(message));
+  }
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -64,7 +73,7 @@ export function ReportsPage() {
         }
       })
       .catch((requestError) => {
-        if (active) setError(t('Could not load booking data: {error}', { error: requestError.message }));
+        if (active) showError(t('Could not load booking data: {error}', { error: requestError.message }));
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -94,31 +103,31 @@ export function ReportsPage() {
   }
 
   async function showDetailedReport() {
-    setError('');
+    showError('');
     if (!range.startDate || !range.endDate || range.startDate > range.endDate) {
-      setError(t('Choose a valid date range.'));
+      showError(t('Choose a valid date range.'));
       return;
     }
 
     try {
       setReportHtml(await fetchBookingReport(range.startDate, range.endDate, language));
     } catch (requestError) {
-      setError(t('Could not load detailed report: {error}', { error: requestError.message }));
+      showError(t('Could not load detailed report: {error}', { error: requestError.message }));
     }
   }
 
   async function handleLogout() {
-    setError('');
+    showError('');
     try {
       await logout();
     } catch (requestError) {
-      setError(t('Could not sign out: {error}', { error: requestError.message }));
+      showError(t('Could not sign out: {error}', { error: requestError.message }));
     }
   }
 
   const reportQueryIsValid = range.startDate && range.endDate && range.startDate <= range.endDate;
   const pdfUrl = reportQueryIsValid
-    ? bookingPdfUrl(range.startDate, range.endDate, language)
+    ? bookingPdfUrl(range.startDate, range.endDate, language, mode.id)
     : undefined;
 
   return (
@@ -152,8 +161,10 @@ export function ReportsPage() {
             <a href="/?page=resources">{t('Manage rooms and cars')}</a>
           </nav>
           <span>{t(mode.title)}</span>
+          <HelpButton />
           <LanguageSelector />
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          <AppSupportActions />
           <button type="button" className="button button-muted" onClick={handleLogout}>{t('Sign out')}</button>
         </div>
       </header>
@@ -169,7 +180,7 @@ export function ReportsPage() {
               {t('Detailed report')}
             </button>
             {pdfUrl && (
-              <a className="button button-primary" href={pdfUrl} target="_blank" rel="noreferrer">
+              <a className="button button-primary" href={pdfUrl}>
                 {t('Export PDF')}
               </a>
             )}
@@ -196,7 +207,6 @@ export function ReportsPage() {
           </label>
         </div>
 
-        {error && <p className="feedback feedback-error" role="alert">{error}</p>}
         {loading && <p className="feedback" role="status">{t('Loading booking data…')}</p>}
       </section>
 
@@ -316,6 +326,11 @@ export function ReportsPage() {
           </section>
         </div>
       )}
+      {error && <p className="feedback feedback-error" role="alert">{error}</p>}
+      <FeedbackDialog
+        message={errorPopupOpen ? error : ''}
+        onClose={() => setErrorPopupOpen(false)}
+      />
     </main>
   );
 }

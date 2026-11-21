@@ -7,16 +7,19 @@ import com.leonsoft.repositories.BookingRepository;
 import com.lowagie.text.DocumentException;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.text.Collator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -25,36 +28,58 @@ public class BookingsService {
 
     private final BookingRepository bookingRepository;
     private final BookingResourceService resourceService;
+    private final BookingAvailabilityPolicy availabilityPolicy;
 
     public BookingsService(
-          BookingRepository bookingRepository, BookingResourceService resourceService) {
+          BookingRepository bookingRepository,
+          BookingResourceService resourceService,
+          BookingAvailabilityPolicy availabilityPolicy) {
         this.bookingRepository = bookingRepository;
         this.resourceService = resourceService;
+        this.availabilityPolicy = availabilityPolicy;
     }
 
-    public void exportToPDF(
-          HttpServletResponse response, String fromDateEuroFmt, String toDateEuroFmt, Locale locale
-    ) throws DocumentException, IOException {
+    public void exportReportToPDF(
+          HttpServletResponse response,
+          String fromDateEuroFmt,
+          String toDateEuroFmt,
+          String resourceType,
+          Locale locale) throws DocumentException, IOException {
+        if (!"rooms".equals(resourceType) && !"cars".equals(resourceType)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid report resource type.");
+        }
 
-        log.debug("/booking/export/pdf");
-        log.debug("fromDate param  " + fromDateEuroFmt);
-        log.debug("toDate param  " + toDateEuroFmt);
+        LocalDate startDate = LocalDate.parse(fromDateEuroFmt, BookingsUtils.formatterEURO);
+        LocalDate endDate = LocalDate.parse(toDateEuroFmt, BookingsUtils.formatterEURO);
+        if (endDate.isBefore(startDate)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid report date range.");
+        }
 
-        LocalDate stDate = LocalDate.parse(fromDateEuroFmt, BookingsUtils.formatterEURO);
-        LocalDate edDate = LocalDate.parse(toDateEuroFmt, BookingsUtils.formatterEURO);
+        List<BookingResource> resources = resourceService.getAll().stream()
+              .filter(resource -> resourceType.equals(resource.getType()))
+              .toList();
+        Map<String, BookingResource> resourcesById = resources.stream()
+              .collect(java.util.stream.Collectors.toMap(BookingResource::getId, resource -> resource));
 
-        List<Booking> results = bookingRepository.findByStartDateBetweenOrderByStartDateDesc(
-              stDate.format(DateTimeFormatter.ISO_DATE),
-              edDate.format(DateTimeFormatter.ISO_DATE));
-        addResourceNames(results);
+        List<Booking> bookings = bookingRepository.findByStartDateBetweenOrderByStartDateDesc(
+                    startDate.format(DateTimeFormatter.ISO_DATE),
+                    endDate.format(DateTimeFormatter.ISO_DATE))
+              .stream()
+              .filter(booking -> resourcesById.containsKey(booking.getRoom()))
+              .sorted(java.util.Comparator
+                    .comparing(Booking::getStartDate)
+                    .thenComparing(
+                          booking -> Objects.toString(booking.getName(), ""),
+                          Collator.getInstance(locale)))
+              .toList();
+        addResourceNames(bookings);
 
         response.setContentType("application/pdf");
-        String headerKey = "Content-Disposition";
-        String headerValue = "attachment; filename=bookings_" + LocalDate.now() + ".pdf";
-        response.setHeader(headerKey, headerValue);
-        BookingsPDFExporter exporter = new BookingsPDFExporter(results, locale);
-        exporter.export(response);
-
+        response.setHeader(
+              "Content-Disposition",
+              "attachment; filename=booking-report-" + resourceType + "-" + LocalDate.now() + ".pdf");
+        new BookingsPDFExporter(bookings, resources, resourceType, startDate, endDate, locale)
+              .export(response);
     }
 
     public String report(String fromDateEuroFmt, String toDateEuroFmt, Locale locale) {
@@ -76,6 +101,7 @@ public class BookingsService {
     }
 
 
+    @Transactional
     public Booking create(Booking booking) {
 
         booking.setId(UUID.randomUUID().toString());
@@ -84,6 +110,7 @@ public class BookingsService {
         return saveWithNormalizedValues(booking);
     }
 
+    @Transactional
     public Booking update(Booking booking) {
         Booking existing = booking.getId() == null
               ? null
@@ -101,6 +128,16 @@ public class BookingsService {
         BookingResource resource = resourceService.requireActive(booking.getRoom());
         LocalDate stDate = LocalDate.parse(booking.getStartDate(), BookingsUtils.formatterEURO);
         LocalDate edDate = LocalDate.parse(booking.getEndDate(), BookingsUtils.formatterEURO);
+
+        if (edDate.isAfter(stDate)
+              && isBookable(booking.getStatus())
+              && availabilityPolicy.preventsOverlap(resource.getType())
+              && hasOverlappingBooking(booking, stDate, edDate)) {
+            String unavailableMessage = "rooms".equals(resource.getType())
+                  ? "Room is not available for those dates."
+                  : "Vehicle is not available for those dates.";
+            throw new ResponseStatusException(HttpStatus.CONFLICT, unavailableMessage);
+        }
 
         booking.setStartDate(stDate.format(DateTimeFormatter.ISO_DATE));
         booking.setEndDate(edDate.format(DateTimeFormatter.ISO_DATE));
@@ -120,6 +157,19 @@ public class BookingsService {
         return booking;
     }
 
+    private boolean hasOverlappingBooking(Booking candidate, LocalDate startDate, LocalDate endDate) {
+        return bookingRepository.findByRoomAndStatusIn(
+                    candidate.getRoom(), List.of("active", "paid"))
+              .stream()
+              .filter(existing -> !Objects.equals(existing.getId(), candidate.getId()))
+              .anyMatch(existing -> existing.getStartDate().compareTo(endDate.toString()) < 0
+                    && startDate.toString().compareTo(existing.getEndDate()) < 0);
+    }
+
+    private static boolean isBookable(String status) {
+        return "active".equals(status) || "paid".equals(status);
+    }
+
     public Boolean deleteObject(String bookingId) {
         log.debug(" Delete    {}", bookingId);
         if (!bookingRepository.existsById(bookingId)) {
@@ -131,6 +181,11 @@ public class BookingsService {
 
     public void delCancelledBooking(String bookingId) {
         log.debug(" Delete  a cancelled   {}", bookingId);
+        Booking booking = bookingRepository.findById(bookingId)
+              .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found."));
+        if (!"cancelled".equals(booking.getStatus())) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Only cancelled bookings can be deleted.");
+        }
         bookingRepository.deleteById(bookingId);
     }
 
@@ -138,9 +193,9 @@ public class BookingsService {
         List<Booking> all = bookingRepository.findAllByOrderByStartDateAsc();
         addResourceNames(all);
         for (Booking booking : all) {
-            LocalDate stDt = LocalDate.parse(booking.getStartDate(), BookingsUtils.formatterISO);
+            LocalDate stDt = BookingsUtils.parseStoredDate(booking.getStartDate());
             booking.setStartDate(BookingsUtils.formatterEURO.format(stDt));
-            LocalDate edDt = LocalDate.parse(booking.getEndDate(), BookingsUtils.formatterISO);
+            LocalDate edDt = BookingsUtils.parseStoredDate(booking.getEndDate());
             booking.setEndDate(BookingsUtils.formatterEURO.format(edDt));
         }
         return all;

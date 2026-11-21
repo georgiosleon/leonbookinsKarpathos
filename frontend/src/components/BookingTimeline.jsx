@@ -4,7 +4,7 @@ import {
   useImperativeHandle,
   useRef,
 } from 'react';
-import { bookingsForTimeline } from '../bookingConfig.js';
+import { bookingsForTimeline, shouldStackTimeline } from '../bookingConfig.js';
 import { toTimelineItem } from '../bookingLogic.js';
 import { useLanguage } from '../i18n.jsx';
 
@@ -90,7 +90,10 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
     const items = new vis.DataSet();
     itemsRef.current = items;
 
-    const timeline = new vis.Timeline(containerRef.current, items, groups, timelineOptions);
+    const timeline = new vis.Timeline(containerRef.current, items, groups, {
+      ...timelineOptions,
+      stack: shouldStackTimeline(timelineType),
+    });
     timelineRef.current = timeline;
     timeline.setCurrentTime(Date.now());
 
@@ -125,7 +128,7 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
       timelineRef.current = null;
       itemsRef.current = null;
     };
-  }, [mode, language, t]);
+  }, [mode, language, t, timelineType]);
 
   useEffect(() => {
     if (!itemsRef.current) return;

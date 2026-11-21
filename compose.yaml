@@ -4,11 +4,14 @@ services:
     image: leonbookinskarpathos:local
     restart: unless-stopped
     ports:
-      - "127.0.0.1:8080:8080"
+      - "${BOOKING_HOST_ADDRESS:-127.0.0.1}:8080:8080"
     environment:
       APP_ADMIN_USERNAME: ${APP_ADMIN_USERNAME:?Set APP_ADMIN_USERNAME in .env}
       APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:?Set APP_ADMIN_PASSWORD in .env}
       APP_DB_URL: jdbc:sqlite:/data/bookings.db
+      APP_DEPLOYMENT_TYPE: docker
+      APP_DIAGNOSTICS_LOG_FILE: /data/application.log
+      LOGGING_FILE_NAME: /data/application.log
       SPRING_PROFILES_ACTIVE: prod
       SERVER_ADDRESS: 0.0.0.0
     volumes:
