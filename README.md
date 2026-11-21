@@ -1,21 +1,49 @@
 
-
-install
-
-```sh
-cd ~/dev/leonbookinsKarpathos
-./install/package.sh linux
-tar -xzf install/dist/linux/LeonBookings-1.0.0-linux-x86_64.tar.gz -C "$PWD"
-cd LeonBookings
-./bin/LeonBookings
-```
-
-
 # Leon Bookings (Karpathos)
 
 Room and vehicle booking management with a React interface, Spring Boot backend,
 and SQLite storage. The UI is available in English, Greek, German, Dutch,
 Danish, and French.
+
+## Application overview
+
+Leon Bookings is a self-hosted planner for apartments/studios and cars/bikes
+(product branding: Leon Soft). A single administrator manages reservations on
+a timeline, with financial fields (charge, received, commission, balance) and
+localized HTML/PDF reports. It is a single-admin, single-process application,
+not a multi-tenant SaaS: one env-configured admin account, booking data in a
+local SQLite file, and one deployable Spring Boot process that also serves the
+React UI.
+
+| Layer | Technology |
+|--------|------------|
+| Backend | Java 25, Spring Boot 3.5 (MVC, Security, JPA, Validation) |
+| Database | SQLite |
+| Frontend | React 19 + Vite, i18next, vis-timeline |
+| Reports | OpenPDF + localized HTML templates |
+| Packaging | Maven fat JAR, Docker Compose, optional desktop launcher (`jpackage`) |
+
+```text
+Browser → React UI → /api/v1/* → Controllers → Services → JPA → SQLite
+                                      ↘ HTML / PDF reports
+```
+
+Main screens use query parameters:
+
+- `/?type=rooms` or `/?type=cars` — booking form and dual timelines (active/paid
+  vs cancelled)
+- `?page=reports` — filtered reports and PDF export
+- `?page=resources` — add rooms and cars to the catalog
+
+Auth is one in-memory `ADMIN` from `APP_ADMIN_USERNAME` /
+`APP_ADMIN_PASSWORD` (not stored in SQLite). Run it with Docker Compose,
+`./mvnw generate-resources spring-boot:run`, or a desktop package under
+`install/`. An offline `db backup|restore` CLI is available on the JAR before
+Spring starts.
+
+For entities, API routes, package layout, and current boundaries, see the
+[application deep dive](docs/application-deep-dive.md). Broader architecture
+notes live in [`docs/`](docs/README.md).
 
 ## Quick start for users (Docker)
 
@@ -239,8 +267,10 @@ use a new major prefix, such as `/api/v2`, rather than changing v1 behavior.
 ## Developer documentation
 
 The [`docs/`](docs/README.md) folder describes the system architecture,
-frontend, backend, current tests, and architectural decisions. It includes
-Mermaid architecture and class diagrams that render in GitHub Markdown.
+frontend, backend, current tests, and architectural decisions. Start with the
+[application deep dive](docs/application-deep-dive.md) for a full product and
+codebase walkthrough. Architecture docs also include Mermaid diagrams that
+render in GitHub Markdown.
 
 ### React frontend
 

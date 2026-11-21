@@ -3,6 +3,9 @@
 This folder documents the current implementation. Treat the source code and
 tests as authoritative when behavior changes.
 
+- [Application deep dive](application-deep-dive.md): product purpose, stack,
+  domain entities, API surface, frontend flows, deploy paths, and current
+  boundaries (expands the overview in the top-level README).
 - [Architecture and design decisions](architecture.md): system overview,
   request flow, class diagram, and guidance on Kafka and Protocol Buffers.
 - [Frontend](frontend.md): React/Vite structure, UI behavior, and API
