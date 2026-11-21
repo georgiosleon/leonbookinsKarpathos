@@ -1,4 +1,5 @@
 import { useLanguage } from '../i18n.jsx';
+import { supportedLanguages } from '../localeConfig.js';
 
 export function LanguageSelector() {
   const { language, setLanguage, t } = useLanguage();
@@ -11,8 +12,9 @@ export function LanguageSelector() {
         value={language}
         onChange={(event) => setLanguage(event.target.value)}
       >
-        <option value="en">{t('English')}</option>
-        <option value="el">{t('Greek')}</option>
+        {supportedLanguages.map(({ code, name }) => (
+          <option key={code} value={code}>{t(name)}</option>
+        ))}
       </select>
     </label>
   );

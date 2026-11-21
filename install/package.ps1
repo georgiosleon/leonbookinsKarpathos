@@ -2,8 +2,8 @@ $ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $PSScriptRoot
 $Type = if ($args.Count -gt 0) { $args[0] } else { "msi" }
-if ($Type -ne "msi") {
-    throw "Windows supports the msi package type."
+if ($Type -notin @("msi", "portable")) {
+    throw "Windows supports the msi and portable package types."
 }
 
 function Get-CommandVersion([string]$Name, [string[]]$Arguments) {
@@ -49,10 +49,12 @@ if (-not (Test-Path -LiteralPath (Join-Path $Root "mvnw.cmd") -PathType Leaf) -o
     throw "Maven Wrapper files are missing. Restore mvnw.cmd and .mvn/wrapper from the project."
 }
 
-$WixCandle = Get-Command "candle.exe" -ErrorAction SilentlyContinue
-$WixLight = Get-Command "light.exe" -ErrorAction SilentlyContinue
-if (-not $WixCandle -or -not $WixLight) {
-    throw "WiX Toolset 3 must be installed with candle.exe and light.exe on PATH to build MSI packages. See install/README.md."
+if ($Type -eq "msi") {
+    $WixCandle = Get-Command "candle.exe" -ErrorAction SilentlyContinue
+    $WixLight = Get-Command "light.exe" -ErrorAction SilentlyContinue
+    if (-not $WixCandle -or -not $WixLight) {
+        throw "WiX Toolset 3 must be installed with candle.exe and light.exe on PATH to build MSI packages. See install/README.md."
+    }
 }
 
 [xml]$Pom = Get-Content (Join-Path $Root "pom.xml")
@@ -60,6 +62,10 @@ $Version = $Pom.SelectSingleNode("/*[local-name()='project']/*[local-name()='ver
 if (-not $Version) {
     throw "Could not read the project version from pom.xml."
 }
+
+# Keep the runtime small but retain bin/java.exe: the launcher starts Spring Boot with it.
+$RuntimeModules = "java.base,java.desktop,java.instrument,java.logging,java.management,java.naming,java.security.jgss,java.sql,java.xml,jdk.crypto.ec,jdk.unsupported"
+$JlinkOptions = "--strip-debug --no-man-pages --no-header-files --compress=2"
 
 Push-Location $Root
 try {
@@ -71,7 +77,7 @@ try {
     $LauncherClasses = Join-Path $Root "target/desktop-launcher/classes"
     $PackageInput = Join-Path $Root "target/desktop-package"
     $Output = Join-Path $Root ("target/desktop-output-" + [guid]::NewGuid().ToString())
-    $Dist = Join-Path $Root "install/dist/msi"
+    $Dist = Join-Path $Root "install/dist/$Type"
     New-Item -ItemType Directory -Force $LauncherClasses, $PackageInput, $Output, $Dist | Out-Null
 
     & javac --release 25 -d $LauncherClasses `
@@ -87,25 +93,47 @@ try {
     Copy-Item (Join-Path $Root "target/leonbookinsKarpathos-$Version.jar") `
         (Join-Path $PackageInput "leonbookinsKarpathos.jar") -Force
 
-    & jpackage `
-        --type msi `
-        --name LeonBookings `
-        --app-version $Version `
-        --input $PackageInput `
-        --main-jar desktop-launcher.jar `
-        --main-class com.leonsoft.desktop.DesktopLauncher `
-        --add-modules ALL-MODULE-PATH `
-        --dest $Output `
-        --win-upgrade-uuid 967737ef-d283-47ab-a360-0d71b4b33060 `
-        --win-menu `
-        --win-shortcut `
-        --win-dir-chooser `
-        --win-per-user-install
+    $JpackageType = if ($Type -eq "portable") { "app-image" } else { "msi" }
+    $JpackageArguments = @(
+        "--type", $JpackageType,
+        "--name", "LeonBookings",
+        "--app-version", $Version,
+        "--input", $PackageInput,
+        "--main-jar", "desktop-launcher.jar",
+        "--main-class", "com.leonsoft.desktop.DesktopLauncher",
+        "--add-modules", $RuntimeModules,
+        "--jlink-options", $JlinkOptions,
+        "--dest", $Output,
+        "--win-console"
+    )
+    if ($Type -eq "msi") {
+        $JpackageArguments += @(
+            "--win-upgrade-uuid", "967737ef-d283-47ab-a360-0d71b4b33060",
+            "--win-menu",
+            "--win-shortcut",
+            "--win-dir-chooser",
+            "--win-per-user-install"
+        )
+    }
+
+    & jpackage @JpackageArguments
     if ($LASTEXITCODE -ne 0) {
         throw "jpackage failed with exit code $LASTEXITCODE."
     }
-    Copy-Item (Join-Path $Output "*.msi") $Dist -Force
-    Write-Host "Installer created in install/dist/msi/"
+    if ($Type -eq "msi") {
+        Copy-Item (Join-Path $Output "*.msi") $Dist -Force
+        Write-Host "Installer created in install/dist/msi/"
+    } else {
+        $AppImage = Join-Path $Output "LeonBookings"
+        if (-not (Test-Path -LiteralPath (Join-Path $AppImage "LeonBookings.exe") -PathType Leaf) -or
+            -not (Test-Path -LiteralPath (Join-Path $AppImage "runtime/bin/java.exe") -PathType Leaf)) {
+            throw "The portable app image is missing its launcher or bundled Java runtime."
+        }
+        $Architecture = [System.Runtime.InteropServices.RuntimeInformation]::OSArchitecture.ToString().ToLowerInvariant()
+        $Archive = Join-Path $Dist "LeonBookings-$Version-windows-$Architecture.zip"
+        Compress-Archive -Path $AppImage -DestinationPath $Archive -Force
+        Write-Host "Portable application created at $Archive"
+    }
 } finally {
     Pop-Location
 }

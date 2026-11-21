@@ -1,3 +1,5 @@
+import { resolveLanguage } from './localeConfig.js';
+
 export function reportDocument(reportHtml, theme, language = 'en') {
   const dark = theme === 'dark';
   const background = dark ? '#151b26' : '#ffffff';
@@ -6,7 +8,7 @@ export function reportDocument(reportHtml, theme, language = 'en') {
   const alternate = dark ? '#202938' : '#f3f6fb';
 
   return `<!doctype html>
-<html lang="${language === 'el' ? 'el' : 'en'}">
+<html lang="${resolveLanguage(language)}">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">

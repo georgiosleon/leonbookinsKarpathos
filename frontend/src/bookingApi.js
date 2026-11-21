@@ -1,4 +1,5 @@
 import { formatDateForApi } from './bookingLogic.js';
+import { defaultLanguage, languageStorageKey, resolveLanguage } from './localeConfig.js';
 
 let csrfToken;
 
@@ -23,9 +24,9 @@ async function request(url, options) {
 
 function selectedLanguage() {
   try {
-    return window.localStorage.getItem('booking-language') === 'el' ? 'el' : 'en';
+    return resolveLanguage(window.localStorage.getItem(languageStorageKey));
   } catch {
-    return 'en';
+    return defaultLanguage;
   }
 }
 
@@ -44,6 +45,16 @@ export async function fetchBookings() {
 
 export async function fetchResources() {
   const response = await request('/api/v1/resources');
+  return response.json();
+}
+
+export async function fetchAvailabilitySettings() {
+  const response = await request('/api/v1/settings/availability');
+  return response.json();
+}
+
+export async function fetchApplicationInfo() {
+  const response = await request('/api/v1/app-info');
   return response.json();
 }
 
@@ -98,8 +109,14 @@ export async function fetchBookingReport(startDate, endDate, language = 'en') {
   return response.text();
 }
 
-export function bookingPdfUrl(startDate, endDate, language = 'en') {
-  return bookingReportUrl('/api/v1/booking/export/pdf', startDate, endDate, language);
+export function bookingPdfUrl(startDate, endDate, language = 'en', type = 'rooms') {
+  const query = new URLSearchParams({
+    fromDate: formatDateForApi(startDate),
+    toDate: formatDateForApi(endDate),
+    lang: language,
+    type,
+  });
+  return `/api/v1/booking/export/pdf?${query}`;
 }
 
 function bookingReportUrl(path, startDate, endDate, language) {

@@ -11,6 +11,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -52,6 +54,46 @@ class DatabaseCliTest {
                 () -> DatabaseCli.backupDatabase(database, output));
 
         assertEquals("keep this file", Files.readString(output));
+    }
+
+    @Test
+    void encryptedBackupCanBeRestoredOnlyWithItsPassphrase() throws Exception {
+        Path encryptedBackup = backupDirectory.resolve("support.sqlite3.enc");
+        char[] passphrase = "correct horse battery".toCharArray();
+        char[] wrongPassphrase = "incorrect horse battery".toCharArray();
+
+        try {
+            DatabaseCli.backupDatabaseEncrypted(database, encryptedBackup, passphrase);
+            updateBookingName(database, "changed");
+
+            assertTrue(EncryptedDatabaseBackup.isEncrypted(encryptedBackup));
+            assertFalse(new String(Files.readAllBytes(encryptedBackup), StandardCharsets.US_ASCII)
+                    .startsWith("SQLite format 3"));
+            assertThrows(java.io.IOException.class, () -> DatabaseCli.restoreEncryptedDatabase(
+                    database, encryptedBackup, backupDirectory, wrongPassphrase));
+            assertEquals("changed", bookingName(database));
+
+            DatabaseCli.restoreEncryptedDatabase(database, encryptedBackup, backupDirectory, passphrase);
+            assertEquals("current", bookingName(database));
+        } finally {
+            Arrays.fill(passphrase, '\0');
+            Arrays.fill(wrongPassphrase, '\0');
+        }
+    }
+
+    @Test
+    void encryptedBackupDoesNotOverwriteExistingFile() throws Exception {
+        Path output = temporaryDirectory.resolve("existing.sqlite3.enc");
+        Files.writeString(output, "keep this file");
+        char[] passphrase = "correct horse battery".toCharArray();
+
+        try {
+            assertThrows(IllegalArgumentException.class,
+                    () -> DatabaseCli.backupDatabaseEncrypted(database, output, passphrase));
+            assertEquals("keep this file", Files.readString(output));
+        } finally {
+            Arrays.fill(passphrase, '\0');
+        }
     }
 
     @Test
@@ -116,6 +158,14 @@ class DatabaseCliTest {
              var result = statement.executeQuery("SELECT name FROM Booking WHERE id = '1'")) {
             assertTrue(result.next());
             return result.getString(1);
+        }
+    }
+
+    private static void updateBookingName(Path path, String name) throws SQLException {
+        try (var connection = DriverManager.getConnection("jdbc:sqlite:" + path);
+             var statement = connection.prepareStatement("UPDATE Booking SET name = ? WHERE id = '1'")) {
+            statement.setString(1, name);
+            statement.executeUpdate();
         }
     }
 }

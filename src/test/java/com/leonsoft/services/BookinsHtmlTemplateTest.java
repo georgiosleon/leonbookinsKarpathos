@@ -59,6 +59,16 @@ class BookinsHtmlTemplateTest {
         assertTrue(report.contains(">Ακυρωμένη</td>"));
         assertTrue(report.contains("<h3>ΣΥΝΟΛΑ</h3>"));
         assertTrue(report.contains("1.234,50"));
-        assertTrue(report.contains("&amp;lang=el"));
+        assertFalse(report.contains("/export/pdf"));
+    }
+
+    @Test
+    void rendersFrenchLabelsWithoutAnInaccuratePdfLink() {
+        String report = BookinsHtmlTemplate.report(
+              "20/06/2026", "30/06/2026", List.of(), Locale.FRANCE);
+
+        assertTrue(report.contains("<th>Arrivée</th>"));
+        assertTrue(report.contains("<h3>TOTAUX</h3>"));
+        assertFalse(report.contains("/export/pdf"));
     }
 }

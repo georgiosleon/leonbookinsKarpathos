@@ -19,5 +19,10 @@ class LoginPageControllerTest {
         assertTrue(page.contains("Invalid username or password."));
         assertTrue(page.contains("Λανθασμένο όνομα χρήστη ή κωδικός πρόσβασης."));
         assertTrue(page.contains("localStorage.setItem('booking-language', value)"));
+        assertTrue(page.contains("<option value=\"de\">Deutsch</option>"));
+        assertTrue(page.contains("<option value=\"nl\">Nederlands</option>"));
+        assertTrue(page.contains("<option value=\"da\">Dansk</option>"));
+        assertTrue(page.contains("<option value=\"fr\">Français</option>"));
+        assertTrue(page.contains("hasOwnProperty.call(copy, detected)"));
     }
 }

@@ -1,0 +1,5 @@
+<?xml version="1.0" ?>
+<jpackage-state version="25.0.5" platform="linux">
+  <app-version>1.0.0</app-version>
+  <main-launcher>LeonBookings</main-launcher>
+  <main-class>com.leonsoft.desktop.DesktopLauncher</main-class></jpackage-state>

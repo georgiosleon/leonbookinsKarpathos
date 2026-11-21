@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import org.sqlite.SQLiteConnection;
@@ -40,10 +41,23 @@ public final class DatabaseCli {
 
             switch (operation) {
                 case "backup" -> {
-                    options.allowOnly("--database", "--output");
-                    Path output = options.path("--output",
-                            timestampedPath(DEFAULT_BACKUP_DIRECTORY, "bookings"));
-                    Path result = backupDatabase(database, output);
+                    options.allowOnly("--database", "--output", "--encrypt");
+                    boolean encrypt = options.flag("--encrypt");
+                    Path output = options.path("--output", timestampedPath(
+                            DEFAULT_BACKUP_DIRECTORY,
+                            "bookings",
+                            encrypt ? ".sqlite3.enc" : ".sqlite3"));
+                    Path result;
+                    if (encrypt) {
+                        char[] passphrase = requestBackupPassphrase();
+                        try {
+                            result = backupDatabaseEncrypted(database, output, passphrase);
+                        } finally {
+                            Arrays.fill(passphrase, '\0');
+                        }
+                    } else {
+                        result = backupDatabase(database, output);
+                    }
                     System.out.println("Backup created: " + result);
                 }
                 case "restore" -> {
@@ -52,10 +66,24 @@ public final class DatabaseCli {
                     if (!options.flag("--yes")) {
                         confirmRestore(database, input);
                     }
-                    Path backup = restoreDatabase(
-                            database,
-                            input,
-                            options.path("--backup-dir", DEFAULT_BACKUP_DIRECTORY));
+                    Path backup;
+                    if (EncryptedDatabaseBackup.isEncrypted(input)) {
+                        char[] passphrase = requestRestorePassphrase();
+                        try {
+                            backup = restoreEncryptedDatabase(
+                                    database,
+                                    input,
+                                    options.path("--backup-dir", DEFAULT_BACKUP_DIRECTORY),
+                                    passphrase);
+                        } finally {
+                            Arrays.fill(passphrase, '\0');
+                        }
+                    } else {
+                        backup = restoreDatabase(
+                                database,
+                                input,
+                                options.path("--backup-dir", DEFAULT_BACKUP_DIRECTORY));
+                    }
                     if (backup != null) {
                         System.out.println("Pre-restore backup created: " + backup);
                     }
@@ -93,6 +121,62 @@ public final class DatabaseCli {
             Files.deleteIfExists(temporary);
         }
         return output;
+    }
+
+    public static Path backupDatabaseEncrypted(Path database, Path output, char[] passphrase)
+            throws IOException, SQLException {
+        database = database.toAbsolutePath().normalize();
+        output = output.toAbsolutePath().normalize();
+        if (database.equals(output)) {
+            throw new IllegalArgumentException("Backup output must be different from the live database");
+        }
+        validateDatabase(database);
+
+        Path parent = output.getParent();
+        Files.createDirectories(parent);
+        Path temporaryDatabase = null;
+        Path temporaryEncrypted = null;
+        try {
+            temporaryDatabase = Files.createTempFile(parent, ".booking-", ".sqlite3");
+            temporaryEncrypted = Files.createTempFile(parent, ".booking-", ".enc");
+            Files.delete(temporaryDatabase);
+            backupDatabase(database, temporaryDatabase);
+            validateDatabase(temporaryDatabase);
+            EncryptedDatabaseBackup.encrypt(temporaryDatabase, temporaryEncrypted, passphrase);
+            try {
+                Files.move(temporaryEncrypted, output);
+            } catch (java.nio.file.FileAlreadyExistsException error) {
+                throw new IllegalArgumentException("Refusing to overwrite existing backup: " + output, error);
+            }
+        } finally {
+            if (temporaryDatabase != null) {
+                Files.deleteIfExists(temporaryDatabase);
+            }
+            if (temporaryEncrypted != null) {
+                Files.deleteIfExists(temporaryEncrypted);
+            }
+        }
+        return output;
+    }
+
+    public static Path restoreEncryptedDatabase(
+            Path database, Path input, Path backupDirectory, char[] passphrase)
+            throws IOException, SQLException {
+        database = database.toAbsolutePath().normalize();
+        input = input.toAbsolutePath().normalize();
+        if (database.equals(input)) {
+            throw new IllegalArgumentException("Restore source must be different from the live database");
+        }
+        Path parent = database.getParent();
+        Files.createDirectories(parent);
+        Path temporaryDatabase = Files.createTempFile(parent, ".booking-restore-", ".sqlite3");
+        try {
+            EncryptedDatabaseBackup.decrypt(input, temporaryDatabase, passphrase);
+            validateDatabase(temporaryDatabase);
+            return restoreDatabase(database, temporaryDatabase, backupDirectory);
+        } finally {
+            Files.deleteIfExists(temporaryDatabase);
+        }
     }
 
     public static Path restoreDatabase(Path database, Path input, Path backupDirectory)
@@ -197,7 +281,48 @@ public final class DatabaseCli {
     }
 
     private static Path timestampedPath(Path directory, String prefix) {
-        return directory.resolve(prefix + "-" + LocalDateTime.now().format(TIMESTAMP) + ".sqlite3");
+        return timestampedPath(directory, prefix, ".sqlite3");
+    }
+
+    private static Path timestampedPath(Path directory, String prefix, String extension) {
+        return directory.resolve(prefix + "-" + LocalDateTime.now().format(TIMESTAMP) + extension);
+    }
+
+    private static char[] requestBackupPassphrase() {
+        if (System.console() == null) {
+            throw new IllegalArgumentException(
+                    "Encrypted backup requires an interactive terminal for the passphrase");
+        }
+        char[] passphrase = System.console().readPassword("New backup passphrase (at least 12 characters): ");
+        if (passphrase == null) {
+            throw new IllegalArgumentException("Encrypted backup cancelled");
+        }
+        if (passphrase.length < 12) {
+            Arrays.fill(passphrase, '\0');
+            throw new IllegalArgumentException("Backup passphrase must be at least 12 characters");
+        }
+        char[] confirmation = System.console().readPassword("Confirm backup passphrase: ");
+        if (!Arrays.equals(passphrase, confirmation)) {
+            Arrays.fill(passphrase, '\0');
+            if (confirmation != null) {
+                Arrays.fill(confirmation, '\0');
+            }
+            throw new IllegalArgumentException("Backup passphrases do not match");
+        }
+        Arrays.fill(confirmation, '\0');
+        return passphrase;
+    }
+
+    private static char[] requestRestorePassphrase() {
+        if (System.console() == null) {
+            throw new IllegalArgumentException(
+                    "Encrypted restore requires an interactive terminal for the passphrase");
+        }
+        char[] passphrase = System.console().readPassword("Backup passphrase: ");
+        if (passphrase == null) {
+            throw new IllegalArgumentException("Encrypted restore cancelled");
+        }
+        return passphrase;
     }
 
     private static void confirmRestore(Path database, Path input) {
@@ -220,7 +345,7 @@ public final class DatabaseCli {
     private static void printUsage() {
         System.out.println("""
                 Usage:
-                  java -jar app.jar db backup [--database PATH] [--output PATH]
+                  java -jar app.jar db backup [--database PATH] [--output PATH] [--encrypt]
                   java -jar app.jar db restore --input PATH [--database PATH]
                       [--backup-dir PATH] [--yes]
 
@@ -228,15 +353,16 @@ public final class DatabaseCli {
                   Database:   bookings.db (current working directory)
                   Backups:    backups/ (current working directory)
 
-                Stop the application before restoring a database.
-                """);
+                  Encrypted backups prompt for a passphrase; restore detects them automatically.
+                  Stop the application before restoring a database.
+                  """);
     }
 
     private static Options parseOptions(String[] args, int start) {
         Options options = new Options();
         for (int index = start; index < args.length; index++) {
             String name = args[index];
-            if ("--yes".equals(name)) {
+            if ("--yes".equals(name) || "--encrypt".equals(name)) {
                 options.addFlag(name);
                 continue;
             }
@@ -254,7 +380,7 @@ public final class DatabaseCli {
 
     private static final class Options {
         private final java.util.Map<String, String> values = new java.util.HashMap<>();
-        private boolean confirmed;
+        private final java.util.Set<String> flags = new java.util.HashSet<>();
 
         private void addValue(String name, String value) {
             if (!List.of("--database", "--output", "--input", "--backup-dir").contains(name)) {
@@ -266,14 +392,13 @@ public final class DatabaseCli {
         }
 
         private void addFlag(String name) {
-            if (!"--yes".equals(name) || confirmed) {
+            if (!List.of("--yes", "--encrypt").contains(name) || !flags.add(name)) {
                 throw new IllegalArgumentException("Invalid or repeated option: " + name);
             }
-            confirmed = true;
         }
 
         private boolean flag(String name) {
-            return "--yes".equals(name) && confirmed;
+            return flags.contains(name);
         }
 
         private Path path(String name, Path fallback) {
@@ -295,8 +420,10 @@ public final class DatabaseCli {
                     throw new IllegalArgumentException("Option is not valid for this command: " + name);
                 }
             }
-            if (confirmed && !allowedOptions.contains("--yes")) {
-                throw new IllegalArgumentException("Option is not valid for this command: --yes");
+            for (String name : flags) {
+                if (!allowedOptions.contains(name)) {
+                    throw new IllegalArgumentException("Option is not valid for this command: " + name);
+                }
             }
         }
     }

@@ -13,6 +13,7 @@ import {
 import {
   deleteBooking as deleteBookingRequest,
   logout as logoutRequest,
+  fetchAvailabilitySettings,
   fetchBookingReport,
   fetchBookings,
   fetchResources,
@@ -21,11 +22,14 @@ import {
 } from '../bookingApi.js';
 import { BookingForm } from './BookingForm.jsx';
 import { BookingTimeline } from './BookingTimeline.jsx';
+import { FeedbackDialog } from './FeedbackDialog.jsx';
+import { HelpButton } from './HelpButton.jsx';
 import { ThemeToggle } from './ThemeToggle.jsx';
 import { useTheme } from '../useTheme.js';
 import { reportDocument } from '../reportDocument.js';
 import { formatMoney, useLanguage } from '../i18n.jsx';
 import { LanguageSelector } from './LanguageSelector.jsx';
+import { AppSupportActions } from './AppSupportActions.jsx';
 
 function todayAsIsoDate() {
   const now = new Date();
@@ -34,6 +38,15 @@ function todayAsIsoDate() {
     String(now.getMonth() + 1).padStart(2, '0'),
     String(now.getDate()).padStart(2, '0'),
   ].join('-');
+}
+
+function formatHeadingDate(value, locale) {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value ?? '');
+  if (!match) return value ?? '';
+  const [, year, month, day] = match;
+  return new Intl.DateTimeFormat(locale).format(
+    new Date(Number(year), Number(month) - 1, Number(day)),
+  );
 }
 
 function emptyForm() {
@@ -77,27 +90,39 @@ export function BookingPage() {
   const [form, setForm] = useState(emptyForm);
   const [bookings, setBookings] = useState([]);
   const [resources, setResources] = useState([]);
+  const [availabilitySettings, setAvailabilitySettings] = useState({
+    roomsPreventOverlap: true,
+    carsPreventOverlap: true,
+  });
   const [selectedBooking, setSelectedBooking] = useState(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [errorPopupOpen, setErrorPopupOpen] = useState(false);
   const [notice, setNotice] = useState('');
   const [saveMode, setSaveMode] = useState(getInitialBookingSaveMode);
   const [reportHtml, setReportHtml] = useState('');
+  const [formVisible, setFormVisible] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const { language, locale, t } = useLanguage();
   const [clock, setClock] = useState(() => formatClock(new Date(), locale));
 
+  function showError(message) {
+    setError(message);
+    setErrorPopupOpen(Boolean(message));
+  }
+
   useEffect(() => {
     let active = true;
-    Promise.all([fetchBookings(), fetchResources()])
-      .then(([loadedBookings, loadedResources]) => {
+    Promise.all([fetchBookings(), fetchResources(), fetchAvailabilitySettings()])
+      .then(([loadedBookings, loadedResources, loadedAvailabilitySettings]) => {
         if (active) {
           setBookings(loadedBookings);
           setResources(loadedResources);
+          setAvailabilitySettings(loadedAvailabilitySettings);
         }
       })
       .catch((requestError) => {
-        if (active) setError(t('Could not load bookings: {error}', { error: requestError.message }));
+        if (active) showError(t('Could not load bookings: {error}', { error: requestError.message }));
       });
 
     return () => {
@@ -114,7 +139,7 @@ export function BookingPage() {
   function resetForm() {
     setForm(emptyForm());
     setSelectedBooking(null);
-    setError('');
+    showError('');
     setNotice('');
     bookableTimelineRef.current?.clearSelection();
     cancelledTimelineRef.current?.clearSelection();
@@ -122,25 +147,28 @@ export function BookingPage() {
 
   async function handleSubmit(event) {
     event.preventDefault();
-    setError('');
+    showError('');
     setNotice('');
 
     const payload = toBookingPayload(form);
     if (!payload.name || !payload.room || !payload.agency || !payload.numOfGuests) {
-      setError(t('Complete the required name, guest, agency, and resource fields.'));
+      showError(t('Complete the required name, guest, agency, and resource fields.'));
       return;
     }
     if (!payload.startDate || !payload.endDate || payload.numOfNights <= 0) {
-      setError(t('The end date must be after the start date.'));
+      showError(t('The end date must be after the start date.'));
       return;
     }
     if (form.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) {
-      setError(t('Enter a valid email address.'));
+      showError(t('Enter a valid email address.'));
       return;
     }
     const ignoredBookingId = saveMode === 'edit' ? selectedBooking?.id : null;
-    if (hasAvailabilityConflict(payload, bookings, ignoredBookingId)) {
-      setError(t(mode.unavailableMessage));
+    const preventOverlap = baseMode.id === 'rooms'
+      ? availabilitySettings.roomsPreventOverlap
+      : availabilitySettings.carsPreventOverlap;
+    if (preventOverlap && hasAvailabilityConflict(payload, bookings, ignoredBookingId)) {
+      showError(t(mode.unavailableMessage));
       return;
     }
 
@@ -164,7 +192,7 @@ export function BookingPage() {
           : t('Cancelled booking saved and shown in the cancelled bookings timeline.'));
       }
     } catch (requestError) {
-      setError(t('Could not save booking: {error}', { error: requestError.message }));
+      showError(t('Could not save booking: {error}', { error: requestError.message }));
     } finally {
       setBusy(false);
     }
@@ -177,29 +205,29 @@ export function BookingPage() {
       setSelectedBooking((current) => current?.id === id ? null : current);
       setNotice(t('Booking deleted.'));
     } catch (requestError) {
-      setError(t('Could not delete booking: {error}', { error: requestError.message }));
+      showError(t('Could not delete booking: {error}', { error: requestError.message }));
       throw requestError;
     }
   }
 
   async function handleReport() {
-    setError('');
+    showError('');
     setNotice('');
     if (!form.startDate || !form.endDate || form.startDate > form.endDate) {
-      setError(t('Choose a valid date range for the report.'));
+      showError(t('Choose a valid date range for the report.'));
       return;
     }
     try {
       setReportHtml(await fetchBookingReport(form.startDate, form.endDate, language));
     } catch (requestError) {
-      setError(t('Could not load report: {error}', { error: requestError.message }));
+      showError(t('Could not load report: {error}', { error: requestError.message }));
     }
   }
 
   function handleSelect(booking) {
     setSelectedBooking(booking);
     setForm(bookingToForm(booking));
-    setError('');
+    showError('');
     setNotice('');
   }
 
@@ -227,11 +255,11 @@ export function BookingPage() {
   }
 
   async function handleLogout() {
-    setError('');
+    showError('');
     try {
       await logoutRequest();
     } catch (requestError) {
-      setError(t('Could not sign out: {error}', { error: requestError.message }));
+      showError(t('Could not sign out: {error}', { error: requestError.message }));
     }
   }
 
@@ -272,8 +300,10 @@ export function BookingPage() {
             </a>
             <a href="/?page=resources">{t('Manage rooms and cars')}</a>
           </nav>
+          <HelpButton />
           <LanguageSelector />
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          <AppSupportActions />
           <label className="save-mode-toggle">
             <input
               type="checkbox"
@@ -292,23 +322,42 @@ export function BookingPage() {
           <div>
             <h2 id="booking-form-heading">{t('Booking details')}</h2>
             <p>{t('Enter a new booking or select one on the timeline to review it.')}</p>
+            <p className="booking-details-summary" aria-live="polite">
+              {form.name.trim() && <span><strong>{t('Name')}:</strong> {form.name.trim()}</span>}
+              {form.startDate && <span><strong>{t('From')}:</strong> {formatHeadingDate(form.startDate, locale)}</span>}
+              {form.endDate && <span><strong>{t('To')}:</strong> {formatHeadingDate(form.endDate, locale)}</span>}
+              {form.tel.trim() && <span><strong>{t('Telephone')}:</strong> {form.tel.trim()}</span>}
+            </p>
           </div>
-          <strong className="balance-summary">{t('Balance: {amount}', { amount: formatMoney(balance, locale) })}</strong>
+          <div className="booking-form-heading-actions">
+            <strong className="balance-summary">{t('Balance: {amount}', { amount: formatMoney(balance, locale) })}</strong>
+            <button
+              type="button"
+              className="button button-muted"
+              aria-expanded={formVisible}
+              aria-controls="booking-form"
+              onClick={() => setFormVisible((visible) => !visible)}
+            >
+              {t(formVisible ? 'Hide form' : 'Show form')}
+            </button>
+          </div>
         </div>
 
         {error && <p className="feedback feedback-error" role="alert">{error}</p>}
         {notice && <p className="feedback feedback-success" role="status">{notice}</p>}
 
-        <BookingForm
-          mode={mode}
-          form={form}
-          onChange={setForm}
-          onSubmit={handleSubmit}
-          onReset={resetForm}
-          selectedBooking={selectedBooking}
-          saveMode={saveMode}
-          busy={busy}
-        />
+        <div id="booking-form" hidden={!formVisible}>
+          <BookingForm
+            mode={mode}
+            form={form}
+            onChange={setForm}
+            onSubmit={handleSubmit}
+            onReset={resetForm}
+            selectedBooking={selectedBooking}
+            saveMode={saveMode}
+            busy={busy}
+          />
+        </div>
 
         <div className="toolbar" aria-label={t('Timeline controls')}>
           <button type="button" className="button button-muted" onClick={() => handleDateNavigation('goto')}>{t('Go to start date')}</button>
@@ -330,7 +379,7 @@ export function BookingPage() {
         description={t('Select a booking to load its details. Drag the timeline to move through dates.')}
         onSelect={handleSelect}
         onDelete={handleDelete}
-        onError={setError}
+        onError={showError}
       />
 
       <BookingTimeline
@@ -342,7 +391,7 @@ export function BookingPage() {
         description={t('Cancelled reservations are listed separately and do not block availability.')}
         onSelect={handleSelect}
         onDelete={handleDelete}
-        onError={setError}
+        onError={showError}
       />
 
       {reportHtml && (
@@ -358,6 +407,10 @@ export function BookingPage() {
           </section>
         </div>
       )}
+      <FeedbackDialog
+        message={errorPopupOpen ? error : ''}
+        onClose={() => setErrorPopupOpen(false)}
+      />
     </main>
   );
 }

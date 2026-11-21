@@ -6,7 +6,12 @@ import {
   resolveBookingSaveMode,
   storeBookingSaveMode,
 } from '../src/appConfig.js';
-import { bookingModes, bookingsForTimeline, resourcesForMode } from '../src/bookingConfig.js';
+import {
+  bookingModes,
+  bookingsForTimeline,
+  resourcesForMode,
+  shouldStackTimeline,
+} from '../src/bookingConfig.js';
 import {
   bookingToForm,
   calculateBalance,
@@ -21,6 +26,7 @@ import {
   selectBookingsForReport,
   summarizeBookings,
 } from '../src/reportLogic.js';
+import { bookingPdfUrl } from '../src/bookingApi.js';
 import { getInitialTheme, resolveTheme, storeTheme } from '../src/theme.js';
 import { reportDocument } from '../src/reportDocument.js';
 
@@ -130,6 +136,35 @@ test('separates cancelled records from active and paid timeline bookings', () =>
   assert.throws(() => bookingsForTimeline(bookings, 'unknown'), /Unknown timeline type/);
 });
 
+test('keeps same-guest cancelled bookings as separate stacked timeline items', () => {
+  const bookings = [
+    {
+      id: 'cancelled-1',
+      name: 'Alex',
+      room: 'APT2',
+      startDate: '08/03/2026',
+      endDate: '11/03/2026',
+      status: 'cancelled',
+    },
+    {
+      id: 'cancelled-2',
+      name: 'Alex',
+      room: 'APT2',
+      startDate: '08/03/2026',
+      endDate: '11/03/2026',
+      status: 'cancelled',
+    },
+  ];
+
+  const cancelledBookings = bookingsForTimeline(bookings, 'cancelled');
+  const timelineItems = cancelledBookings.map((booking) => toTimelineItem(booking, roomMode));
+
+  assert.deepEqual(cancelledBookings.map(({ id }) => id), ['cancelled-1', 'cancelled-2']);
+  assert.deepEqual(timelineItems.map(({ id }) => id), ['cancelled-1', 'cancelled-2']);
+  assert.equal(shouldStackTimeline('cancelled'), true);
+  assert.equal(shouldStackTimeline('bookable'), false);
+});
+
 test('marks cancelled timeline items for their separate visual treatment', () => {
   const item = toTimelineItem({
     id: 'cancelled-1',
@@ -209,6 +244,8 @@ test('creates a standalone report document with theme-specific colors', () => {
   assert.match(reportDocument('<table></table>', 'light'), /color-scheme: light/);
   assert.match(reportDocument('<table></table>', 'light'), /#ffffff/);
   assert.match(reportDocument('<table></table>', 'light', 'el'), /<html lang="el">/);
+  assert.match(reportDocument('<table></table>', 'light', 'fr'), /<html lang="fr">/);
+  assert.match(reportDocument('<table></table>', 'light', 'fr"><script>'), /<html lang="en">/);
 });
 
 test('filters report records by selected mode and inclusive arrival-date range', () => {
@@ -281,5 +318,15 @@ test('summarizes active financials by resource and counts cancellations separate
     charge: 400,
     received: 200,
     balance: 150,
+  });
+
+  test('builds a PDF export URL with the selected resource type, date range, and language', () => {
+    const url = new URL(bookingPdfUrl('2026-07-01', '2026-07-31', 'fr', 'cars'), 'http://localhost');
+
+    assert.equal(url.pathname, '/api/v1/booking/export/pdf');
+    assert.equal(url.searchParams.get('fromDate'), '01/07/2026');
+    assert.equal(url.searchParams.get('toDate'), '31/07/2026');
+    assert.equal(url.searchParams.get('lang'), 'fr');
+    assert.equal(url.searchParams.get('type'), 'cars');
   });
 });

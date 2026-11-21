@@ -31,18 +31,20 @@ public class BookingsRestController {
     }
 
     @GetMapping("/export/pdf")
-    public void exportToPDF(HttpServletResponse response,
+    public void exportToPDF(
+          HttpServletResponse response,
           @RequestParam(name = "fromDate") String fromDateEuroFmt,
           @RequestParam(name = "toDate") String toDateEuroFmt,
-          @RequestParam(name = "lang", defaultValue = "en") String language
-    ) throws DocumentException, IOException {
-        log.debug("/booking/export/pdf");
-        log.debug("fromDate param  " + fromDateEuroFmt);
-        log.debug("toDate param  " + toDateEuroFmt);
-        bookingsService.exportToPDF(response, fromDateEuroFmt, toDateEuroFmt,
+          @RequestParam(name = "type") String resourceType,
+          @RequestParam(name = "lang", defaultValue = "en") String language)
+          throws DocumentException, IOException {
+        bookingsService.exportReportToPDF(
+              response,
+              fromDateEuroFmt,
+              toDateEuroFmt,
+              resourceType,
               ReportMessages.supportedLocale(language));
     }
-
 
     @GetMapping(value = "/report", produces = MediaType.TEXT_PLAIN_VALUE)
     String report(
@@ -76,7 +78,7 @@ public class BookingsRestController {
         return Boolean.TRUE;
     }
 
-    @GetMapping(value = "/del")
+    @PostMapping(value = "/del")
     void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {
         log.debug(" Delete  a cancelled   {}", bookingId);
         bookingsService.delCancelledBooking(bookingId);

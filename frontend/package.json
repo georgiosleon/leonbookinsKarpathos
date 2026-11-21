@@ -5,12 +5,15 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run check:translations && vite build",
+    "check:translations": "node scripts/check-translations.js",
     "test": "node --test"
   },
   "dependencies": {
+    "i18next": "^27.2.2",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0"
+    "react-dom": "^19.0.0",
+    "react-i18next": "^18.0.3"
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",

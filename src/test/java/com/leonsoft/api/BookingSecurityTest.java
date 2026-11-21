@@ -6,12 +6,15 @@ import static org.springframework.security.test.web.servlet.request.SecurityMock
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.leonsoft.config.SecurityConfig;
 import com.leonsoft.models.Booking;
 import com.leonsoft.models.BookingResource;
+import com.leonsoft.services.BookingAvailabilityPolicy;
 import com.leonsoft.services.BookingResourceService;
+import com.leonsoft.services.ApplicationSupportService;
 import com.leonsoft.services.BookingsService;
 import java.util.List;
 import org.junit.jupiter.api.Test;
@@ -24,7 +27,11 @@ import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(
       controllers = {
-            BookingsRestController.class, BookingResourceController.class, CsrfController.class
+            BookingsRestController.class,
+            BookingResourceController.class,
+            AvailabilitySettingsRestController.class,
+            ApplicationSupportController.class,
+            CsrfController.class
       },
       properties = {
             "APP_ADMIN_USERNAME=test-admin",
@@ -42,6 +49,12 @@ class BookingSecurityTest {
     @MockBean
     private BookingResourceService bookingResourceService;
 
+    @MockBean
+    private BookingAvailabilityPolicy bookingAvailabilityPolicy;
+
+    @MockBean
+    private ApplicationSupportService applicationSupportService;
+
     @Test
     void bookingEndpointsRequireAuthentication() throws Exception {
         mockMvc.perform(get("/api/v1/booking/getAll"))
@@ -52,6 +65,37 @@ class BookingSecurityTest {
     void resourceEndpointsRequireAuthentication() throws Exception {
         mockMvc.perform(get("/api/v1/resources"))
               .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void applicationSupportEndpointsRequireAdminRole() throws Exception {
+        when(applicationSupportService.appInfo())
+              .thenReturn(new ApplicationSupportService.AppInfo("1.0.0", "standalone"));
+
+        mockMvc.perform(get("/api/v1/app-info"))
+              .andExpect(status().isUnauthorized());
+
+        mockMvc.perform(get("/api/v1/app-info").with(user("operator").roles("USER")))
+              .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/api/v1/app-info").with(user("test-admin").roles("ADMIN")))
+              .andExpect(status().isOk())
+              .andExpect(jsonPath("$.version").value("1.0.0"));
+
+        mockMvc.perform(get("/api/v1/diagnostics").with(user("operator").roles("USER")))
+              .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void availabilitySettingsAreReturnedToAuthenticatedUsers() throws Exception {
+        when(bookingAvailabilityPolicy.settings())
+              .thenReturn(new BookingAvailabilityPolicy.AvailabilitySettings(true, false));
+
+        mockMvc.perform(get("/api/v1/settings/availability")
+                    .with(user("test-admin").roles("ADMIN")))
+              .andExpect(status().isOk())
+              .andExpect(jsonPath("$.roomsPreventOverlap").value(true))
+              .andExpect(jsonPath("$.carsPreventOverlap").value(false));
     }
 
     @Test
@@ -98,6 +142,25 @@ class BookingSecurityTest {
                     .with(csrf())
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("{\"id\":\"booking-1\"}"))
+              .andExpect(status().isOk());
+    }
+
+    @Test
+    void cancelledBookingDeletionRequiresPostAndCsrfToken() throws Exception {
+        mockMvc.perform(get("/api/v1/booking/del")
+                    .with(user("test-admin").roles("ADMIN"))
+                    .param("bid", "booking-1"))
+              .andExpect(status().isMethodNotAllowed());
+
+        mockMvc.perform(post("/api/v1/booking/del")
+                    .with(user("test-admin").roles("ADMIN"))
+                    .param("bid", "booking-1"))
+              .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/api/v1/booking/del")
+                    .with(user("test-admin").roles("ADMIN"))
+                    .with(csrf())
+                    .param("bid", "booking-1"))
               .andExpect(status().isOk());
     }
 

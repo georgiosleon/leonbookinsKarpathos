@@ -11,7 +11,7 @@ flowchart LR
     Repo["Spring Data repository"]
     ResourceRepo["Resource catalog repository"]
     SQLite[("SQLite database")]
-    Reports["HTML / PDF reports"]
+    Reports["Localized detailed and summary PDF reports"]
     Launcher["Desktop launcher"]
 
     Browser --> React
@@ -29,6 +29,11 @@ Spring Boot application. The desktop launcher is an optional wrapper around
 that application; Docker and direct Maven runs start the same backend without
 the desktop wrapper. SQLite is the application database, with its location
 selected by the runtime configuration.
+
+LAN clients connect to the host running the application; the SQLite file
+remains on that host. Desktop and Docker host access are loopback-only by
+default. Enabling LAN access is a deployment setting and does not create
+additional user accounts or permissions.
 
 ## Request and persistence flow
 

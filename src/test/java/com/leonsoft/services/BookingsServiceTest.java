@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -11,10 +12,12 @@ import com.leonsoft.models.Booking;
 import com.leonsoft.models.BookingResource;
 import com.leonsoft.repositories.BookingRepository;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
@@ -29,8 +32,13 @@ class BookingsServiceTest {
     @Mock
     private BookingResourceService resourceService;
 
-    @InjectMocks
     private BookingsService bookingsService;
+
+    @BeforeEach
+    void setUp() {
+        bookingsService = new BookingsService(
+              bookingRepository, resourceService, new BookingAvailabilityPolicy(true, true));
+    }
 
     @Test
     void createNormalizesDatesAndRecalculatesNightsAndBalance() {
@@ -91,7 +99,131 @@ class BookingsServiceTest {
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
     }
 
+    @Test
+    void legacyDeleteOnlyRemovesCancelledBookings() {
+        Booking cancelled = savedBooking("cancelled-1", "2026-06-20", "2026-06-23", "cancelled");
+        when(bookingRepository.findById("cancelled-1")).thenReturn(Optional.of(cancelled));
+
+        bookingsService.delCancelledBooking("cancelled-1");
+
+        verify(bookingRepository).deleteById("cancelled-1");
+    }
+
+    @Test
+    void legacyDeleteRejectsNonCancelledBookings() {
+        Booking active = savedBooking("active-1", "2026-06-20", "2026-06-23", "active");
+        when(bookingRepository.findById("active-1")).thenReturn(Optional.of(active));
+
+        ResponseStatusException exception = assertThrows(
+              ResponseStatusException.class, () -> bookingsService.delCancelledBooking("active-1"));
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        verify(bookingRepository, never()).deleteById("active-1");
+    }
+
+    @Test
+    void legacyDeleteReturnsNotFoundForUnknownBookings() {
+        when(bookingRepository.findById("missing")).thenReturn(Optional.empty());
+
+        ResponseStatusException exception = assertThrows(
+              ResponseStatusException.class, () -> bookingsService.delCancelledBooking("missing"));
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        verify(bookingRepository, never()).deleteById("missing");
+    }
+
+    @Test
+    void pdfExportRejectsUnsupportedResourceType() {
+        ResponseStatusException exception = assertThrows(
+              ResponseStatusException.class,
+              () -> bookingsService.exportReportToPDF(
+                    new org.springframework.mock.web.MockHttpServletResponse(),
+                    "01/06/2026",
+                    "30/06/2026",
+                    "unknown",
+                    java.util.Locale.UK));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        verify(bookingRepository, never()).findByStartDateBetweenOrderByStartDateDesc(any(), any());
+    }
+
+    @Test
+    void rejectsOverlappingRoomBookingWhenRoomFlagIsEnabled() {
+        Booking existing = savedBooking("existing", "2026-06-20", "2026-06-23", "active");
+        when(resourceService.requireActive("APT2"))
+              .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
+        when(bookingRepository.findByRoomAndStatusIn("APT2", List.of("active", "paid")))
+              .thenReturn(List.of(existing));
+
+        ResponseStatusException exception = assertThrows(
+              ResponseStatusException.class,
+              () -> bookingsService.create(booking("22/06/2026", "24/06/2026", "active")));
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+        verify(bookingRepository, never()).save(any(Booking.class));
+    }
+
+    @Test
+    void roomFlagCanAllowOverlapsWithoutDisablingVehicleProtection() {
+        bookingsService = new BookingsService(
+              bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true));
+        when(resourceService.requireActive("APT2"))
+              .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Booking roomBooking = booking("22/06/2026", "24/06/2026", "active");
+        assertNotNull(bookingsService.create(roomBooking).getId());
+        verify(bookingRepository, never())
+              .findByRoomAndStatusIn("APT2", List.of("active", "paid"));
+
+        bookingsService = new BookingsService(
+              bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true));
+        Booking existingVehicleBooking = savedBooking("vehicle-existing", "2026-06-20", "2026-06-23", "paid");
+        existingVehicleBooking.setRoom("CAR1");
+        when(resourceService.requireActive("CAR1"))
+              .thenReturn(new BookingResource("CAR1", "cars", "Car 1"));
+        when(bookingRepository.findByRoomAndStatusIn("CAR1", List.of("active", "paid")))
+              .thenReturn(List.of(existingVehicleBooking));
+
+        Booking vehicleBooking = booking("22/06/2026", "24/06/2026", "active");
+        vehicleBooking.setRoom("CAR1");
+        ResponseStatusException exception = assertThrows(
+              ResponseStatusException.class, () -> bookingsService.create(vehicleBooking));
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
+    }
+
+    @Test
+    void cancelledBookingsDoNotBlockAvailability() {
+        when(resourceService.requireActive("APT2"))
+              .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Booking cancelled = booking("22/06/2026", "24/06/2026", "cancelled");
+        assertNotNull(bookingsService.create(cancelled).getId());
+        verify(bookingRepository, never())
+              .findByRoomAndStatusIn("APT2", List.of("active", "paid"));
+    }
+
+    @Test
+    void getAllReturnsBothLegacyEuropeanAndIsoStoredDatesInEuropeanFormat() {
+        Booking legacyBooking = savedBooking("legacy", "20/11/2026", "23/11/2026", "active");
+        Booking isoBooking = savedBooking("iso", "2026-11-24", "2026-11-27", "active");
+        when(bookingRepository.findAllByOrderByStartDateAsc()).thenReturn(List.of(legacyBooking, isoBooking));
+        when(resourceService.namesById()).thenReturn(Map.of());
+
+        List<Booking> bookings = bookingsService.getAll();
+
+        assertEquals("20/11/2026", bookings.get(0).getStartDate());
+        assertEquals("23/11/2026", bookings.get(0).getEndDate());
+        assertEquals("24/11/2026", bookings.get(1).getStartDate());
+        assertEquals("27/11/2026", bookings.get(1).getEndDate());
+    }
+
     private static Booking booking(String startDate, String endDate) {
+        return booking(startDate, endDate, null);
+    }
+
+    private static Booking booking(String startDate, String endDate, String status) {
         Booking booking = new Booking();
         booking.setStartDate(startDate);
         booking.setEndDate(endDate);
@@ -99,6 +231,17 @@ class BookingsServiceTest {
         booking.setCommission(10.0);
         booking.setReceived(20.0);
         booking.setRoom("APT2");
+        booking.setStatus(status);
+        return booking;
+    }
+
+    private static Booking savedBooking(String id, String startDate, String endDate, String status) {
+        Booking booking = new Booking();
+        booking.setId(id);
+        booking.setStartDate(startDate);
+        booking.setEndDate(endDate);
+        booking.setRoom("APT2");
+        booking.setStatus(status);
         return booking;
     }
 }
