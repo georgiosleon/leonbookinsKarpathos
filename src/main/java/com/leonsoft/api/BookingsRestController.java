@@ -32,6 +32,7 @@ public class BookingsRestController {
     }
 
     @GetMapping("/export/pdf")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
     public void exportToPDF(
             HttpServletResponse response,
             @RequestParam(name = "fromDate") String fromDateEuroFmt,
@@ -48,6 +49,7 @@ public class BookingsRestController {
     }
 
     @GetMapping(value = "/report", produces = MediaType.TEXT_PLAIN_VALUE)
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
     String report(
             @RequestParam(name = "fromDate") String fromDateEuroFmt,
             @RequestParam(name = "toDate") String toDateEuroFmt,
@@ -61,20 +63,20 @@ public class BookingsRestController {
     }
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER')")
+    @PreAuthorize("hasRole('OPERATOR')")
     Booking create(@Valid @RequestBody BookingRequest request) {
         return bookingsService.create(request.toBooking());
     }
 
     @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER') and (principal.username == #request.name or hasRole('ADMIN'))")
+    @PreAuthorize("hasRole('OPERATOR')")
     Booking update(@Valid @RequestBody BookingRequest request) {
         return bookingsService.update(request.toBooking());
     }
 
 
     @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('OPERATOR')")
     Boolean deleteObject(@Valid @RequestBody BookingDeleteRequest request) {
         log.debug(" Delete    {}", request.id());
         bookingsService.deleteObject(request.id());
@@ -82,14 +84,14 @@ public class BookingsRestController {
     }
 
     @PostMapping(value = "/del")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('OPERATOR')")
     void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {
         log.debug(" Delete  a cancelled   {}", bookingId);
         bookingsService.delCancelledBooking(bookingId);
     }
 
     @GetMapping(value = "/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'USER', 'GUEST')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR', 'GUEST')")
     List<Booking> getAll() {
         return bookingsService.getAll();
     }

@@ -45,17 +45,16 @@ backend at its configured local address.
 - English, Greek, German, Dutch, Danish, and French are supported. English is
   the default and fallback. Language and light/dark theme preferences are
   stored in the browser.
-- The admin resource screen adds rooms and vehicles to the shared catalog.
-  Active resources are selectable for new bookings; the booking stores the
-  resource ID while API/report display uses its name.
+- The admin resource screen (`?page=resources`) adds rooms and vehicles to the shared catalog. Active resources are selectable for new bookings; the booking stores the resource ID while API/report display uses its name.
+- The admin user-management screen (`?page=users`) lists/creates/updates/deletes database-backed users. The UI gates actions by role, but backend authorization is authoritative.
 
 ## API integration
 
 `src/bookingApi.js` centralizes calls to the same-origin backend. It uses
 `/api/v1` endpoints, includes credentials through the browser session, fetches
 the CSRF token for writes, and sends JSON for create, update, and delete
-requests. API errors are surfaced to the UI rather than treating failed
-requests as successful.
+requests. `fetchCurrentUser()`/`/api/v1/users/me` provides role for UI gating.
+API errors are surfaced to the UI; 401 redirects to login, 403 shows a permission error.
 
 Translation catalogs live in `src/locales/<language>/translation.json`.
 `npm run build` checks catalog keys and interpolation placeholders before
@@ -76,7 +75,7 @@ checking.
 
 The resource catalog is loaded from the backend; the frontend does not contain
 a second hardcoded copy of the room/car inventory. Visit `/?page=resources` to
-add a resource as the current administrator.
+add a resource as an administrator.
 
 ## Development
 
@@ -93,7 +92,7 @@ Run the unit tests with:
 npm test
 ```
 
-Set the backend administrator environment variables before starting Spring
-Boot. The Vite app communicates with the local backend; consult the Vite
-configuration and package scripts in `frontend/` for the current development
-proxy and available commands.
+Set seed/admin environment variables as needed before starting Spring Boot
+(`APP_ADMIN_*`, `APP_OPERATOR_*` or legacy `APP_USER_*`, `APP_GUEST_*`). The Vite
+app communicates with the local backend; consult the Vite configuration and
+package scripts in `frontend/` for the current development proxy and commands.

@@ -3,11 +3,11 @@
 This folder contains the desktop launcher and native installer build scripts.
 The command-line launcher prompts for administrator credentials, runs the
 Spring Boot app locally, opens the React app in the default browser, and stops
-the server when you press Enter or interrupt the launcher. Credentials are
-requested on each launch. Enter a username and a password of 12–72 UTF-8 bytes;
-the password is hidden while typing. The launcher passes them to the application
-process but does not save them to disk or the database. Start the app image or
-installed launcher from a terminal; it requires an interactive console.
+the server when you press Enter or interrupt the launcher. The launcher passes
+credentials to the application process as `APP_ADMIN_*` environment variables;
+it does not save them to disk. User accounts are stored in the SQLite database
+and managed by admins in the application. Start the app image or installed
+launcher from a terminal; it requires an interactive console.
 
 Application logs are kept in the current user's application data directory:
 
@@ -15,12 +15,11 @@ Application logs are kept in the current user's application data directory:
 - macOS: `~/Library/Application Support/LeonSoft/Leon Bookings`
 - Linux: `${XDG_DATA_HOME:-~/.local/share}/leon-bookings`
 
-The desktop launcher uses `bookings.db` in its current working directory. It
-preserves an existing database there and applies the idempotent SQL schema
-initializer to add missing tables. When the file does not exist, the launcher
-creates a new database and loads one clearly labeled sample booking. Back up
-the database before moving or replacing it; future schema evolution should use
-versioned migrations such as Liquibase.
+The desktop launcher uses `bookings.db` in its current working directory by
+default. Startup uses JPA schema updates and `DatabaseInitializer` for
+idempotent seed/migration logic (including legacy role normalization). Back up
+the database before moving, upgrading, or replacing it; future schema-altering
+changes should use versioned migrations.
 
 For a support copy, use `db backup --encrypt` to create a passphrase-protected
 `.sqlite3.enc` file; the full Windows and macOS commands are in the app's Help
@@ -38,20 +37,23 @@ downloads the pinned Maven distribution on first use. The build downloads and
 packages the frontend through Maven; end users do not need Java, Maven,
 Node.js, npm, or Docker installed.
 
-## Administrator credentials
+## Accounts and credentials
 
-The application currently provisions one in-memory administrator account when
-it starts. It does not keep user accounts or passwords in SQLite.
+The application uses database-backed users with roles `ADMIN`, `OPERATOR`, and
+`GUEST` (legacy `USER` accepted/migrated to `OPERATOR`). Seed accounts are
+created only when missing.
 
-- **Desktop installer:** enter the administrator username and password in the
-  launcher prompt on each launch.
-- **Docker:** set `APP_ADMIN_USERNAME` and `APP_ADMIN_PASSWORD` in the private
-  `.env` file before running Compose. The sample `.env.example` contains a
-  placeholder password that must be replaced.
-- **Direct Spring Boot/Maven run:** set those two environment variables in
-  the shell before starting the application.
+- **Desktop installer:** the launcher prompts for admin credentials and passes
+  them as `APP_ADMIN_USERNAME`/`APP_ADMIN_PASSWORD`. Configure operator/guest
+  seed accounts via `APP_OPERATOR_*` (or legacy `APP_USER_*`) and `APP_GUEST_*`
+  environment variables as needed.
+- **Docker:** set `APP_ADMIN_*`, `APP_OPERATOR_*` (or legacy `APP_USER_*`), and
+  `APP_GUEST_*` in the private `.env` file before running Compose. Replace
+  placeholder passwords.
+- **Direct Spring Boot/Maven run:** set the same environment variables in the
+  shell before starting the application.
 
-Passwords must be between 12 and 72 UTF-8 bytes. Keep environment files and
+Seed passwords must be at least 12 characters. Keep environment files and
 shell/session access private; do not commit real credentials.
 
 ## Install build prerequisites
@@ -299,8 +301,8 @@ The application binds to `127.0.0.1:8080` by default. To allow other devices
 on the LAN to connect, set `SERVER_ADDRESS=0.0.0.0` in the environment before
 launching it; then open `http://<host-computer-LAN-IP>:8080` from the other
 device. This exposes the app to every network interface, so enable it only on a
-trusted network and restrict port 8080 with the host firewall. Use a strong
-administrator password. The launcher reports the startup log location in the
+trusted network and restrict port 8080 with the host firewall. Use strong
+account passwords. The launcher reports the startup log location in the
 user's data directory if the port is already in use.
 
 For Docker Compose, the published port is loopback-only by default. To enable

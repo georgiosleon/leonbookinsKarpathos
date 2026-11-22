@@ -5,6 +5,12 @@ target/
 /src/main/resources/public/react-assets/
 /backups/
 /install/dist/
+*.db
+*.db-journal
+*.db-shm
+*.db-wal
+*.sqlite3
+*.sqlite3.enc
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/

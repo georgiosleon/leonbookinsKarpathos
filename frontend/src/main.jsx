@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BookingPage } from './components/BookingPage.jsx';
 import { ReportsPage } from './components/ReportsPage.jsx';
 import { ResourcesPage } from './components/ResourcesPage.jsx';
+import { UserManagement } from './components/admin/UserManagement.jsx';
 import { getInitialTheme } from './theme.js';
 import { LanguageProvider } from './i18n.jsx';
 
@@ -17,7 +18,9 @@ const App = requestedPage === 'reports'
   ? ReportsPage
   : requestedPage === 'resources'
     ? ResourcesPage
-    : BookingPage;
+    : requestedPage === 'users'
+      ? UserManagement
+      : BookingPage;
 document.documentElement.dataset.theme = getInitialTheme();
 
 createRoot(rootElement).render(

@@ -8,6 +8,13 @@ const backendPublic = fileURLToPath(
 
 export default defineConfig({
   plugins: [react()],
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: './tests/setup.js',
+    include: ['src/**/*.{test,spec}.{js,jsx}'],
+    css: false,
+  },
   server: {
     proxy: {
       '/booking': 'http://localhost:8080',

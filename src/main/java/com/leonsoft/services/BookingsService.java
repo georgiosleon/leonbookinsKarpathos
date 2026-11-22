@@ -66,38 +66,18 @@ public class BookingsService {
     /** Check if the current user is an admin */
     private boolean isCurrentUserAdmin() {
         User user = getCurrentUser();
-        return user != null && "admin".equals(user.getRole());
+        return user != null && user.isAdmin();
     }
 
-    /** Check if the current user is the owner of a booking, or is admin */
+    /** Operators can create/update/delete any booking; admins and guests cannot. */
     private boolean canModifyBooking(Booking booking) {
         User currentUser = getCurrentUser();
-        // Admin can modify any booking
-        if (currentUser != null && "admin".equals(currentUser.getRole())) {
-            return true;
-        }
-        // User can modify their own booking
-        if (currentUser != null && booking.getUser() != null
-                && Objects.equals(booking.getUser().getId(), currentUser.getId())) {
-            return true;
-        }
-        return false;
+        return currentUser != null && currentUser.isOperator();
     }
 
-    /** Check if the current user can view a booking */
+    /** Any authenticated user can view bookings; visibility is constrained at the list/report level. */
     private boolean canViewBooking(Booking booking) {
-        User currentUser = getCurrentUser();
-        // Admin can view any booking
-        if (currentUser != null && "admin".equals(currentUser.getRole())) {
-            return true;
-        }
-        // User can view their own booking
-        if (currentUser != null && booking.getUser() != null
-                && Objects.equals(booking.getUser().getId(), currentUser.getId())) {
-            return true;
-        }
-        // Guest can view all bookings (handled at controller level)
-        return false;
+        return getCurrentUser() != null;
     }
 
     public void exportReportToPDF(
@@ -144,19 +124,14 @@ public class BookingsService {
                 .export(response);
     }
 
-    /** Get all bookings visible to the current user based on their role */
+    /** Get all bookings visible to the current user based on their role. */
     private List<Booking> getAllBookingsForReport() {
         User currentUser = getCurrentUser();
-        if (currentUser != null && "admin".equals(currentUser.getRole())) {
-            // Admin sees all bookings
-            return bookingRepository.findAllByOrderByStartDateAsc();
+        if (currentUser == null) {
+            return List.of();
         }
-        // User sees only their own bookings
-        if (currentUser != null) {
-            return bookingRepository.findByUserIdOrderByStartDateAsc(currentUser.getId());
-        }
-        // No authenticated user - return empty (will be handled by authentication filter)
-        return List.of();
+        // All authenticated roles can view all bookings; mutation permissions differ.
+        return bookingRepository.findAllByOrderByStartDateAsc();
     }
 
     public String report(String fromDateEuroFmt, String toDateEuroFmt, Locale locale) {
@@ -313,32 +288,19 @@ public class BookingsService {
 
     public List<Booking> getAll() {
         User currentUser = getCurrentUser();
-        if (currentUser != null && "admin".equals(currentUser.getRole())) {
-            // Admin sees all bookings
-            List<Booking> all = bookingRepository.findAllByOrderByStartDateAsc();
-            addResourceNames(all);
-            for (Booking booking : all) {
-                LocalDate stDt = BookingsUtils.parseStoredDate(booking.getStartDate());
-                booking.setStartDate(BookingsUtils.formatterEURO.format(stDt));
-                LocalDate edDt = BookingsUtils.parseStoredDate(booking.getEndDate());
-                booking.setEndDate(BookingsUtils.formatterEURO.format(edDt));
-            }
-            return all;
+        if (currentUser == null) {
+            return List.of();
         }
-        // User sees only their own bookings
-        if (currentUser != null) {
-            List<Booking> userBookings = bookingRepository.findByUserIdOrderByStartDateAsc(currentUser.getId());
-            addResourceNames(userBookings);
-            for (Booking booking : userBookings) {
-                LocalDate stDt = BookingsUtils.parseStoredDate(booking.getStartDate());
-                booking.setStartDate(BookingsUtils.formatterEURO.format(stDt));
-                LocalDate edDt = BookingsUtils.parseStoredDate(booking.getEndDate());
-                booking.setEndDate(BookingsUtils.formatterEURO.format(edDt));
-            }
-            return userBookings;
+        // All authenticated roles can view all bookings; mutation permissions differ.
+        List<Booking> all = bookingRepository.findAllByOrderByStartDateAsc();
+        addResourceNames(all);
+        for (Booking booking : all) {
+            LocalDate stDt = BookingsUtils.parseStoredDate(booking.getStartDate());
+            booking.setStartDate(BookingsUtils.formatterEURO.format(stDt));
+            LocalDate edDt = BookingsUtils.parseStoredDate(booking.getEndDate());
+            booking.setEndDate(BookingsUtils.formatterEURO.format(edDt));
         }
-        // No authenticated user - return empty
-        return List.of();
+        return all;
     }
 
     private void addResourceNames(List<Booking> bookings) {

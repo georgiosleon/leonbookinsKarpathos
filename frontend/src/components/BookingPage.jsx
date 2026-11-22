@@ -20,6 +20,7 @@ import {
   saveBooking,
   updateBooking,
 } from '../bookingApi.js';
+import { fetchMe } from '../usersApi.js';
 import { BookingForm } from './BookingForm.jsx';
 import { BookingTimeline } from './BookingTimeline.jsx';
 import { FeedbackDialog } from './FeedbackDialog.jsx';
@@ -30,6 +31,7 @@ import { reportDocument } from '../reportDocument.js';
 import { formatMoney, useLanguage } from '../i18n.jsx';
 import { LanguageSelector } from './LanguageSelector.jsx';
 import { AppSupportActions } from './AppSupportActions.jsx';
+import { useCurrentUser } from '../useCurrentUser.js';
 
 function todayAsIsoDate() {
   const now = new Date();
@@ -89,6 +91,7 @@ export function BookingPage() {
   const cancelledTimelineRef = useRef(null);
   const [form, setForm] = useState(emptyForm);
   const [bookings, setBookings] = useState([]);
+  const [me, setMe] = useState(null);
   const [resources, setResources] = useState([]);
   const [availabilitySettings, setAvailabilitySettings] = useState({
     roomsPreventOverlap: true,
@@ -104,6 +107,10 @@ export function BookingPage() {
   const [formVisible, setFormVisible] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const { language, locale, t } = useLanguage();
+  const { currentUser } = useCurrentUser();
+  const isAdmin = currentUser?.role === 'ADMIN';
+  const canManageBookings = currentUser?.role === 'OPERATOR';
+  const canSeeReports = isAdmin || canManageBookings;
   const [clock, setClock] = useState(() => formatClock(new Date(), locale));
 
   function showError(message) {
@@ -129,6 +136,21 @@ export function BookingPage() {
       active = false;
     };
   }, [t]);
+
+  useEffect(() => {
+    let active = true;
+    fetchMe()
+      .then((user) => {
+        if (active) setMe(user);
+      })
+      .catch(() => {
+        if (active) setMe(null);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   useEffect(() => {
     document.documentElement.lang = language;
@@ -276,42 +298,52 @@ export function BookingPage() {
           <p className="eyebrow">{t('Karpathos booking planner')}</p>
           <h1>{t(mode.title)}</h1>
         </div>
+        {me && (
+          <p className="signed-in-label">
+            {t('Signed in as {username}', { username: me.username })}
+          </p>
+        )}
         <div className="header-meta">
           <nav aria-label={t('Booking type')}>
             <a href="/?type=rooms" aria-current={mode.id === 'rooms' ? 'page' : undefined}>{t('Rooms')}</a>
             <a href="/?type=cars" aria-current={mode.id === 'cars' ? 'page' : undefined}>{t('Cars & bikes')}</a>
-            <a className="nav-icon-link" href={`/?type=${mode.id}&page=reports`}>
-              <svg
-                className="nav-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M4 19.5h16" />
-                <path d="M7 16V10" />
-                <path d="M12 16V5" />
-                <path d="M17 16v-4" />
-              </svg>
-              <span>{t('Reports')}</span>
-            </a>
-            <a href="/?page=resources">{t('Manage rooms and cars')}</a>
+            {canSeeReports && (
+              <a className="nav-icon-link" href={`/?type=${mode.id}&page=reports`}>
+                <svg
+                  className="nav-icon"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d="M4 19.5h16" />
+                  <path d="M7 16V10" />
+                  <path d="M12 16V5" />
+                  <path d="M17 16v-4" />
+                </svg>
+                <span>{t('Reports')}</span>
+              </a>
+            )}
+            {isAdmin && <a href="/?page=resources">{t('Manage rooms and cars')}</a>}
+            {isAdmin && <a href="/?page=users">{t('Manage users')}</a>}
           </nav>
           <HelpButton />
           <LanguageSelector />
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
           <AppSupportActions />
-          <label className="save-mode-toggle">
-            <input
-              type="checkbox"
-              checked={saveMode === 'edit'}
-              onChange={handleSaveModeChange}
-            />
-            <span>{t('Edit selected booking')} <small>{t('(testing)')}</small></span>
-          </label>
+          {canManageBookings && (
+            <label className="save-mode-toggle">
+              <input
+                type="checkbox"
+                checked={saveMode === 'edit'}
+                onChange={handleSaveModeChange}
+              />
+              <span>{t('Edit selected booking')} <small>{t('(testing)')}</small></span>
+            </label>
+          )}
           <button type="button" className="button button-muted" onClick={handleLogout}>{t('Sign out')}</button>
           <time>{clock}</time>
         </div>
@@ -356,6 +388,7 @@ export function BookingPage() {
             selectedBooking={selectedBooking}
             saveMode={saveMode}
             busy={busy}
+            canManage={canManageBookings}
           />
         </div>
 
@@ -366,7 +399,7 @@ export function BookingPage() {
           <button type="button" className="button button-muted" onClick={() => handleDateNavigation(-30)}>{t('30 days back')}</button>
           <button type="button" className="button button-muted" onClick={() => handleDateNavigation(30)}>{t('30 days forward')}</button>
           <button type="button" className="button button-muted" onClick={() => handleDateNavigation(90)}>{t('90 days forward')}</button>
-          <button type="button" className="button button-primary" onClick={handleReport}>{t('Run report')}</button>
+          {canSeeReports && <button type="button" className="button button-primary" onClick={handleReport}>{t('Run report')}</button>}
         </div>
       </section>
 
@@ -380,6 +413,7 @@ export function BookingPage() {
         onSelect={handleSelect}
         onDelete={handleDelete}
         onError={showError}
+        canDelete={canManageBookings}
       />
 
       <BookingTimeline
@@ -392,6 +426,7 @@ export function BookingPage() {
         onSelect={handleSelect}
         onDelete={handleDelete}
         onError={showError}
+        canDelete={canManageBookings}
       />
 
       {reportHtml && (

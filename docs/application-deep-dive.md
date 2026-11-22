@@ -9,14 +9,15 @@ authoritative when behavior changes. Related docs:
 ## Product and domain
 
 Leon Bookings (Karpathos) is a local/self-hosted **room and vehicle booking
-planner**. An administrator manages reservations for apartments/studios and
+planner**. Authenticated users manage reservations for apartments/studios and
 cars/bikes, with timeline visualization, financial fields (charge / received /
 commission / balance), localized reports (HTML + PDF), and a managed resource
 catalog.
 
-It is a **single-admin, single-process** application, not a multi-tenant SaaS.
-Authentication is one in-memory administrator from environment variables;
-booking data lives in SQLite on the host that runs the process.
+It is a **single-process** application, not a multi-tenant SaaS. Authentication
+uses database-backed users with `ADMIN`, `OPERATOR`, and `GUEST` roles; default seed
+accounts can be configured via environment variables and are created only when
+missing. Booking data lives in SQLite on the host that runs the process.
 
 Primary entry points for humans: top-level `README.md`, this deep dive, and the
 rest of `docs/`.
@@ -25,7 +26,7 @@ rest of `docs/`.
 
 | Layer | Technology |
 |--------|------------|
-| Backend | Java **25**, Spring Boot **3.5**, Spring MVC, Spring Security, Bean Validation, Spring Data JPA |
+| Backend | Java **25**, Spring Boot **4.1**, Spring MVC, Spring Security, Bean Validation, Spring Data JPA |
 | Database | **SQLite** (`sqlite-jdbc` + Hibernate community SQLite dialect) |
 | Reports | OpenPDF, HTML template + i18n property bundles |
 | Frontend | **React 19** + **Vite**, i18next / react-i18next; **vis-timeline** as a static browser script |
@@ -56,7 +57,7 @@ Profiles: `dev` (default for direct runs) vs `prod` (Docker Compose forces
 
 ### Booking
 
-Entity: `models/Booking.java` (table `Booking` in `schema.sql`).
+Entity: `models/Booking.java` (table `Booking`).
 
 - Stay: `startDate`, `endDate`, `numOfNights`
 - Money: `charge`, `received`, `commission`, `balance` (balance calculated
@@ -74,12 +75,16 @@ Entity: `models/Booking.java` (table `Booking` in `schema.sql`).
 Entity: `models/BookingResource.java` (table `booking_resources`).
 
 - `id`, `type` (`rooms` | `cars`), `name`, `active`
-- Seeded catalog of APT/STU/POT/MER rooms and CAR/BIKE vehicles in `schema.sql`
+- Resource catalog is managed by admin through the API/UI; existing bookings keep
+  stored resource assignments.
 
 ### Users
 
-There is no persisted user table. One **ADMIN** account is configured from
-`APP_ADMIN_USERNAME` / `APP_ADMIN_PASSWORD` (`SecurityConfig`).
+Entity: `models/User.java` (table `users`). Users have `username`,
+`passwordHash`, `email`, `role` (`ADMIN`/`OPERATOR`/`GUEST`), and `active` flags.
+`DatabaseInitializer` seeds missing default accounts on startup using
+`APP_ADMIN_*`, `APP_OPERATOR_* (or legacy APP_USER_*)`, and `APP_GUEST_*` environment variables; existing
+accounts are not overwritten. Passwords are BCrypt-hashed.
 
 ### Features
 
@@ -102,11 +107,10 @@ There is no persisted user table. One **ADMIN** account is configured from
 |------|------|
 | `src/main/java/com/leonsoft/api/` | REST controllers + request DTOs |
 | `src/main/java/com/leonsoft/services/` | Booking rules, availability, resources, PDF/HTML reports |
-| `src/main/java/com/leonsoft/repositories/` | `BookingRepository`, `BookingResourceRepository` |
-| `src/main/java/com/leonsoft/models/` | JPA entities |
-| `src/main/java/com/leonsoft/config/` | Security, DB/SQLite, MVC/SPA fallback, validation |
+| `src/main/java/com/leonsoft/repositories/` | `BookingRepository`, `BookingResourceRepository`, `UserRepository` |
+| `src/main/java/com/leonsoft/models/` | JPA entities (`Booking`, `BookingResource`, `User`, `Role`) |
+| `src/main/java/com/leonsoft/config/` | Security, DB/SQLite, MVC/SPA fallback, validation, seed initialization |
 | `src/main/java/com/leonsoft/cli/` | Offline `DatabaseCli` / encrypted backup |
-| `src/main/resources/schema.sql` | Idempotent table create + resource seed |
 | `src/main/resources/public/` | SPA shell, redirects, shared CSS/JS (vis-timeline, etc.) |
 | `src/main/resources/public/react-assets/` | Vite build output (Maven-generated) |
 | `frontend/` | React source, locales, Vite config, unit tests |
@@ -144,9 +148,10 @@ Controllers include `BookingsRestController`, `BookingResourceController`,
 `ApplicationSupportController`, `LoginPageController`, and
 `ErrorRestController`.
 
-Security: administrator role on booking/resources/app-info/diagnostics; CSRF
-cookie for mutating browser calls. Frontend client module:
-`frontend/src/bookingApi.js`.
+Security: database-backed users with `ADMIN`/`OPERATOR`/`GUEST` roles (legacy `USER` accepted/migrated).
+Admins manage users, resources, and admin ops and can view reports; operators manage bookings and view reports;
+guests have read-only booking/resource visibility. CSRF cookie protects mutating browser calls. Frontend client modules:
+`frontend/src/bookingApi.js`, `frontend/src/usersApi.js`.
 
 ## Frontend structure and flows
 
@@ -155,6 +160,7 @@ Routing is query-param based in `frontend/src/main.jsx`:
 - Default → `BookingPage` (`/?type=rooms|cars`)
 - `?page=reports` → `ReportsPage`
 - `?page=resources` → `ResourcesPage`
+- `?page=users` → `UserManagement` (admin)
 
 Main modules:
 
@@ -177,15 +183,14 @@ Maven still builds the SPA for packaged runs.
 
 ## How to run and deploy
 
-1. **Docker** — `cp .env.example .env`, set admin credentials,
+1. **Docker** — `cp .env.example .env`, set seed account credentials,
    `docker compose up --build -d` → `http://localhost:8080`. Data lives in
    volume `booking-data`.
-2. **Maven** — set `APP_ADMIN_*`, then
+2. **Maven** — set `APP_ADMIN_*` / `APP_OPERATOR_* (or legacy APP_USER_*)` / `APP_GUEST_*` as needed, then
    `./mvnw generate-resources spring-boot:run` (or `package`). Default DB is
    `bookings.db`; override with `APP_DB_URL`.
 3. **Desktop** — `install/package.sh` / `package.ps1` → portable archive / MSI /
-   DMG with bundled JRE. Launcher prompts for admin credentials, starts the
-   service, and opens the browser. See [`install/README.md`](../install/README.md).
+   DMG with bundled JRE. See [`install/README.md`](../install/README.md).
 4. **CLI** — `java -jar target/leonbookinsKarpathos-1.0.0.jar db backup|restore …`
    (dispatched in `Application.main` before Spring).
 
@@ -200,14 +205,15 @@ unfinished swap. What remains transitional or deferred:
 - Old static HTML backups under `src/main/resources/static/bckup/` and leftover
   libs (for example `public/js/w2ui.js`) are not the active app path
 - Unversioned `/booking` and `/csrf` aliases; `/booking/del` legacy delete
-- Schema via idempotent `schema.sql` (create-if-missing + seed), **not**
-  Liquibase/Flyway — versioned migrations are future work
-- No multi-user persistence yet (user prefs / management are future)
+- Schema evolution is currently handled by JPA `ddl-auto=update` and startup
+  initialization, **not** Liquibase/Flyway — versioned migrations are future work
+- User management exists (ADMIN CRUD), but user self-service/profile/password
+  flows and finer-grained permissions are still limited
 - Resource **add only** (no deactivate/edit UI yet; see [resources.md](resources.md))
 
 ## Mental model
 
 One Spring Boot JAR embeds a React booking SPA, talks to itself over `/api/v1`,
-stores bookings plus a room/car catalog in SQLite, authenticates a single
-env-configured admin with session + CSRF, and can be launched as Docker,
-Maven, or a desktop wrapper with an offline backup CLI.
+stores bookings, users, and a room/car catalog in SQLite, enforces database-backed
+role authorization (`ADMIN`/`OPERATOR`/`GUEST`, legacy `USER` migrated) with session + CSRF,
+and can be launched as Docker, Maven, or a desktop wrapper with an offline backup CLI.

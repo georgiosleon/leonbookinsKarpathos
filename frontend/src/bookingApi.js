@@ -3,7 +3,7 @@ import { defaultLanguage, languageStorageKey, resolveLanguage } from './localeCo
 
 let csrfToken;
 
-async function request(url, options) {
+export async function request(url, options) {
   const response = await fetch(url, {
     ...options,
     headers: {
@@ -14,6 +14,10 @@ async function request(url, options) {
   if (response.status === 401) {
     window.location.assign('/login');
     throw new Error('Your session has expired. Please sign in again.');
+  }
+  if (response.status === 403) {
+    const message = (await response.text()).trim();
+    throw new Error(message || 'You do not have permission to perform this action.');
   }
   if (!response.ok) {
     const message = (await response.text()).trim();
@@ -30,7 +34,7 @@ function selectedLanguage() {
   }
 }
 
-async function csrfHeaders() {
+export async function csrfHeaders() {
   if (!csrfToken) {
     const response = await request('/api/v1/csrf');
     csrfToken = await response.json();
@@ -50,6 +54,11 @@ export async function fetchResources() {
 
 export async function fetchAvailabilitySettings() {
   const response = await request('/api/v1/settings/availability');
+  return response.json();
+}
+
+export async function fetchCurrentUser() {
+  const response = await request('/api/v1/users/me');
   return response.json();
 }
 

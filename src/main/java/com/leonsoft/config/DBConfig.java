@@ -16,7 +16,7 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
 @Configuration
 @EnableJpaRepositories(basePackages = "com.leonsoft.repositories")
-@PropertySource("persistence-sqlite.properties")
+@PropertySource("classpath:persistence-sqlite.properties")
 public class DBConfig {
 
     @Autowired

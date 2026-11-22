@@ -7,6 +7,7 @@ import { useTheme } from '../useTheme.js';
 import { FeedbackDialog } from './FeedbackDialog.jsx';
 import { HelpButton } from './HelpButton.jsx';
 import { AppSupportActions } from './AppSupportActions.jsx';
+import { useCurrentUser } from '../useCurrentUser.js';
 
 export function ResourcesPage() {
   const [resources, setResources] = useState([]);
@@ -21,6 +22,8 @@ export function ResourcesPage() {
   const [notice, setNotice] = useState('');
   const { language, t } = useLanguage();
   const { theme, toggleTheme } = useTheme();
+  const { currentUser, loading: userLoading } = useCurrentUser();
+  const isAdmin = currentUser?.role === 'ADMIN';
 
   function showError(message) {
     setError(message);
@@ -32,6 +35,11 @@ export function ResourcesPage() {
   }, [language]);
 
   useEffect(() => {
+    if (userLoading) return undefined;
+    if (!isAdmin) {
+      setLoading(false);
+      return undefined;
+    }
     let active = true;
     fetchResources()
       .then((data) => {
@@ -47,7 +55,7 @@ export function ResourcesPage() {
     return () => {
       active = false;
     };
-  }, [t]);
+  }, [t, userLoading, isAdmin]);
 
   async function handleSubmit(event) {
     event.preventDefault();
@@ -80,6 +88,28 @@ export function ResourcesPage() {
     } catch (requestError) {
       showError(t('Could not sign out: {error}', { error: requestError.message }));
     }
+  }
+
+  if (userLoading) {
+    return (
+      <main className="app-shell">
+        <p className="feedback" role="status">{t('Loading resources…')}</p>
+      </main>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <main className="app-shell">
+        <header className="app-header">
+          <div>
+            <p className="eyebrow">{t('Karpathos booking planner')}</p>
+            <h1>{t('Manage rooms and cars')}</h1>
+          </div>
+        </header>
+        <p className="feedback feedback-error" role="alert">{t('You do not have permission to perform this action.')}</p>
+      </main>
+    );
   }
 
   return (

@@ -1,5 +1,7 @@
 package com.leonsoft.api;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +13,11 @@ public class LoginPageController {
     @GetMapping(value = "/login", produces = "text/html;charset=UTF-8")
     @ResponseBody
     public String loginPage(@RequestAttribute("_csrf") CsrfToken csrfToken) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        boolean signedIn = authentication != null
+                && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getPrincipal());
+        String username = signedIn ? escapeAttribute(authentication.getName()) : "";
         return """
                 <!doctype html>
                 <html lang="en">
@@ -27,6 +34,7 @@ public class LoginPageController {
                       border-radius: 14px; background: white; box-shadow: 0 8px 30px #17203318; }
                     h1 { margin: 0 0 8px; font-size: 1.5rem; }
                     p { color: #53627a; }
+                    .signed-in { color: #53627a; }
                     label { display: block; margin-top: 16px; font-weight: 650; }
                     input, select, button { width: 100%%; min-height: 44px; margin-top: 6px;
                       padding: 9px 11px; border: 1px solid #aeb9ca; border-radius: 8px;
@@ -39,6 +47,9 @@ public class LoginPageController {
                 <body>
                   <main>
                     <p data-message="brand">Karpathos booking planner</p>
+                    <p id="signed-in" class="signed-in" hidden data-user="%s">
+                      <span data-message="signedIn">Signed in as</span> <span id="signed-in-name">%s</span>
+                    </p>
                     <h1 data-message="title">Sign in</h1>
                     <p id="login-message" class="error" hidden data-message="invalid">Invalid username or password.</p>
                     <p id="logout-message" hidden data-message="signedOut">You have signed out.</p>
@@ -67,22 +78,28 @@ public class LoginPageController {
                     const copy = {
                       en: { brand: 'Karpathos booking planner', title: 'Sign in',
                         invalid: 'Invalid username or password.', signedOut: 'You have signed out.',
-                        username: 'Username', password: 'Password', language: 'Language', submit: 'Sign in' },
+                        username: 'Username', password: 'Password', language: 'Language', submit: 'Sign in',
+                        signedIn: 'Signed in as' },
                       el: { brand: 'Σύστημα κρατήσεων Καρπάθου', title: 'Σύνδεση',
                         invalid: 'Λανθασμένο όνομα χρήστη ή κωδικός πρόσβασης.', signedOut: 'Έχετε αποσυνδεθεί.',
-                        username: 'Όνομα χρήστη', password: 'Κωδικός πρόσβασης', language: 'Γλώσσα', submit: 'Σύνδεση' },
+                        username: 'Όνομα χρήστη', password: 'Κωδικός πρόσβασης', language: 'Γλώσσα', submit: 'Σύνδεση',
+                        signedIn: 'Συνδεδεμένος ως' },
                       de: { brand: 'Karpathos Buchungsplaner', title: 'Anmelden',
                         invalid: 'Ungültiger Benutzername oder ungültiges Passwort.', signedOut: 'Sie wurden abgemeldet.',
-                        username: 'Benutzername', password: 'Passwort', language: 'Sprache', submit: 'Anmelden' },
+                        username: 'Benutzername', password: 'Passwort', language: 'Sprache', submit: 'Anmelden',
+                        signedIn: 'Angemeldet als' },
                       nl: { brand: 'Boekingsplanner Karpathos', title: 'Aanmelden',
                         invalid: 'Ongeldige gebruikersnaam of wachtwoord.', signedOut: 'U bent afgemeld.',
-                        username: 'Gebruikersnaam', password: 'Wachtwoord', language: 'Taal', submit: 'Aanmelden' },
+                        username: 'Gebruikersnaam', password: 'Wachtwoord', language: 'Taal', submit: 'Aanmelden',
+                        signedIn: 'Aangemeld als' },
                       da: { brand: 'Bookingplanlægger for Karpathos', title: 'Log ind',
                         invalid: 'Ugyldigt brugernavn eller adgangskode.', signedOut: 'Du er logget ud.',
-                        username: 'Brugernavn', password: 'Adgangskode', language: 'Sprog', submit: 'Log ind' },
+                        username: 'Brugernavn', password: 'Adgangskode', language: 'Sprog', submit: 'Log ind',
+                        signedIn: 'Logget ind som' },
                       fr: { brand: 'Gestion des réservations de Karpathos', title: 'Connexion',
                         invalid: 'Nom d’utilisateur ou mot de passe invalide.', signedOut: 'Vous êtes déconnecté.',
-                        username: 'Nom d’utilisateur', password: 'Mot de passe', language: 'Langue', submit: 'Se connecter' }
+                        username: 'Nom d’utilisateur', password: 'Mot de passe', language: 'Langue', submit: 'Se connecter',
+                        signedIn: 'Connecté en tant que' }
                     };
                     const selector = document.getElementById('language');
                     let language = 'en';
@@ -106,10 +123,15 @@ public class LoginPageController {
                     }
                     selector.addEventListener('change', () => applyLanguage(selector.value));
                     applyLanguage(language);
+                    const signedIn = document.getElementById('signed-in');
+                    if (signedIn && signedIn.dataset.user) {
+                      signedIn.hidden = false;
+                    }
                   </script>
                 </body>
                 </html>
-                """.formatted(escapeAttribute(csrfToken.getParameterName()), escapeAttribute(csrfToken.getToken()));
+                """.formatted(username, username,
+                            escapeAttribute(csrfToken.getParameterName()), escapeAttribute(csrfToken.getToken()));
     }
 
     private static String escapeAttribute(String value) {

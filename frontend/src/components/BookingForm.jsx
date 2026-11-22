@@ -23,10 +23,12 @@ export function BookingForm({
   selectedBooking,
   saveMode,
   busy,
+  canManage = true,
 }) {
   const [showDetails, setShowDetails] = useState(true);
   const nights = nightsBetween(form.startDate, form.endDate);
   const { locale, t } = useLanguage();
+  const readOnly = !canManage;
 
   function update(name, value) {
     onChange({ ...form, [name]: value });
@@ -46,6 +48,7 @@ export function BookingForm({
 
   return (
     <form className="booking-form" onSubmit={onSubmit}>
+      <fieldset disabled={readOnly} style={{ border: 0, padding: 0, margin: 0, minInlineSize: 0 }}>
       <div className="form-grid">
         <label className="field field-name">
           <span>{t('Name *')}</span>
@@ -194,6 +197,7 @@ export function BookingForm({
           />
         </label>
       </div>
+      </fieldset>
 
       <div className="form-details-toggle">
         <button type="button" className="button button-muted" onClick={() => setShowDetails(!showDetails)}>
@@ -201,6 +205,7 @@ export function BookingForm({
         </button>
       </div>
 
+      <fieldset disabled={readOnly} style={{ border: 0, padding: 0, margin: 0, minInlineSize: 0 }}>
       {showDetails && (
         <div className="details-grid">
           {detailFields.map(({ name, label, type = 'text' }) => (
@@ -223,8 +228,9 @@ export function BookingForm({
           </label>
         </div>
       )}
+      </fieldset>
 
-      {selectedBooking && (
+      {selectedBooking && canManage && (
         <p className="form-note">
           {t('Selected booking {name} ({id}).', { name: selectedBooking.name, id: selectedBooking.id })}{' '}
           {saveMode === 'edit'
@@ -233,16 +239,18 @@ export function BookingForm({
         </p>
       )}
 
-      <div className="form-actions">
-        <button className="button button-primary" type="submit" disabled={busy || nights <= 0}>
-          {busy
-            ? (saveMode === 'edit' && selectedBooking ? t('Updating…') : t('Saving…'))
-            : (saveMode === 'edit' && selectedBooking ? t('Update booking') : t('Save as new booking'))}
-        </button>
-        <button className="button button-muted" type="button" onClick={onReset} disabled={busy}>
-          {t('New / reset')}
-        </button>
-      </div>
+      {canManage && (
+        <div className="form-actions">
+          <button className="button button-primary" type="submit" disabled={busy || nights <= 0}>
+            {busy
+              ? (saveMode === 'edit' && selectedBooking ? t('Updating…') : t('Saving…'))
+              : (saveMode === 'edit' && selectedBooking ? t('Update booking') : t('Save as new booking'))}
+          </button>
+          <button className="button button-muted" type="button" onClick={onReset} disabled={busy}>
+            {t('New / reset')}
+          </button>
+        </div>
+      )}
     </form>
   );
 }

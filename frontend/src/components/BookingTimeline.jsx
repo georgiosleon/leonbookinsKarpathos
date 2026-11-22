@@ -46,6 +46,7 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
   onSelect,
   onDelete,
   onError,
+  canDelete = true,
 }, ref) {
   const { language, t } = useLanguage();
   const containerRef = useRef(null);
@@ -93,6 +94,7 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
     const timeline = new vis.Timeline(containerRef.current, items, groups, {
       ...timelineOptions,
       stack: shouldStackTimeline(timelineType),
+      editable: { add: false, remove: canDelete },
     });
     timelineRef.current = timeline;
     timeline.setCurrentTime(Date.now());
@@ -120,7 +122,9 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
     };
 
     timeline.on('click', handleClick);
-    timeline.setOptions({ onRemove: handleRemove });
+    if (canDelete) {
+      timeline.setOptions({ onRemove: handleRemove });
+    }
 
     return () => {
       timeline.off('click', handleClick);
@@ -128,7 +132,7 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
       timelineRef.current = null;
       itemsRef.current = null;
     };
-  }, [mode, language, t, timelineType]);
+  }, [mode, language, t, timelineType, canDelete]);
 
   useEffect(() => {
     if (!itemsRef.current) return;

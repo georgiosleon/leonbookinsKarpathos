@@ -8,12 +8,12 @@ Danish, and French.
 ## Application overview
 
 Leon Bookings is a self-hosted planner for apartments/studios and cars/bikes
-(product branding: Leon Soft). A single administrator manages reservations on
-a timeline, with financial fields (charge, received, commission, balance) and
-localized HTML/PDF reports. It is a single-admin, single-process application,
-not a multi-tenant SaaS: one env-configured admin account, booking data in a
-local SQLite file, and one deployable Spring Boot process that also serves the
-React UI.
+(product branding: Leon Soft). Authenticated users manage reservations on a
+timeline, with financial fields (charge, received, commission, balance) and
+localized HTML/PDF reports. It is a single-process application, not a
+multi-tenant SaaS: user accounts and roles are stored in the local SQLite
+database, booking data lives in the same SQLite file, and one deployable Spring
+Boot process also serves the React UI.
 
 | Layer | Technology |
 |--------|------------|
@@ -35,11 +35,13 @@ Main screens use query parameters:
 - `?page=reports` — filtered reports and PDF export
 - `?page=resources` — add rooms and cars to the catalog
 
-Auth is one in-memory `ADMIN` from `APP_ADMIN_USERNAME` /
-`APP_ADMIN_PASSWORD` (not stored in SQLite). Run it with Docker Compose,
-`./mvnw generate-resources spring-boot:run`, or a desktop package under
-`install/`. An offline `db backup|restore` CLI is available on the JAR before
-Spring starts.
+Authentication uses database-backed users with `ADMIN`, `OPERATOR`, and `GUEST`
+roles. On first startup, default accounts are seeded only when missing; set
+`APP_ADMIN_USERNAME/PASSWORD`, `APP_OPERATOR_USERNAME/PASSWORD` (or legacy `APP_USER_*`), and
+`APP_GUEST_USERNAME/PASSWORD` in the environment to control those seed accounts.
+Run it with Docker Compose, `./mvnw generate-resources spring-boot:run`, or a
+desktop package under `install/`. An offline `db backup|restore` CLI is
+available on the JAR before Spring starts.
 
 For entities, API routes, package layout, and current boundaries, see the
 [application deep dive](docs/application-deep-dive.md). Broader architecture
@@ -48,16 +50,15 @@ notes live in [`docs/`](docs/README.md).
 ## Quick start for users (Docker)
 
 Install Docker Engine/Desktop with the Docker Compose plugin. From the project
-directory, create the local environment file and set a unique administrator
-username and password. The password must be 12–72 UTF-8 bytes:
+directory, create the local environment file and set unique credentials for the
+seeded accounts. Passwords must be at least 12 characters:
 
 ```sh
 cp .env.example .env
 ```
 
-Edit `.env` and replace the sample username and `CHANGE_ME` with your own
-administrator credentials. Use a unique password of 12–72 UTF-8 bytes, then
-build and start the application:
+Edit `.env` and replace the placeholder passwords with strong, unique values for
+the admin, operator, and guest seed accounts. Then build and start the application:
 
 ```sh
 docker compose up --build -d
@@ -144,11 +145,11 @@ $env:APP_ADMIN_USERNAME = "admin"
 $env:APP_ADMIN_PASSWORD = Read-Host "Admin password"
 ```
 
-The username and password are read from `APP_ADMIN_USERNAME` and
-`APP_ADMIN_PASSWORD` at startup. The password must be 12–72 UTF-8 bytes. This
-application currently has one in-memory administrator account; it does not
-store user accounts or passwords in SQLite. Protect the environment and avoid
-putting real credentials in source control.
+The default seed account credentials are read from `APP_ADMIN_*`,
+`APP_OPERATOR_*` (or legacy `APP_USER_*`), and `APP_GUEST_*` environment variables at startup. Missing seed
+accounts are created in SQLite; existing user accounts are not overwritten.
+Passwords must be at least 12 characters. Protect the environment and avoid putting
+real credentials in source control.
 
 Build and run the tests:
 
@@ -276,12 +277,10 @@ render in GitHub Markdown.
 
 The React/Vite source is in `frontend/`. It shares one booking screen between
 rooms and vehicles, uses the existing vis-timeline browser library, and calls
-the current Spring booking endpoints. Access is protected by one administrator
-account configured with `APP_ADMIN_USERNAME` and `APP_ADMIN_PASSWORD`.
-For direct and Docker runs, credentials come from process environment
-variables. The desktop launcher asks for the username and password on every
-launch and passes them to the application process; it does not save them to
-the database or configuration files.
+the current Spring booking endpoints. Access is protected by database-backed
+user accounts with `ADMIN`, `OPERATOR`, and `GUEST` roles. Default seed accounts
+can be configured through `APP_ADMIN_*`, `APP_OPERATOR_*` (or legacy `APP_USER_*`), and `APP_GUEST_*`
+environment variables; existing accounts are not overwritten on startup.
 Active/paid bookings and cancelled bookings appear in separate timeline panels.
 Cancelled entries are stacked in their panel so overlapping cancellations,
 including multiple records for the same guest, remain individually visible.
@@ -292,7 +291,7 @@ with `BOOKING_AVAILABILITY_ROOMS_PREVENT_OVERLAP` or
 settings, not switches in the application UI. When enabled, overlapping
 active/paid bookings for the same resource are rejected, while cancelled
 bookings do not block availability.
-The administrator can add rooms and vehicles from the **Manage rooms and cars**
+Administrators can add rooms and vehicles from the **Manage rooms and cars**
 screen. Existing bookings keep their stored resource assignments.
 
 #### Recent security and usability improvements
@@ -300,11 +299,10 @@ screen. Existing bookings keep their stored resource assignments.
 - Booking create, update, and delete requests use validated request objects.
   The backend validates required values, dates, status, email, and financial
   amounts, then calculates nights and balance itself.
-- Admin-only booking and report endpoints use a single in-memory administrator
-  account. Browser writes include CSRF protection; user accounts are not
-  persisted. The `booking_resources` table stores the admin-managed room and
-  vehicle catalog; the existing bookings table and its resource assignments
-  are preserved.
+- Authentication uses database-backed users with `ADMIN`, `OPERATOR`, and `GUEST`
+  roles (legacy `USER` accepted/migrated to `OPERATOR`). Admins manage users, resources, and admin ops and can view reports; operators manage bookings and view reports; guests have read-only booking/resource visibility. Browser writes include CSRF protection. The
+  `booking_resources` table stores the managed room and vehicle catalog; the
+  existing bookings table and its resource assignments are preserved.
 - The detailed HTML report escapes booking data before rendering. The SPA
   fallback reads the entry page from the classpath, and static assets are
   configured for packaged applications.
@@ -469,13 +467,11 @@ Compose stores SQLite data in a named volume and configures the app to listen
 inside the container. For remote access, configure a trusted HTTPS reverse
 proxy rather than exposing the application directly to the internet.
 
-Administrator passwords must be 12–72 UTF-8 bytes. Booking and report
-endpoints require the administrator role; browser sessions use CSRF protection
-for write requests.
+Seed account passwords must be at least 12 characters. Role access: `ADMIN` manages users/resources/admin ops and can view reports (no booking mutations); `OPERATOR` can create/edit/delete any booking and view reports; `GUEST` has read-only booking visibility. Browser sessions use CSRF protection for write requests.
 
 For Vite hot-reload development, install Node.js/npm and run `npm ci` followed
 by `npm run dev` from `frontend/`, with Spring Boot running on port 8080.
-Export the same administrator environment variables before starting Spring Boot.
+Export the seed account environment variables before starting Spring Boot.
 The build writes the bundled React app to the ignored
 `src/main/resources/public/react-assets/` directory. `/rooms.html` and
 `/cars.html` remain as redirects to the shared screen.

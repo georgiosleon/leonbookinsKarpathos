@@ -16,6 +16,7 @@ import { LanguageSelector } from './LanguageSelector.jsx';
 import { FeedbackDialog } from './FeedbackDialog.jsx';
 import { HelpButton } from './HelpButton.jsx';
 import { AppSupportActions } from './AppSupportActions.jsx';
+import { useCurrentUser } from '../useCurrentUser.js';
 
 function currentMonthRange() {
   const today = new Date();
@@ -53,6 +54,9 @@ export function ReportsPage() {
   const [reportHtml, setReportHtml] = useState('');
   const { theme, toggleTheme } = useTheme();
   const { language, locale, t } = useLanguage();
+  const { currentUser, loading: userLoading } = useCurrentUser();
+  const isAdmin = currentUser?.role === 'ADMIN';
+  const canAccessReports = isAdmin || currentUser?.role === 'OPERATOR';
 
   function showError(message) {
     setError(message);
@@ -64,6 +68,11 @@ export function ReportsPage() {
   }, [language]);
 
   useEffect(() => {
+    if (userLoading) return undefined;
+    if (!canAccessReports) {
+      setLoading(false);
+      return undefined;
+    }
     let active = true;
     Promise.all([fetchBookings(), fetchResources()])
       .then(([data, resourceData]) => {
@@ -82,7 +91,7 @@ export function ReportsPage() {
     return () => {
       active = false;
     };
-  }, [t]);
+  }, [t, userLoading, canAccessReports]);
 
   const mode = useMemo(() => ({
     ...baseMode,
@@ -130,6 +139,28 @@ export function ReportsPage() {
     ? bookingPdfUrl(range.startDate, range.endDate, language, mode.id)
     : undefined;
 
+  if (userLoading) {
+    return (
+      <main className="app-shell">
+        <p className="feedback" role="status">{t('Loading booking data…')}</p>
+      </main>
+    );
+  }
+
+  if (!canAccessReports) {
+    return (
+      <main className="app-shell">
+        <header className="app-header">
+          <div>
+            <p className="eyebrow">{t('Karpathos booking planner')}</p>
+            <h1>{t('Booking reports')}</h1>
+          </div>
+        </header>
+        <p className="feedback feedback-error" role="alert">{t('You do not have permission to perform this action.')}</p>
+      </main>
+    );
+  }
+
   return (
     <main className="app-shell">
       <header className="app-header">
@@ -158,7 +189,8 @@ export function ReportsPage() {
               </svg>
               <span>{t('Reports')}</span>
             </a>
-            <a href="/?page=resources">{t('Manage rooms and cars')}</a>
+            {isAdmin && <a href="/?page=resources">{t('Manage rooms and cars')}</a>}
+            {isAdmin && <a href="/?page=users">{t('Manage users')}</a>}
           </nav>
           <span>{t(mode.title)}</span>
           <HelpButton />

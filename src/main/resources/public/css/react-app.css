@@ -46,6 +46,12 @@ textarea {
   margin-bottom: 20px;
 }
 
+.signed-in-label {
+  margin: 0 0 4px;
+  color: #53627a;
+  font-size: 0.9rem;
+}
+
 .app-support-actions {
   display: flex;
   align-items: center;

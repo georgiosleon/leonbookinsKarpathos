@@ -37,15 +37,12 @@ additional user accounts or permissions.
 
 ## Request and persistence flow
 
-1. The React screen loads bookings through the frontend API module.
-2. Spring Security authenticates the administrator session and applies CSRF
-   protection to browser writes.
-3. The REST controller validates request DTOs and delegates booking operations
-   to `BookingsService`.
-4. The service applies booking rules and calls `BookingRepository`.
-5. Spring Data JPA persists the `Booking` entity in SQLite.
-6. Report requests use the same service/data path and return report text or a
-   PDF response.
+1. The React screen loads data through the frontend API module and uses `/api/v1/users/me` for role-aware UI gating.
+2. Spring Security authenticates the session against database-backed users, enforces role-based authorization, and applies CSRF protection to browser writes.
+3. REST controllers validate request DTOs and delegate to services.
+4. Services apply booking/user rules and call repositories.
+5. Spring Data JPA persists entities in SQLite.
+6. Report requests use the same service/data path and return report text or a PDF response.
 
 The database backup/restore CLI is an offline path. `Application` dispatches
 the `db` command to `DatabaseCli` before starting Spring Boot.
@@ -147,15 +144,8 @@ the application's SQLite persistence.
 
 ## Current boundaries and growth
 
-- **Authentication and permissions:** the current backend has one configured
-  administrator account and an administrator authority. It is not yet a
-  multi-user management system with persisted users or per-user permissions.
-- **Resources:** rooms and vehicles are persisted as managed resources; the
-  existing booking `room` column stores their stable resource IDs.
-- **Database:** the application uses SQLite and does not currently have a
-  separate database migration service.
-- **Deployment:** the backend and compiled frontend are one application
-  artifact. Desktop packaging, Docker, and direct Maven execution are
-  alternative launch/deployment paths.
-- **API compatibility:** breaking external API changes should use a new major
-  version prefix instead of changing `/api/v1` behavior.
+- **Authentication and permissions:** database-backed users with roles `ADMIN`, `OPERATOR`, and `GUEST` (legacy `USER` accepted/migrated to `OPERATOR`). Admins manage users/resources/admin ops and can view reports; operators manage bookings and view reports; guests have read-only booking visibility. The system prevents removing/deactivating/deleting the last active admin or operator.
+- **Resources:** rooms and vehicles are persisted as managed resources; the existing booking `room` column stores their stable resource IDs.
+- **Database:** SQLite with JPA `ddl-auto=update` and `DatabaseInitializer` bootstrap/migration logic. Adopt versioned migrations before schema-altering changes.
+- **Deployment:** the backend and compiled frontend are one application artifact. Desktop packaging, Docker, and direct Maven execution are alternative launch/deployment paths.
+- **API compatibility:** breaking external API changes should use a new major version prefix instead of changing `/api/v1` behavior.

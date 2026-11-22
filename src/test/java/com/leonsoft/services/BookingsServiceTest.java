@@ -4,23 +4,30 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.leonsoft.models.Booking;
 import com.leonsoft.models.BookingResource;
+import com.leonsoft.models.User;
 import com.leonsoft.repositories.BookingRepository;
+import com.leonsoft.repositories.UserRepository;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.authority.AuthorityUtils;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(MockitoExtension.class)
@@ -32,12 +39,29 @@ class BookingsServiceTest {
     @Mock
     private BookingResourceService resourceService;
 
+    @Mock
+    private UserRepository userRepository;
+
     private BookingsService bookingsService;
 
     @BeforeEach
     void setUp() {
         bookingsService = new BookingsService(
-              bookingRepository, resourceService, new BookingAvailabilityPolicy(true, true));
+              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(true, true));
+        User admin = new User();
+        admin.setId(1);
+        admin.setUsername("admin");
+        admin.setRole("ADMIN");
+        admin.setActive(true);
+        lenient().when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+        SecurityContextHolder.getContext().setAuthentication(
+              new UsernamePasswordAuthenticationToken("admin", "n/a",
+                    AuthorityUtils.createAuthorityList("ROLE_ADMIN")));
+    }
+
+    @AfterEach
+    void clearSecurityContext() {
+        SecurityContextHolder.clearContext();
     }
 
     @Test
@@ -69,6 +93,26 @@ class BookingsServiceTest {
 
     @Test
     void updateKeepsOriginalRequestTimestamp() {
+        User user = new User();
+        user.setId(2);
+        user.setUsername("user");
+        user.setRole("OPERATOR");
+        user.setActive(true);
+        when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("user", "n/a",
+                        AuthorityUtils.createAuthorityList("ROLE_OPERATOR")));
+
+        User regular = new User();
+        regular.setId(2);
+        regular.setUsername("user");
+        regular.setRole("OPERATOR");
+        regular.setActive(true);
+        when(userRepository.findByUsername("user")).thenReturn(Optional.of(regular));
+        SecurityContextHolder.getContext().setAuthentication(
+              new UsernamePasswordAuthenticationToken("user", "n/a",
+                    AuthorityUtils.createAuthorityList("ROLE_OPERATOR")));
+
         LocalDateTime createdAt = LocalDateTime.of(2026, 1, 2, 3, 4);
         Booking existing = new Booking();
         existing.setRequestDateTime(createdAt);
@@ -101,6 +145,26 @@ class BookingsServiceTest {
 
     @Test
     void legacyDeleteOnlyRemovesCancelledBookings() {
+        User user = new User();
+        user.setId(2);
+        user.setUsername("user");
+        user.setRole("OPERATOR");
+        user.setActive(true);
+        when(userRepository.findByUsername("user")).thenReturn(Optional.of(user));
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken("user", "n/a",
+                        AuthorityUtils.createAuthorityList("ROLE_OPERATOR")));
+
+        User regular = new User();
+        regular.setId(2);
+        regular.setUsername("user");
+        regular.setRole("OPERATOR");
+        regular.setActive(true);
+        when(userRepository.findByUsername("user")).thenReturn(Optional.of(regular));
+        SecurityContextHolder.getContext().setAuthentication(
+              new UsernamePasswordAuthenticationToken("user", "n/a",
+                    AuthorityUtils.createAuthorityList("ROLE_OPERATOR")));
+
         Booking cancelled = savedBooking("cancelled-1", "2026-06-20", "2026-06-23", "cancelled");
         when(bookingRepository.findById("cancelled-1")).thenReturn(Optional.of(cancelled));
 
@@ -166,7 +230,7 @@ class BookingsServiceTest {
     @Test
     void roomFlagCanAllowOverlapsWithoutDisablingVehicleProtection() {
         bookingsService = new BookingsService(
-              bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true));
+              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(false, true));
         when(resourceService.requireActive("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -177,7 +241,7 @@ class BookingsServiceTest {
               .findByRoomAndStatusIn("APT2", List.of("active", "paid"));
 
         bookingsService = new BookingsService(
-              bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true));
+              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(false, true));
         Booking existingVehicleBooking = savedBooking("vehicle-existing", "2026-06-20", "2026-06-23", "paid");
         existingVehicleBooking.setRoom("CAR1");
         when(resourceService.requireActive("CAR1"))
@@ -217,6 +281,98 @@ class BookingsServiceTest {
         assertEquals("23/11/2026", bookings.get(0).getEndDate());
         assertEquals("24/11/2026", bookings.get(1).getStartDate());
         assertEquals("27/11/2026", bookings.get(1).getEndDate());
+    }
+
+    @Test
+    void getAllForAuthenticatedUsersReturnsAllBookings() {
+        User regular = new User();
+        regular.setId(2);
+        regular.setUsername("user");
+        regular.setRole("OPERATOR");
+        regular.setActive(true);
+        when(userRepository.findByUsername("user")).thenReturn(Optional.of(regular));
+        SecurityContextHolder.getContext().setAuthentication(
+              new UsernamePasswordAuthenticationToken("user", "n/a",
+                    AuthorityUtils.createAuthorityList("ROLE_OPERATOR")));
+
+        Booking own = savedBooking("own", "2026-06-20", "2026-06-23", "active");
+        own.setUser(regular);
+        Booking other = savedBooking("other", "2026-06-24", "2026-06-26", "active");
+        when(bookingRepository.findAllByOrderByStartDateAsc()).thenReturn(List.of(own, other));
+        when(resourceService.namesById()).thenReturn(Map.of());
+
+        List<Booking> bookings = bookingsService.getAll();
+
+        assertEquals(2, bookings.size());
+        verify(bookingRepository).findAllByOrderByStartDateAsc();
+        verify(bookingRepository, never()).findByUserIdOrderByStartDateAsc(2);
+    }
+
+    @Test
+    void userCanUpdateAnyBooking() {
+        User regular = new User();
+        regular.setId(2);
+        regular.setUsername("user");
+        regular.setRole("OPERATOR");
+        regular.setActive(true);
+        when(userRepository.findByUsername("user")).thenReturn(Optional.of(regular));
+        SecurityContextHolder.getContext().setAuthentication(
+              new UsernamePasswordAuthenticationToken("user", "n/a",
+                    AuthorityUtils.createAuthorityList("ROLE_OPERATOR")));
+
+        Booking existing = savedBooking("booking-1", "2026-06-20", "2026-06-23", "active");
+        existing.setUser(new User());
+        when(bookingRepository.findById("booking-1")).thenReturn(Optional.of(existing));
+        when(resourceService.requireActive("APT2"))
+              .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Booking update = booking("21/06/2026", "23/06/2026");
+        update.setId("booking-1");
+
+        Booking result = bookingsService.update(update);
+
+        assertEquals("21/06/2026", result.getStartDate());
+        verify(bookingRepository).save(any(Booking.class));
+    }
+
+    @Test
+    void adminCannotUpdateBookings() {
+        Booking existing = savedBooking("booking-1", "2026-06-20", "2026-06-23", "active");
+        when(bookingRepository.findById("booking-1")).thenReturn(Optional.of(existing));
+
+        Booking update = booking("21/06/2026", "23/06/2026");
+        update.setId("booking-1");
+
+        ResponseStatusException exception = assertThrows(
+              ResponseStatusException.class, () -> bookingsService.update(update));
+
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
+        verify(bookingRepository, never()).save(any(Booking.class));
+    }
+
+    @Test
+    void guestCannotDeleteBookings() {
+        User guest = new User();
+        guest.setId(3);
+        guest.setUsername("guest");
+        guest.setRole("GUEST");
+        guest.setActive(true);
+        when(userRepository.findByUsername("guest")).thenReturn(Optional.of(guest));
+        SecurityContextHolder.getContext().setAuthentication(
+              new UsernamePasswordAuthenticationToken("guest", "n/a",
+                    AuthorityUtils.createAuthorityList("ROLE_GUEST")));
+
+        Booking existing = savedBooking("booking-1", "2026-06-20", "2026-06-23", "active");
+        when(bookingRepository.existsById("booking-1")).thenReturn(true);
+        when(bookingRepository.existsById("booking-1")).thenReturn(true);
+        when(bookingRepository.findById("booking-1")).thenReturn(Optional.of(existing));
+
+        ResponseStatusException exception = assertThrows(
+              ResponseStatusException.class, () -> bookingsService.deleteObject("booking-1"));
+
+        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
+        verify(bookingRepository, never()).deleteById("booking-1");
     }
 
     private static Booking booking(String startDate, String endDate) {

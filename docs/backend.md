@@ -36,13 +36,10 @@ Direct runs using the `prod` profile bind to `127.0.0.1` by default. Set
 the application with a trusted HTTPS proxy or trusted-network firewall because
 the application does not provide TLS itself.
 
-The SQL initializer remains enabled in both profiles. `schema.sql` creates
-the `Booking` and `booking_resources` tables only if absent, and seeds legacy
-resource IDs idempotently; it does not overwrite existing booking data.
-The desktop launcher selects `bookings.db` from its current working directory;
-only when that file is absent does it request `demo-data.sql` for one sample
-booking. This is the current bootstrap approach; adopt versioned Liquibase
-migrations before making future schema changes that alter existing tables.
+Schema initialization is currently handled by JPA `ddl-auto=update` and
+`DatabaseInitializer` seed logic. SQL init scripts are not the primary bootstrap
+path; adopt versioned Liquibase migrations before making future schema changes
+that alter existing tables.
 
 ## Layers
 
@@ -62,21 +59,26 @@ avoid exposing persistence details as new API contracts.
 ## HTTP API
 
 The frontend uses `/api/v1`; `/booking/...` and `/csrf` aliases are retained
-for compatibility. The main routes include:
+for compatibility. Access is deny-by-default; endpoints below require authentication unless noted.
 
-| Method | Route | Purpose |
-|---|---|---|
-| `GET` | `/api/v1/booking/getAll` | List bookings. |
-| `POST` | `/api/v1/booking/save` | Create a booking from a validated JSON request. |
-| `PUT` | `/api/v1/booking/update` | Update a booking from a validated JSON request. |
-| `POST` | `/api/v1/booking/delete` | Delete a booking by ID. |
-| `POST` | `/api/v1/booking/del?bid=...` | Delete a cancelled booking only (legacy route; CSRF token required). |
-| `GET` | `/api/v1/booking/report` | Generate a localized detailed report response. |
-| `GET` | `/api/v1/booking/export/pdf` | Download the filtered room or vehicle report, summary, and resource breakdown as PDF. |
-| `GET` | `/api/v1/settings/availability` | Read room and vehicle overlap rules. |
-| `GET` | `/api/v1/csrf` | Obtain the CSRF token for browser writes. |
-| `GET` | `/api/v1/resources` | List managed rooms and vehicles. |
-| `POST` | `/api/v1/resources` | Add a room or vehicle using a JSON `type` and `name`. |
+| Method | Route | Access | Purpose |
+|---|---|---|---|
+| `GET` | `/api/v1/booking/getAll` | ADMIN, OPERATOR, GUEST | List bookings (all authenticated roles see all bookings). |
+| `POST` | `/api/v1/booking/save` | OPERATOR | Create a booking. |
+| `PUT` | `/api/v1/booking/update` | OPERATOR | Update any booking. |
+| `POST` | `/api/v1/booking/delete` | OPERATOR | Delete a booking by ID. |
+| `POST` | `/api/v1/booking/del?bid=...` | OPERATOR | Delete a cancelled booking only (legacy route; CSRF required). |
+| `GET` | `/api/v1/booking/report` | ADMIN, OPERATOR | Generate a localized detailed report response. |
+| `GET` | `/api/v1/booking/export/pdf` | ADMIN, OPERATOR | Download filtered PDF report. |
+| `GET` | `/api/v1/settings/availability` | ADMIN, OPERATOR, GUEST | Read room/vehicle overlap rules. |
+| `GET` | `/api/v1/resources` | ADMIN, OPERATOR, GUEST | List managed rooms and vehicles. |
+| `POST` | `/api/v1/resources` | ADMIN | Add a room or vehicle. |
+| `GET` | `/api/v1/users/me` | Authenticated | Current user identity/role for UI gating. |
+| `GET/POST` | `/api/v1/users` | ADMIN | List/create users. |
+| `GET/PUT/DELETE` | `/api/v1/users/{id}` | ADMIN | Get/update/delete user. |
+| `GET` | `/api/v1/app-info` | ADMIN | Application info. |
+| `GET` | `/api/v1/diagnostics` | ADMIN | Diagnostics download. |
+| `GET` | `/api/v1/csrf` | Authenticated | Obtain CSRF token for browser writes. |
 
 Report requests accept `fromDate` and `toDate` in `dd/MM/yyyy` format and an
 optional `lang` language code. PDF requests also require `type=rooms` or
@@ -86,17 +88,27 @@ major prefix (for example `/api/v2`).
 
 ## Security
 
-The current configuration uses one administrator identity supplied through
-`APP_ADMIN_USERNAME` and `APP_ADMIN_PASSWORD`, with administrator-only booking
-and report access. Browser sessions use CSRF protection for state-changing
-requests. This is not yet a persisted user directory, invitation flow, or
-configurable per-user permission system.
+Authentication uses database-backed users in the `users` table with roles
+`ADMIN`, `OPERATOR`, and `GUEST` (legacy `USER` is accepted/migrated to
+`OPERATOR`). Spring Security enforces role-based access and CSRF protection for
+browser state-changing requests.
 
-Do not put credentials in frontend source or commit real secrets. Development
-and desktop runs bind to loopback by default; Docker Compose also publishes
-the host port on loopback. LAN access is an explicit opt-in documented above.
-Do not expose the app directly to the internet; use a trusted HTTPS proxy for
-remote access.
+Default seed accounts are created only when missing, using `APP_ADMIN_*`,
+`APP_OPERATOR_*` (or legacy `APP_USER_*`), and `APP_GUEST_*` environment
+variables. Seed passwords must be at least 12 characters; built-in `change-me-*`
+defaults are rejected in production.
+
+Role matrix:
+
+| Role | Bookings | Reports/export | Users | Resources/admin ops |
+|---|---|---:|---:|---:|
+| `ADMIN` | View all, read-only | Yes | Manage | Yes |
+| `OPERATOR` | View/create/edit/delete any | Yes | No | No |
+| `GUEST` | View all, read-only | No | No | No |
+
+The system prevents removing, deactivating, or deleting the last active admin or
+operator account. Do not commit real secrets. LAN/internet exposure requires
+trusted-network controls and HTTPS proxying; the app does not provide TLS.
 
 ## Persistence and reports
 
@@ -106,16 +118,15 @@ the launch mode and configuration; use `APP_DB_URL` to select a JDBC URL when
 running locally.
 
 `BookingResource` and `BookingResourceRepository` manage the room/car catalog
-in the `booking_resources` table. `schema.sql` creates both tables idempotently
-and seeds the resource IDs already used by existing bookings; existing booking
-rows remain unchanged. A booking continues to store the resource ID in its
-existing `room` column.
+in the `booking_resources` table. `User` and `UserRepository` manage
+database-backed user accounts. A booking continues to store the resource ID in
+its existing `room` column.
 
-Database initialization is currently idempotent SQL, not a versioned migration
-system. It creates missing tables and catalog entries, but does not alter
-existing table columns. Back up existing customer databases before upgrading
-and test releases against copies; Liquibase or another migration system is a
-separate future decision.
+Database initialization currently uses JPA `ddl-auto=update` and
+`DatabaseInitializer` for idempotent seed/migration logic (default accounts and
+legacy role normalization). This is not a versioned migration system. Back up
+existing customer databases before upgrading and test releases against copies;
+adopt Liquibase/Flyway before schema-altering changes.
 
 For LAN use, clients connect to the host running the app; the SQLite database
 stays on that host. Do not point multiple application instances at the same
