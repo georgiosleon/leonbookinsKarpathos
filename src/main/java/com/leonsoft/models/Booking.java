@@ -1,24 +1,23 @@
 package com.leonsoft.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Transient;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import lombok.NoArgsConstructor;
+import java.util.Collection;
+import java.util.List;
 
 @Getter
 @Setter
-@ToString
+@ToString(exclude = {"user"})
 @NoArgsConstructor
 @Entity
 @Data
-@EqualsAndHashCode
+@EqualsAndHashCode(callSuper = false)
 
 public class Booking {
 
@@ -26,6 +25,9 @@ public class Booking {
     @Column(name = "id")
     private String id;
 
+    @ManyToOne
+    @JoinColumn(name = "user_id", nullable = true)
+    private User user;
 
     @Column(name = "start_date")
     private String startDate; // "2023-03-06",   iso format  for saving  and EU for frontend  dd/MM/yyyy  06/03/2023
@@ -96,6 +98,5 @@ public class Booking {
 
     @Column(name = "request_DateTime")
     private LocalDateTime   requestDateTime;
-
 
 }
