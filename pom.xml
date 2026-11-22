@@ -1,25 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+<!-- @formatter:off -->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.5.16</version>
+        <version>4.1.2</version>
 
         <relativePath/>
     </parent>
+
     <groupId>leonbookinsKarpathos.dev</groupId>
     <artifactId>leonbookinsKarpathos</artifactId>
     <version>1.0.0</version>
     <name>leonbookinsKarpathos</name>
+
     <description>Leon Soft</description>
+
+
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>25</java.version>
         <start-class>com.leonsoft.Application</start-class>
         <openpdf.version>1.3.33</openpdf.version>
         <lombok.version>1.18.42</lombok.version>
+
+        <!-- Add this line to prevent "Could not find or load main class @{argLine}" -->
+        <argLine> </argLine>  <!-- important with single space as value ok -->
+
     </properties>
     <dependencies>
 
@@ -28,14 +39,10 @@
             <artifactId>openpdf</artifactId>
             <version>${openpdf.version}</version>
         </dependency>
-
-
-
-
-<!--        <dependency>-->
-<!--            <groupId>org.springframework.boot</groupId>-->
-<!--            <artifactId>spring-boot-starter-actuator</artifactId>-->
-<!--        </dependency>-->
+        <!--    for devs     <dependency> -->
+        <!--            <groupId>org.springframework.boot</groupId>-->
+        <!--            <artifactId>spring-boot-starter-actuator</artifactId>-->
+        <!--        </dependency>-->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -61,12 +68,20 @@
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
         </dependency>
-
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-webmvc-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
         <dependency>
             <groupId>org.hibernate.orm</groupId>
             <artifactId>hibernate-community-dialects</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
@@ -77,10 +92,30 @@
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
         </dependency>
-
     </dependencies>
+
+
     <build>
         <plugins>
+
+
+            <!--
+            command plugins here   like maven - *** plugins
+            -->
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>properties</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -94,6 +129,35 @@
                     </annotationProcessorPaths>
                 </configuration>
             </plugin>
+
+            <!--
+            Bake It Into Your Executable JAR (pom.xml) : Configure maven-jar-plugin (which spring-boot-maven-plugin inherits manifest entries from when repackaging) to add Enable-Native-Access: ALL-UNNAMED:
+            -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Enable-Native-Access>ALL-UNNAMED</Enable-Native-Access>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <!--suppress UnresolvedMavenProperty -->
+                    <argLine>@{argLine} -Xshare:off --enable-native-access=ALL-UNNAMED -javaagent:${org.mockito:mockito-core:jar}</argLine>
+                </configuration>
+            </plugin>
+
+
+            <!--
+            Front end plugins here
+            -->
             <plugin>
                 <groupId>com.github.eirslett</groupId>
                 <artifactId>frontend-maven-plugin</artifactId>
@@ -134,9 +198,20 @@
                     </execution>
                 </executions>
             </plugin>
+
+
+
+
+            <!--
+            Backend plugins   downhere
+            Manifest attributes only apply when launching via java -jar. If you also run your app locally using mvn spring-boot:run, add <jvmArguments> to your existing spring-boot-maven-plugin in pom.xml:
+            -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <jvmArguments>--enable-native-access=ALL-UNNAMED</jvmArguments>
+                </configuration>
                 <executions>
                     <execution>
                         <goals>
@@ -145,8 +220,10 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
     </build>
 
-
 </project>
+
+<!-- @formatter:on -->
