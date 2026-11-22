@@ -73,7 +73,7 @@ class BookingSecurityTest {
     }
 
     @Test
-    void applicationSupportEndpointsRequireAdminRole() throws Exception {
+    void applicationSupportEndpointsAllowVersionForAuthenticatedUsersButDiagnosticsAdminOnly() throws Exception {
         when(applicationSupportService.appInfo())
                 .thenReturn(new ApplicationSupportService.AppInfo("1.0.0", "standalone"));
 
@@ -81,7 +81,12 @@ class BookingSecurityTest {
                 .andExpect(status().isUnauthorized());
 
         mockMvc.perform(get("/api/v1/app-info").with(user("operator").roles("OPERATOR")))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value("1.0.0"));
+
+        mockMvc.perform(get("/api/v1/app-info").with(user("guest").roles("GUEST")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.version").value("1.0.0"));
 
         mockMvc.perform(get("/api/v1/app-info").with(user("test-admin").roles("ADMIN")))
                 .andExpect(status().isOk())

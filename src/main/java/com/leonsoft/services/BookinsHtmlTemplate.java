@@ -71,8 +71,8 @@ public class BookinsHtmlTemplate {
 
 
             ////// pre processing
-            LocalDate stDt = LocalDate.parse(booking.getStartDate(), BookingsUtils.formatterISO);
-            LocalDate edDt = LocalDate.parse(booking.getEndDate(), BookingsUtils.formatterISO);
+            LocalDate stDt = BookingsUtils.parseStoredDate(booking.getStartDate());
+            LocalDate edDt = BookingsUtils.parseStoredDate(booking.getEndDate());
 
             String statusClass = Objects.equals(booking.getStatus(), "cancelled")
                   ? " class=\"cancelled-status\""

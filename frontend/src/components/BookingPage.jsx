@@ -300,7 +300,7 @@ export function BookingPage() {
         </div>
         {me && (
           <p className="signed-in-label">
-            {t('Signed in as {username}', { username: me.username })}
+            {t('Signed in as {username}', { username: `${me.username} (${me.role})` })}
           </p>
         )}
         <div className="header-meta">
