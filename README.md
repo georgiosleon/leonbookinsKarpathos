@@ -264,6 +264,11 @@ The frontend uses the major-versioned `/api/v1` routes, such as
 `/api/v1/booking/getAll` and `/api/v1/csrf`. Breaking API changes should use a
 new major prefix, such as `/api/v2`, rather than changing v1 behavior.
 
+## Releases
+
+Release tags use the `v<major>.<minor>.<patch>` format and trigger the desktop
+installer workflow.
+
 ## Developer documentation
 
 The [`docs/`](docs/README.md) folder describes the system architecture,
