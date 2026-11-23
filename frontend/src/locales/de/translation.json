@@ -209,7 +209,6 @@
   "active/paid": "aktiv/bezahlt",
   "{count} active/paid bookings": "{count} aktive/bezahlte Buchungen",
   "Excluded from financial totals": "Von den Finanzsummen ausgeschlossen",
-  "Charge less received and commission": "Betrag abzüglich Erhaltenem und Provision",
   "By {resource}": "Nach {resource}",
   "Cancelled bookings are excluded from occupancy and financial totals.": "Stornierte Buchungen werden bei Auslastung und Finanzsummen nicht berücksichtigt.",
   "{resource} summary table": "Übersichtstabelle: {resource}",
@@ -252,5 +251,8 @@
   "Could not delete user: {error}": "Benutzer konnte nicht gelöscht werden: {error}",
   "Are you sure you want to delete {username}?": "Möchten Sie den Benutzer {username} wirklich löschen?",
   "New password (leave blank to keep)": "Neues Passwort (leer lassen, um es beizubehalten)",
-  "Signed in as {username}": "Angemeldet als {username}"
+  "Signed in as {username}": "Angemeldet als {username}",
+  "Rental tax (€)": "Mietsteuer (€)",
+  "Rental tax per night (€)": "Mietsteuer pro Nacht (€)",
+  "Charge less received, commission, and rental tax": "Gebühr abzüglich erhaltenem Betrag, Provision und Mietsteuer"
 }

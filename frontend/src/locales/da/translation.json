@@ -209,7 +209,6 @@
   "active/paid": "aktive/betalte",
   "{count} active/paid bookings": "{count} aktive/betalte bookinger",
   "Excluded from financial totals": "Udeladt fra økonomiske totaler",
-  "Charge less received and commission": "Beløb minus modtaget og provision",
   "By {resource}": "Efter {resource}",
   "Cancelled bookings are excluded from occupancy and financial totals.": "Annullerede bookinger indgår ikke i belægnings- og økonomiske totaler.",
   "{resource} summary table": "Oversigtstabel for {resource}",
@@ -252,5 +251,8 @@
   "Could not delete user: {error}": "Bruger kunne ikke slettes: {error}",
   "Are you sure you want to delete {username}?": "Er du sikker på, at du vil slette {username}?",
   "New password (leave blank to keep)": "Ny adgangskode (lad stå tom for at beholde)",
-  "Signed in as {username}": "Logget ind som {username}"
+  "Signed in as {username}": "Logget ind som {username}",
+  "Rental tax (€)": "Lejeskat (€)",
+  "Rental tax per night (€)": "Lejeskat pr. nat (€)",
+  "Charge less received, commission, and rental tax": "Gebyr minus modtaget, provision og lejeskat"
 }

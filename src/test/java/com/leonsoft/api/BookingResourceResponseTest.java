@@ -11,6 +11,7 @@ class BookingResourceResponseTest {
     @Test
     void fromMapsResourceFields() {
         BookingResource resource = new BookingResource("r1", "rooms", "APT 2");
+        resource.setRentalTaxPerNight(new java.math.BigDecimal("1.50"));
 
         BookingResourceResponse response = BookingResourceResponse.from(resource);
 
@@ -18,5 +19,6 @@ class BookingResourceResponseTest {
         assertEquals("rooms", response.type());
         assertEquals("APT 2", response.name());
         assertTrue(response.active());
+        assertEquals(new java.math.BigDecimal("1.50"), response.rentalTaxPerNight());
     }
 }

@@ -30,7 +30,7 @@ class BookingResourceServiceTest {
 
     @Test
     void createsNamedResourceWithGeneratedId() {
-        BookingResourceRequest request = new BookingResourceRequest("rooms", "  Suite 1  ");
+        BookingResourceRequest request = new BookingResourceRequest("rooms", "  Suite 1  ", new java.math.BigDecimal("2.50"));
         when(resourceRepository.save(any(BookingResource.class)))
               .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -38,6 +38,7 @@ class BookingResourceServiceTest {
 
         assertEquals("rooms", result.getType());
         assertEquals("Suite 1", result.getName());
+        assertEquals(new java.math.BigDecimal("2.50"), result.getRentalTaxPerNight());
         assertNotNull(result.getId());
         verify(resourceRepository).save(any(BookingResource.class));
     }
@@ -48,7 +49,7 @@ class BookingResourceServiceTest {
 
         ResponseStatusException exception = assertThrows(
               ResponseStatusException.class,
-              () -> resourceService.create(new BookingResourceRequest("cars", "Car 1")));
+              () -> resourceService.create(new BookingResourceRequest("cars", "Car 1", java.math.BigDecimal.ZERO)));
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
     }

@@ -112,8 +112,11 @@ public class BookingsService {
         booking.setCharge(BookingsUtils.normalizeMoney(booking.getCharge()));
         booking.setCommission(BookingsUtils.normalizeMoney(booking.getCommission()));
         booking.setReceived(BookingsUtils.normalizeMoney(booking.getReceived()));
+        java.math.BigDecimal rentalTax = BookingsUtils.normalizeMoney(resource.getRentalTaxPerNight())
+                .multiply(java.math.BigDecimal.valueOf(booking.getNumOfNights()));
+        booking.setRentalTax(BookingsUtils.normalizeMoney(rentalTax));
         booking.setBalance(BookingsUtils.calculateBalance(
-                booking.getCharge(), booking.getReceived(), booking.getCommission()));
+                booking.getCharge(), booking.getReceived(), booking.getCommission(), booking.getRentalTax()));
 
         booking = bookingRepository.save(booking);
         booking.setResourceName(resource.getName());

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { guestCounts } from '../bookingConfig.js';
 import countries from '../countries.json';
 import { nightsBetween } from '../bookingLogic.js';
@@ -29,6 +29,27 @@ export function BookingForm({
   const nights = nightsBetween(form.startDate, form.endDate);
   const { locale, t } = useLanguage();
   const readOnly = !canManage;
+  const selectedResource = mode.resources.find((resource) => resource.id === form.resourceId);
+  const computedRentalTax = Math.max(0, nights) * (Number(selectedResource?.rentalTaxPerNight) || 0);
+  const prevCalcKey = useRef(null);
+
+  useEffect(() => {
+    const key = `${form.resourceId}|${form.startDate}|${form.endDate}|${selectedResource?.rentalTaxPerNight ?? 0}`;
+    if (prevCalcKey.current === null) {
+      prevCalcKey.current = key;
+      if (form.rentalTax === '' || form.rentalTax == null) {
+        onChange({ ...form, rentalTax: String(computedRentalTax) });
+      }
+      return;
+    }
+    if (prevCalcKey.current !== key) {
+      prevCalcKey.current = key;
+      const next = String(computedRentalTax);
+      if (String(form.rentalTax ?? '') !== next) {
+        onChange({ ...form, rentalTax: next });
+      }
+    }
+  }, [computedRentalTax, form, onChange, selectedResource?.rentalTaxPerNight]);
 
   function update(name, value) {
     onChange({ ...form, [name]: value });
@@ -186,13 +207,22 @@ export function BookingForm({
         </label>
 
         <label className="field">
+          <span>{t('Rental tax (€)')}</span>
+          <input
+            readOnly
+            value={formatMoney(Number(form.rentalTax) || 0, locale)}
+          />
+        </label>
+
+        <label className="field">
           <span>{t('Balance (€)')}</span>
           <input
             readOnly
             value={formatMoney((
               (Number(form.charge) || 0) -
               (Number(form.received) || 0) -
-              (Number(form.commission) || 0)
+              (Number(form.commission) || 0) -
+              (Number(form.rentalTax) || 0)
             ), locale)}
           />
         </label>

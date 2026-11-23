@@ -62,6 +62,7 @@ function emptyForm() {
     charge: '',
     commission: '',
     received: '',
+    rentalTax: '',
     status: 'active',
     identification: '',
     afm: '',
@@ -268,7 +269,7 @@ export function BookingPage() {
     }
   }
 
-  const balance = calculateBalance(form.charge, form.received, form.commission);
+  const balance = calculateBalance(form.charge, form.received, form.commission, form.rentalTax);
   const mode = useMemo(() => ({
     ...baseMode,
     resources: resourcesForMode(resources, baseMode),

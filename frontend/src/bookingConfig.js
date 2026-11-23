@@ -53,6 +53,7 @@ export function resourcesForMode(resources, mode) {
       id: resource.id,
       text: resource.name,
       active: resource.active,
+      rentalTaxPerNight: resource.rentalTaxPerNight ?? 0,
     }));
 }
 

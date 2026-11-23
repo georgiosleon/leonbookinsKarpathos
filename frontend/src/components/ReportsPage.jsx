@@ -251,7 +251,8 @@ export function ReportsPage() {
             <SummaryCard label={t('Nights')} value={summary.nights} detail={t('Active and paid bookings')} />
             <SummaryCard label={t('Charge')} value={formatMoney(summary.charge, locale)} detail={t('Active and paid bookings')} />
             <SummaryCard label={t('Received')} value={formatMoney(summary.received, locale)} detail={t('Active and paid bookings')} />
-            <SummaryCard label={t('Balance')} value={formatMoney(summary.balance, locale)} detail={t('Charge less received and commission')} />
+            <SummaryCard label={t('Rental tax (€)')} value={formatMoney(summary.rentalTax, locale)} detail={t('Active and paid bookings')} />
+            <SummaryCard label={t('Balance')} value={formatMoney(summary.balance, locale)} detail={t('Charge less received, commission, and rental tax')} />
           </section>
 
           <section className="panel" aria-labelledby="resource-report-heading">
@@ -271,6 +272,7 @@ export function ReportsPage() {
                     <th>{t('Nights')}</th>
                     <th>{t('Charge')}</th>
                     <th>{t('Received')}</th>
+                    <th>{t('Rental tax (€)')}</th>
                     <th>{t('Balance')}</th>
                   </tr>
                 </thead>
@@ -283,6 +285,7 @@ export function ReportsPage() {
                       <td>{resource.nights}</td>
                       <td>{formatMoney(resource.charge, locale)}</td>
                       <td>{formatMoney(resource.received, locale)}</td>
+                      <td>{formatMoney(resource.rentalTax, locale)}</td>
                       <td>{formatMoney(resource.balance, locale)}</td>
                     </tr>
                   ))}
@@ -314,6 +317,7 @@ export function ReportsPage() {
                     <th>{t('Nights')}</th>
                     <th>{t('Charge')}</th>
                     <th>{t('Received')}</th>
+                    <th>{t('Rental tax (€)')}</th>
                     <th>{t('Balance')}</th>
                   </tr>
                 </thead>
@@ -330,12 +334,13 @@ export function ReportsPage() {
                       <td>{booking.numOfNights ?? 0}</td>
                       <td>{formatMoney(Number(booking.charge) || 0, locale)}</td>
                       <td>{formatMoney(Number(booking.received) || 0, locale)}</td>
+                      <td>{formatMoney(Number(booking.rentalTax) || 0, locale)}</td>
                       <td>{formatMoney(Number(booking.balance) || 0, locale)}</td>
                     </tr>
                   ))}
                   {filteredBookings.length === 0 && (
                     <tr>
-                      <td colSpan="11" className="report-empty-row">{t('No bookings start in this period.')}</td>
+                      <td colSpan="12" className="report-empty-row">{t('No bookings start in this period.')}</td>
                     </tr>
                   )}
                 </tbody>

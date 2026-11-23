@@ -29,7 +29,7 @@ import java.util.function.Function;
 public class BookingsPDFExporter {
     private static final List<String> BOOKING_HEADERS = List.of(
             "status", "arrival", "departure", "resource", "name", "agency",
-            "guests", "nights", "charge", "received", "balance");
+            "guests", "nights", "charge", "received", "rentalTax", "balance");
 
     private final List<BookingReportView> bookings;
     private final List<BookingResource> resources;
@@ -86,15 +86,16 @@ public class BookingsPDFExporter {
         int guests = sumInt(bookable, BookingReportView::numOfGuests);
         int nights = sumInt(bookable, BookingReportView::numOfNights);
 
-        PdfPTable summary = new PdfPTable(7);
+        PdfPTable summary = new PdfPTable(8);
         summary.setWidthPercentage(100);
-        summary.setWidths(new float[] {13, 13, 13, 13, 16, 16, 16});
+        summary.setWidths(new float[] {12, 12, 10, 10, 14, 14, 14, 14});
         addSummaryCell(summary, text("bookings"), String.valueOf(bookings.size()));
         addSummaryCell(summary, text("cancelledBookings"), String.valueOf(cancelled));
         addSummaryCell(summary, text("guests"), String.valueOf(guests));
         addSummaryCell(summary, text("nights"), String.valueOf(nights));
         addSummaryCell(summary, text("charge"), formatMoney(sum(bookable, BookingReportView::charge)));
         addSummaryCell(summary, text("received"), formatMoney(sum(bookable, BookingReportView::received)));
+        addSummaryCell(summary, text("rentalTax"), formatMoney(sum(bookable, BookingReportView::rentalTax)));
         addSummaryCell(summary, text("balance"), formatMoney(sum(bookable, BookingReportView::balance)));
         document.add(summary);
 
@@ -110,12 +111,12 @@ public class BookingsPDFExporter {
         heading.setSpacingAfter(4);
         document.add(heading);
 
-        PdfPTable table = new PdfPTable(7);
+        PdfPTable table = new PdfPTable(8);
         table.setWidthPercentage(100);
-        table.setWidths(new float[] {24, 13, 10, 10, 15, 14, 14});
+        table.setWidths(new float[] {22, 10, 9, 9, 13, 12, 12, 13});
         addHeader(table, List.of(
               text(resourceType), text("bookings"), text("guests"), text("nights"),
-              text("charge"), text("received"), text("balance")));
+              text("charge"), text("received"), text("rentalTax"), text("balance")));
 
         for (BookingResource resource : resources) {
             List<BookingReportView> rows = bookings.stream()
@@ -130,6 +131,7 @@ public class BookingsPDFExporter {
                   reportFont(8), Element.ALIGN_RIGHT);
             addCell(table, formatMoney(sum(rows, BookingReportView::charge)), reportFont(8), Element.ALIGN_RIGHT);
             addCell(table, formatMoney(sum(rows, BookingReportView::received)), reportFont(8), Element.ALIGN_RIGHT);
+            addCell(table, formatMoney(sum(rows, BookingReportView::rentalTax)), reportFont(8), Element.ALIGN_RIGHT);
             addCell(table, formatMoney(sum(rows, BookingReportView::balance)), reportFont(8), Element.ALIGN_RIGHT);
         }
         table.setHeaderRows(1);
@@ -144,7 +146,7 @@ public class BookingsPDFExporter {
 
         PdfPTable table = new PdfPTable(BOOKING_HEADERS.size());
         table.setWidthPercentage(100);
-        table.setWidths(new float[] {8, 8, 8, 10, 14, 12, 5, 5, 10, 10, 10});
+        table.setWidths(new float[] {8, 8, 8, 10, 13, 11, 5, 5, 8, 8, 8, 8});
         addHeader(table, BOOKING_HEADERS.stream()
               .map(key -> "resource".equals(key) ? text(resourceType) : text(key))
               .toList());
@@ -170,6 +172,7 @@ public class BookingsPDFExporter {
                       font, Element.ALIGN_RIGHT);
                 addCell(table, formatMoney(number(booking.charge())), font, Element.ALIGN_RIGHT);
                 addCell(table, formatMoney(number(booking.received())), font, Element.ALIGN_RIGHT);
+                addCell(table, formatMoney(number(booking.rentalTax())), font, Element.ALIGN_RIGHT);
                 addCell(table, formatMoney(number(booking.balance())), font, Element.ALIGN_RIGHT);
             }
         }

@@ -15,6 +15,7 @@ export function ResourcesPage() {
     new URLSearchParams(window.location.search).get('type') === 'cars' ? 'cars' : 'rooms',
   );
   const [name, setName] = useState('');
+  const [rentalTaxPerNight, setRentalTaxPerNight] = useState('0');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
@@ -68,11 +69,12 @@ export function ResourcesPage() {
 
     setBusy(true);
     try {
-      const resource = await createResource({ type, name: name.trim() });
+      const resource = await createResource({ type, name: name.trim(), rentalTaxPerNight: rentalTaxPerNight === '' ? 0 : Number(rentalTaxPerNight) });
       setResources((current) => [...current, resource].sort(
         (left, right) => left.type.localeCompare(right.type) || left.name.localeCompare(right.name),
       ));
       setName('');
+      setRentalTaxPerNight('0');
       setNotice(t('Resource added.'));
     } catch (requestError) {
       showError(t('Could not add resource: {error}', { error: requestError.message }));
@@ -162,6 +164,16 @@ export function ResourcesPage() {
               onChange={(event) => setName(event.target.value)}
             />
           </label>
+          <label className="field">
+            <span>{t('Rental tax per night (€)')}</span>
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              value={rentalTaxPerNight}
+              onChange={(event) => setRentalTaxPerNight(event.target.value)}
+            />
+          </label>
           <div className="form-actions">
             <button type="submit" className="button button-primary" disabled={busy}>
               {busy ? t('Saving…') : t('Add resource')}
@@ -180,6 +192,7 @@ export function ResourcesPage() {
                   <tr>
                     <th>{t('Resource type')}</th>
                     <th>{t('Resource name')}</th>
+                    <th>{t('Rental tax per night (€)')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -187,10 +200,11 @@ export function ResourcesPage() {
                     <tr key={resource.id}>
                       <td>{t(resource.type === 'rooms' ? 'Rooms' : 'Cars & bikes')}</td>
                       <td>{resource.name}</td>
+                      <td>{Number(resource.rentalTaxPerNight ?? 0).toFixed(2)}</td>
                     </tr>
                   ))}
                   {resources.length === 0 && (
-                    <tr><td colSpan="2" className="report-empty-row">{t('No resources have been added.')}</td></tr>
+                    <tr><td colSpan="3" className="report-empty-row">{t('No resources have been added.')}</td></tr>
                   )}
                 </tbody>
               </table>

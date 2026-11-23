@@ -33,10 +33,11 @@ public final class BookingsUtils {
         return value.setScale(2, RoundingMode.HALF_UP);
     }
 
-    public static BigDecimal calculateBalance(BigDecimal charge, BigDecimal received, BigDecimal commission) {
+    public static BigDecimal calculateBalance(BigDecimal charge, BigDecimal received, BigDecimal commission, BigDecimal rentalTax) {
         return normalizeMoney(charge)
                 .subtract(normalizeMoney(received))
                 .subtract(normalizeMoney(commission))
+                .subtract(normalizeMoney(rentalTax))
                 .setScale(2, RoundingMode.HALF_UP);
     }
 }

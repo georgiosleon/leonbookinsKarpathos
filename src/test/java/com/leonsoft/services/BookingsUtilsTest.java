@@ -12,7 +12,7 @@ class BookingsUtilsTest {
         assertEquals(new BigDecimal("0.00"), BookingsUtils.normalizeMoney(null));
         assertEquals(new BigDecimal("10.12"), BookingsUtils.normalizeMoney(new BigDecimal("10.123")));
         assertEquals(new BigDecimal("10.13"), BookingsUtils.normalizeMoney(new BigDecimal("10.125")));
-        assertEquals(new BigDecimal("90.01"), BookingsUtils.calculateBalance(
-                new BigDecimal("100.01"), new BigDecimal("5.00"), new BigDecimal("5.00")));
+        assertEquals(new BigDecimal("88.01"), BookingsUtils.calculateBalance(
+                new BigDecimal("100.01"), new BigDecimal("5.00"), new BigDecimal("5.00"), new BigDecimal("2.00")));
     }
 }

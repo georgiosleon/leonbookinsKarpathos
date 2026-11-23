@@ -209,7 +209,6 @@
   "active/paid": "actief/betaald",
   "{count} active/paid bookings": "{count} actieve/betaalde boekingen",
   "Excluded from financial totals": "Niet opgenomen in financiële totalen",
-  "Charge less received and commission": "Bedrag min ontvangen en commissie",
   "By {resource}": "Per {resource}",
   "Cancelled bookings are excluded from occupancy and financial totals.": "Geannuleerde boekingen tellen niet mee voor bezetting en financiële totalen.",
   "{resource} summary table": "Overzichtstabel {resource}",
@@ -252,5 +251,8 @@
   "Could not delete user: {error}": "Gebruiker kon niet worden verwijderd: {error}",
   "Are you sure you want to delete {username}?": "Weet u zeker dat u {username} wilt verwijderen?",
   "New password (leave blank to keep)": "Nieuw wachtwoord (leeg laten om te behouden)",
-  "Signed in as {username}": "Aangemeld als {username}"
+  "Signed in as {username}": "Aangemeld als {username}",
+  "Rental tax (€)": "Huurbelasting (€)",
+  "Rental tax per night (€)": "Huurbelasting per nacht (€)",
+  "Charge less received, commission, and rental tax": "Kosten minus ontvangen, commissie en huurbelasting"
 }

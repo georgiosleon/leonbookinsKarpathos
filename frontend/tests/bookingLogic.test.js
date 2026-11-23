@@ -49,7 +49,7 @@ test('converts and validates the API date format', () => {
 test('calculates nights and balance', () => {
   assert.equal(nightsBetween('2026-03-08', '2026-03-11'), 3);
   assert.equal(nightsBetween('2026-03-11', '2026-03-08'), -3);
-  assert.equal(calculateBalance('100.50', '20', '5.25'), 75.25);
+  assert.equal(calculateBalance('100.50', '20', '5.25', '2.00'), 73.25);
 });
 
 test('availability conflicts only for overlapping bookable bookings in the same resource', () => {
@@ -115,7 +115,7 @@ test('creates safe timeline labels and maps managed resources to a mode', () => 
 
   assert.match(item.content, /&lt;img src=x&gt;/);
   assert.equal(item.group, 'APT2');
-  assert.deepEqual(roomMode.resources, [{ id: 'APT2', text: 'APT 2', active: true }]);
+  assert.deepEqual(roomMode.resources, [{ id: 'APT2', text: 'APT 2', active: true, rentalTaxPerNight: 0 }]);
 });
 
 test('separates cancelled records from active and paid timeline bookings', () => {
@@ -308,6 +308,7 @@ test('summarizes active financials by resource and counts cancellations separate
   assert.equal(summary.nights, 4);
   assert.equal(summary.charge, 400);
   assert.equal(summary.received, 200);
+  assert.equal(summary.rentalTax, 0);
   assert.equal(summary.balance, 150);
   assert.deepEqual(summary.resources[0], {
     id: 'APT2',
@@ -317,6 +318,7 @@ test('summarizes active financials by resource and counts cancellations separate
     nights: 4,
     charge: 400,
     received: 200,
+    rentalTax: 0,
     balance: 150,
   });
 

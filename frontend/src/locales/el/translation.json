@@ -201,7 +201,6 @@
   "Active and paid bookings": "Ενεργές και εξοφλημένες κρατήσεις",
   "Charge": "Χρέωση",
   "Received": "Εισπράχθηκαν",
-  "Charge less received and commission": "Χρέωση μείον εισπράξεις και προμήθεια",
   "By {resource}": "Ανά {resource}",
   "Cancelled bookings are excluded from occupancy and financial totals.": "Οι ακυρωμένες κρατήσεις δεν περιλαμβάνονται στην πληρότητα και στα οικονομικά σύνολα.",
   "{resource} summary table": "Πίνακας σύνοψης {resource}",
@@ -252,5 +251,8 @@
   "Could not delete user: {error}": "Δεν ήταν δυνατή η διαγραφή χρήστη: {error}",
   "Are you sure you want to delete {username}?": "Είστε σίγουροι ότι θέλετε να διαγράψετε τον {username};",
   "New password (leave blank to keep)": "Νέος κωδικός (αφήστε κενό για να διατηρηθεί)",
-  "Signed in as {username}": "Συνδεδεμένος ως {username}"
+  "Signed in as {username}": "Συνδεδεμένος ως {username}",
+  "Rental tax (€)": "Φόρος ενοικίασης (€)",
+  "Rental tax per night (€)": "Φόρος ενοικίασης ανά διανυκτέρευση (€)",
+  "Charge less received, commission, and rental tax": "Χρέωση μείον εισπραχθέντα, προμήθεια και φόρο ενοικίασης"
 }

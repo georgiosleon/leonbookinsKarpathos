@@ -44,8 +44,12 @@ public class Booking {
     private java.math.BigDecimal commission;
 
     @Convert(converter = MoneyCentsConverter.class)
+    @Column(name = "rental_tax", columnDefinition = "integer")
+    private java.math.BigDecimal rentalTax;
+
+    @Convert(converter = MoneyCentsConverter.class)
     @Column(name = "balance", columnDefinition = "integer")
-    private java.math.BigDecimal balance;  // balance =   charge  -  ( received + commission )
+    private java.math.BigDecimal balance;  // balance = charge - (received + commission + rentalTax)
 
     @Column(name = "name")
     private String name;
