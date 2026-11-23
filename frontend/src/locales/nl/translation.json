@@ -254,5 +254,11 @@
   "Signed in as {username}": "Aangemeld als {username}",
   "Rental tax (€)": "Huurbelasting (€)",
   "Rental tax per night (€)": "Huurbelasting per nacht (€)",
-  "Charge less received, commission, and rental tax": "Kosten minus ontvangen, commissie en huurbelasting"
+  "Charge less received, commission, and rental tax": "Kosten minus ontvangen, commissie en huurbelasting",
+  "Resource updated.": "Bron bijgewerkt.",
+  "Could not update resource: {error}": "Bron kon niet worden bijgewerkt: {error}",
+  "Edit": "Bewerken",
+  "Save": "Opslaan",
+  "Yes": "Ja",
+  "No": "Nee"
 }

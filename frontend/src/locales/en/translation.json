@@ -254,5 +254,11 @@
   "Signed in as {username}": "Signed in as {username}",
   "Rental tax (€)": "Rental tax (€)",
   "Rental tax per night (€)": "Rental tax per night (€)",
-  "Charge less received, commission, and rental tax": "Charge less received, commission, and rental tax"
+  "Charge less received, commission, and rental tax": "Charge less received, commission, and rental tax",
+  "Resource updated.": "Resource updated.",
+  "Could not update resource: {error}": "Could not update resource: {error}",
+  "Edit": "Edit",
+  "Save": "Save",
+  "Yes": "Yes",
+  "No": "No"
 }

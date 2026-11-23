@@ -254,5 +254,11 @@
   "Signed in as {username}": "Angemeldet als {username}",
   "Rental tax (€)": "Mietsteuer (€)",
   "Rental tax per night (€)": "Mietsteuer pro Nacht (€)",
-  "Charge less received, commission, and rental tax": "Gebühr abzüglich erhaltenem Betrag, Provision und Mietsteuer"
+  "Charge less received, commission, and rental tax": "Gebühr abzüglich erhaltenem Betrag, Provision und Mietsteuer",
+  "Resource updated.": "Ressource aktualisiert.",
+  "Could not update resource: {error}": "Ressource konnte nicht aktualisiert werden: {error}",
+  "Edit": "Bearbeiten",
+  "Save": "Speichern",
+  "Yes": "Ja",
+  "No": "Nein"
 }

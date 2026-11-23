@@ -255,6 +255,29 @@ class BookingSecurityTest {
     }
 
     @Test
+    void adminCanUpdateResourceButOperatorCannot() throws Exception {
+        BookingResource updated = new BookingResource("r1", "rooms", "Suite 2");
+        updated.setRentalTaxPerNight(new java.math.BigDecimal("2.00"));
+        updated.setActive(true);
+        when(bookingResourceService.update(any(String.class), any(com.leonsoft.api.BookingResourceUpdateRequest.class)))
+                .thenReturn(updated);
+
+        mockMvc.perform(put("/api/v1/resources/r1")
+                        .with(user("operator").roles("OPERATOR"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Suite 2\",\"rentalTaxPerNight\":2.00,\"active\":true}"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(put("/api/v1/resources/r1")
+                        .with(user("test-admin").roles("ADMIN"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Suite 2\",\"rentalTaxPerNight\":2.00,\"active\":true}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
     void logoutWithCsrfReturnsNoContent() throws Exception {
         mockMvc.perform(post("/logout")
                         .with(user("test-admin").roles("ADMIN"))

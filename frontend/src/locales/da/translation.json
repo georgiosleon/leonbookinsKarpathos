@@ -254,5 +254,11 @@
   "Signed in as {username}": "Logget ind som {username}",
   "Rental tax (€)": "Lejeskat (€)",
   "Rental tax per night (€)": "Lejeskat pr. nat (€)",
-  "Charge less received, commission, and rental tax": "Gebyr minus modtaget, provision og lejeskat"
+  "Charge less received, commission, and rental tax": "Gebyr minus modtaget, provision og lejeskat",
+  "Resource updated.": "Ressource opdateret.",
+  "Could not update resource: {error}": "Kunne ikke opdatere ressource: {error}",
+  "Edit": "Rediger",
+  "Save": "Gem",
+  "Yes": "Ja",
+  "No": "Nej"
 }

@@ -254,5 +254,11 @@
   "Signed in as {username}": "Συνδεδεμένος ως {username}",
   "Rental tax (€)": "Φόρος ενοικίασης (€)",
   "Rental tax per night (€)": "Φόρος ενοικίασης ανά διανυκτέρευση (€)",
-  "Charge less received, commission, and rental tax": "Χρέωση μείον εισπραχθέντα, προμήθεια και φόρο ενοικίασης"
+  "Charge less received, commission, and rental tax": "Χρέωση μείον εισπραχθέντα, προμήθεια και φόρο ενοικίασης",
+  "Resource updated.": "Ο πόρος ενημερώθηκε.",
+  "Could not update resource: {error}": "Δεν ήταν δυνατή η ενημέρωση πόρου: {error}",
+  "Edit": "Επεξεργασία",
+  "Save": "Αποθήκευση",
+  "Yes": "Ναι",
+  "No": "Όχι"
 }

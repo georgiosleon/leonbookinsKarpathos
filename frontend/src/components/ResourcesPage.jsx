@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { createResource, fetchResources, logout } from '../bookingApi.js';
+import { createResource, fetchResources, logout, updateResource } from '../bookingApi.js';
 import { LanguageSelector } from './LanguageSelector.jsx';
 import { useLanguage } from '../i18n.jsx';
 import { ThemeToggle } from './ThemeToggle.jsx';
@@ -18,6 +18,8 @@ export function ResourcesPage() {
   const [rentalTaxPerNight, setRentalTaxPerNight] = useState('0');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [editingId, setEditingId] = useState(null);
+  const [draft, setDraft] = useState({ name: '', rentalTaxPerNight: '0', active: true });
   const [error, setError] = useState('');
   const [errorPopupOpen, setErrorPopupOpen] = useState(false);
   const [notice, setNotice] = useState('');
@@ -78,6 +80,47 @@ export function ResourcesPage() {
       setNotice(t('Resource added.'));
     } catch (requestError) {
       showError(t('Could not add resource: {error}', { error: requestError.message }));
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  function startEdit(resource) {
+    showError('');
+    setNotice('');
+    setEditingId(resource.id);
+    setDraft({
+      name: resource.name ?? '',
+      rentalTaxPerNight: resource.rentalTaxPerNight == null ? '0' : String(resource.rentalTaxPerNight),
+      active: resource.active !== false,
+    });
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+  }
+
+  async function handleSaveEdit(resource) {
+    showError('');
+    setNotice('');
+    if (!draft.name.trim()) {
+      showError(t('Enter a resource name.'));
+      return;
+    }
+    setBusy(true);
+    try {
+      const updated = await updateResource(resource.id, {
+        name: draft.name.trim(),
+        rentalTaxPerNight: draft.rentalTaxPerNight === '' ? 0 : Number(draft.rentalTaxPerNight),
+        active: Boolean(draft.active),
+      });
+      setResources((current) => current
+        .map((item) => (item.id === resource.id ? updated : item))
+        .sort((left, right) => left.type.localeCompare(right.type) || left.name.localeCompare(right.name)));
+      setEditingId(null);
+      setNotice(t('Resource updated.'));
+    } catch (requestError) {
+      showError(t('Could not update resource: {error}', { error: requestError.message }));
     } finally {
       setBusy(false);
     }
@@ -193,18 +236,60 @@ export function ResourcesPage() {
                     <th>{t('Resource type')}</th>
                     <th>{t('Resource name')}</th>
                     <th>{t('Rental tax per night (€)')}</th>
+                    <th>{t('Active')}</th>
+                    <th>{t('Actions')}</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {resources.map((resource) => (
-                    <tr key={resource.id}>
-                      <td>{t(resource.type === 'rooms' ? 'Rooms' : 'Cars & bikes')}</td>
-                      <td>{resource.name}</td>
-                      <td>{Number(resource.rentalTaxPerNight ?? 0).toFixed(2)}</td>
-                    </tr>
-                  ))}
+                  {resources.map((resource) => {
+                    const editing = editingId === resource.id;
+                    return (
+                      <tr key={resource.id}>
+                        <td>{t(resource.type === 'rooms' ? 'Rooms' : 'Cars & bikes')}</td>
+                        <td>
+                          {editing ? (
+                            <input
+                              value={draft.name}
+                              maxLength="80"
+                              onChange={(event) => setDraft((d) => ({ ...d, name: event.target.value }))}
+                            />
+                          ) : resource.name}
+                        </td>
+                        <td>
+                          {editing ? (
+                            <input
+                              type="number"
+                              min="0"
+                              step="0.01"
+                              value={draft.rentalTaxPerNight}
+                              onChange={(event) => setDraft((d) => ({ ...d, rentalTaxPerNight: event.target.value }))}
+                            />
+                          ) : Number(resource.rentalTaxPerNight ?? 0).toFixed(2)}
+                        </td>
+                        <td>
+                          {editing ? (
+                            <input
+                              type="checkbox"
+                              checked={Boolean(draft.active)}
+                              onChange={(event) => setDraft((d) => ({ ...d, active: event.target.checked }))}
+                            />
+                          ) : (resource.active ? t('Yes') : t('No'))}
+                        </td>
+                        <td>
+                          {editing ? (
+                            <div className="form-actions" style={{ gap: '0.5rem' }}>
+                              <button type="button" className="button button-primary" disabled={busy} onClick={() => handleSaveEdit(resource)}>{t('Save')}</button>
+                              <button type="button" className="button button-muted" disabled={busy} onClick={cancelEdit}>{t('Cancel')}</button>
+                            </div>
+                          ) : (
+                            <button type="button" className="button button-muted" onClick={() => startEdit(resource)}>{t('Edit')}</button>
+                          )}
+                        </td>
+                      </tr>
+                    );
+                  })}
                   {resources.length === 0 && (
-                    <tr><td colSpan="3" className="report-empty-row">{t('No resources have been added.')}</td></tr>
+                    <tr><td colSpan="5" className="report-empty-row">{t('No resources have been added.')}</td></tr>
                   )}
                 </tbody>
               </table>

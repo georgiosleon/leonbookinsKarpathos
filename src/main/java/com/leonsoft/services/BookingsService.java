@@ -88,7 +88,17 @@ public class BookingsService {
 
     @Transactional
     private Booking saveWithNormalizedValues(Booking booking) {
-        BookingResource resource = resourceService.requireActive(booking.getResourceId());
+        BookingResource resource = resourceService.requireExisting(booking.getResourceId());
+        if (!resource.isActive()) {
+            boolean sameExistingResource = booking.getId() != null
+                    && bookingRepository.findById(booking.getId())
+                        .map(Booking::getResourceId)
+                        .filter(booking.getResourceId()::equals)
+                        .isPresent();
+            if (!sameExistingResource) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The selected room or vehicle is not available.");
+            }
+        }
         LocalDate stDate = booking.getStartDate();
         LocalDate edDate = booking.getEndDate();
         if (stDate == null || edDate == null) {

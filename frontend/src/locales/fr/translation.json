@@ -254,5 +254,11 @@
   "Signed in as {username}": "Connecté en tant que {username}",
   "Rental tax (€)": "Taxe de location (€)",
   "Rental tax per night (€)": "Taxe de location par nuit (€)",
-  "Charge less received, commission, and rental tax": "Frais moins reçu, commission et taxe de location"
+  "Charge less received, commission, and rental tax": "Frais moins reçu, commission et taxe de location",
+  "Resource updated.": "Ressource mise à jour.",
+  "Could not update resource: {error}": "Impossible de mettre à jour la ressource : {error}",
+  "Edit": "Modifier",
+  "Save": "Enregistrer",
+  "Yes": "Oui",
+  "No": "Non"
 }

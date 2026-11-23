@@ -117,8 +117,8 @@ export function BookingForm({
             onChange={(event) => update('resourceId', event.target.value)}
           >
             <option value="">{t('Select')}</option>
-            {mode.resources.filter(({ active = true }) => active).map(({ id, text }) => (
-              <option value={id} key={id}>{text}</option>
+            {mode.resources.filter(({ id, active = true }) => active || id === form.resourceId).map(({ id, text, active = true }) => (
+              <option value={id} key={id}>{text}{!active ? ` (${t('Inactive')})` : ''}</option>
             ))}
           </select>
         </label>

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.leonsoft.api.BookingResourceRequest;
+import com.leonsoft.api.BookingResourceUpdateRequest;
 import com.leonsoft.models.BookingResource;
 import com.leonsoft.repositories.BookingResourceRepository;
 import java.util.Optional;
@@ -64,5 +65,45 @@ class BookingResourceServiceTest {
               ResponseStatusException.class, () -> resourceService.requireActive("inactive"));
 
         assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+    }
+
+    @Test
+    void requireExistingReturnsInactiveResource() {
+        BookingResource inactive = new BookingResource("inactive", "rooms", "APT 1");
+        inactive.setActive(false);
+        when(resourceRepository.findById("inactive")).thenReturn(Optional.of(inactive));
+
+        BookingResource result = resourceService.requireExisting("inactive");
+
+        assertEquals("inactive", result.getId());
+        assertEquals(false, result.isActive());
+    }
+
+    @Test
+    void updatesResourceNameTaxAndActive() {
+        BookingResource resource = new BookingResource("r1", "rooms", "APT 1");
+        resource.setRentalTaxPerNight(new java.math.BigDecimal("1.00"));
+        when(resourceRepository.findById("r1")).thenReturn(Optional.of(resource));
+        when(resourceRepository.existsByTypeAndNameIgnoreCaseAndIdNot("rooms", "APT 2", "r1")).thenReturn(false);
+        when(resourceRepository.save(any(BookingResource.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        BookingResource updated = resourceService.update("r1",
+                new BookingResourceUpdateRequest("  APT 2  ", new java.math.BigDecimal("2.50"), false));
+
+        assertEquals("APT 2", updated.getName());
+        assertEquals(new java.math.BigDecimal("2.50"), updated.getRentalTaxPerNight());
+        assertEquals(false, updated.isActive());
+    }
+
+    @Test
+    void rejectsDuplicateNameOnUpdate() {
+        BookingResource resource = new BookingResource("r1", "rooms", "APT 1");
+        when(resourceRepository.findById("r1")).thenReturn(Optional.of(resource));
+        when(resourceRepository.existsByTypeAndNameIgnoreCaseAndIdNot("rooms", "APT 2", "r1")).thenReturn(true);
+
+        ResponseStatusException exception = assertThrows(ResponseStatusException.class,
+                () -> resourceService.update("r1", new BookingResourceUpdateRequest("APT 2", java.math.BigDecimal.ZERO, true)));
+
+        assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
     }
 }
