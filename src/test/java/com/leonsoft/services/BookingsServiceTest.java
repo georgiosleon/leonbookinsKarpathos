@@ -197,21 +197,6 @@ class BookingsServiceTest {
     }
 
     @Test
-    void pdfExportRejectsUnsupportedResourceType() {
-        ResponseStatusException exception = assertThrows(
-              ResponseStatusException.class,
-              () -> bookingsService.exportReportToPDF(
-                    new org.springframework.mock.web.MockHttpServletResponse(),
-                    "01/06/2026",
-                    "30/06/2026",
-                    "unknown",
-                    java.util.Locale.UK));
-
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-        verify(bookingRepository, never()).findByStartDateBetweenOrderByStartDateDesc(any(), any());
-    }
-
-    @Test
     void rejectsOverlappingRoomBookingWhenRoomFlagIsEnabled() {
         Booking existing = savedBooking("existing", "2026-06-20", "2026-06-23", "active");
         when(resourceService.requireActive("APT2"))

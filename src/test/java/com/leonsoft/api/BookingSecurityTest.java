@@ -5,6 +5,7 @@ import com.leonsoft.models.Booking;
 import com.leonsoft.models.BookingResource;
 import com.leonsoft.services.ApplicationSupportService;
 import com.leonsoft.services.BookingAvailabilityPolicy;
+import com.leonsoft.services.BookingReportService;
 import com.leonsoft.services.BookingResourceService;
 import com.leonsoft.repositories.UserRepository;
 import com.leonsoft.services.BookingsService;
@@ -47,6 +48,9 @@ class BookingSecurityTest {
 
     @MockitoBean
     private BookingsService bookingsService;
+
+    @MockitoBean
+    private BookingReportService bookingReportService;
 
     @MockitoBean
     private BookingResourceService bookingResourceService;
@@ -370,7 +374,7 @@ class BookingSecurityTest {
 
     @Test
     void reportsAreAvailableToAdminAndOperatorButNotGuest() throws Exception {
-        when(bookingsService.report(any(), any(), any())).thenReturn("report");
+        when(bookingReportService.report(any(), any(), any())).thenReturn("report");
 
         mockMvc.perform(get("/api/v1/booking/report")
                         .with(user("test-admin").roles("ADMIN"))

@@ -1,7 +1,13 @@
 package com.leonsoft.services;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.leonsoft.models.Booking;
@@ -21,10 +27,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.server.ResponseStatusException;
 
 @ExtendWith(MockitoExtension.class)
 class BookingsReportPdfServiceTest {
@@ -45,7 +53,7 @@ class BookingsReportPdfServiceTest {
         admin.setUsername("admin");
         admin.setRole("ADMIN");
         admin.setActive(true);
-        when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
+        lenient().when(userRepository.findByUsername("admin")).thenReturn(Optional.of(admin));
         SecurityContextHolder.getContext().setAuthentication(
               new UsernamePasswordAuthenticationToken("admin", "n/a",
                     AuthorityUtils.createAuthorityList("ROLE_ADMIN")));
@@ -67,8 +75,8 @@ class BookingsReportPdfServiceTest {
         when(bookingRepository.findAllByOrderByStartDateAsc()).thenReturn(List.of(roomBooking, carBooking));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
-        BookingsService service = new BookingsService(
-              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(true, true), new BookingOverlapChecker(bookingRepository));
+        BookingReportService service = new BookingReportService(
+              bookingRepository, userRepository, resourceService);
 
         service.exportReportToPDF(response, "01/06/2026", "30/06/2026", "rooms", Locale.UK);
 
@@ -83,6 +91,24 @@ class BookingsReportPdfServiceTest {
         } finally {
             reader.close();
         }
+    }
+
+    @Test
+    void pdfExportRejectsUnsupportedResourceType() {
+        BookingReportService service = new BookingReportService(
+              bookingRepository, userRepository, resourceService);
+
+        ResponseStatusException exception = assertThrows(
+              ResponseStatusException.class,
+              () -> service.exportReportToPDF(
+                    new MockHttpServletResponse(),
+                    "01/06/2026",
+                    "30/06/2026",
+                    "unknown",
+                    Locale.UK));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        verify(bookingRepository, never()).findAllByOrderByStartDateAsc();
     }
 
     private static Booking booking(String resourceId, String name) {

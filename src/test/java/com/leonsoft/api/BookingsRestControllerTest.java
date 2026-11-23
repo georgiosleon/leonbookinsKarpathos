@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 
 import com.leonsoft.config.CustomErrorHandler;
 import com.leonsoft.models.Booking;
+import com.leonsoft.services.BookingReportService;
 import com.leonsoft.services.BookingsService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,12 +24,14 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 class BookingsRestControllerTest {
     private MockMvc mockMvc;
     private BookingsService bookingsService;
+    private BookingReportService bookingReportService;
 
     @BeforeEach
     void setUp() {
         bookingsService = org.mockito.Mockito.mock(BookingsService.class);
+        bookingReportService = org.mockito.Mockito.mock(BookingReportService.class);
         mockMvc = MockMvcBuilders
-              .standaloneSetup(new BookingsRestController(bookingsService))
+              .standaloneSetup(new BookingsRestController(bookingsService, bookingReportService))
               .setControllerAdvice(new CustomErrorHandler())
               .build();
     }
@@ -42,7 +45,7 @@ class BookingsRestControllerTest {
                     .param("lang", "fr"))
               .andExpect(status().isOk());
 
-        verify(bookingsService).exportReportToPDF(
+        verify(bookingReportService).exportReportToPDF(
               any(), eq("01/06/2026"), eq("30/06/2026"), eq("cars"), eq(Locale.FRANCE));
     }
 

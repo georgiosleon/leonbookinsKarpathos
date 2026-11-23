@@ -1,6 +1,7 @@
 package com.leonsoft.api;
 
 import com.leonsoft.models.Booking;
+import com.leonsoft.services.BookingReportService;
 import com.leonsoft.services.BookingsService;
 import com.leonsoft.services.ReportMessages;
 import jakarta.servlet.http.HttpServletResponse;
@@ -30,9 +31,11 @@ public class BookingsRestController {
     private static final Logger log = LoggerFactory.getLogger(BookingsRestController.class);
 
     private final BookingsService bookingsService;
+    private final BookingReportService bookingReportService;
 
-    public BookingsRestController(BookingsService bookingsService) {
+    public BookingsRestController(BookingsService bookingsService, BookingReportService bookingReportService) {
         this.bookingsService = bookingsService;
+        this.bookingReportService = bookingReportService;
     }
 
     @GetMapping("/export/pdf")
@@ -44,7 +47,7 @@ public class BookingsRestController {
             @RequestParam(name = "type") String resourceType,
             @RequestParam(name = "lang", defaultValue = "en") String language)
             throws IOException {
-        bookingsService.exportReportToPDF(
+        bookingReportService.exportReportToPDF(
                 response,
                 fromDateEuroFmt,
                 toDateEuroFmt,
@@ -59,7 +62,7 @@ public class BookingsRestController {
             @RequestParam(name = "toDate") String toDateEuroFmt,
             @RequestParam(name = "lang", defaultValue = "en") String language) {
         log.debug("/booking/report fromDate={} toDate={}", fromDateEuroFmt, toDateEuroFmt);
-        return bookingsService.report(
+        return bookingReportService.report(
                 fromDateEuroFmt, toDateEuroFmt, ReportMessages.supportedLocale(language));
 
     }

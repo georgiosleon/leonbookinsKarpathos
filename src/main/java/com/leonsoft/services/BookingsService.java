@@ -5,30 +5,20 @@ import com.leonsoft.models.BookingResource;
 import com.leonsoft.models.User;
 import com.leonsoft.repositories.BookingRepository;
 import com.leonsoft.repositories.UserRepository;
-import com.lowagie.text.DocumentException;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.validation.Valid;
-import java.io.IOException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import java.text.Collator;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
 import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
-import java.util.stream.Collectors;
 
 /** Service class for booking business logic with role-based access control */
 @Service
@@ -70,86 +60,6 @@ public class BookingsService {
     private boolean canModifyBooking(Booking booking) {
         User currentUser = getCurrentUser();
         return currentUser != null && currentUser.isOperator();
-    }
-
-    /** Any authenticated user can view bookings; visibility is constrained at the list/report level. */
-    private boolean canViewBooking(Booking booking) {
-        return getCurrentUser() != null;
-    }
-
-    public void exportReportToPDF(
-            HttpServletResponse response,
-            String fromDateEuroFmt,
-            String toDateEuroFmt,
-            String resourceType,
-            Locale locale) throws DocumentException, IOException {
-
-        if (!"rooms".equals(resourceType) && !"cars".equals(resourceType)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid report resource type.");
-        }
-
-        LocalDate startDate = LocalDate.parse(fromDateEuroFmt, BookingsUtils.formatterEURO);
-        LocalDate endDate = LocalDate.parse(toDateEuroFmt, BookingsUtils.formatterEURO);
-        if (endDate.isBefore(startDate)) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid report date range.");
-        }
-
-        // Filter bookings based on user role
-        List<Booking> allBookings = getAllBookingsForReport();
-
-        List<BookingResource> resources = resourceService.getAll().stream()
-                .filter(resource -> resourceType.equals(resource.getType()))
-                .toList();
-        Map<String, BookingResource> resourcesById = resources.stream()
-                .collect(java.util.stream.Collectors.toMap(BookingResource::getId, resource -> resource));
-
-        List<Booking> bookings = allBookings.stream()
-                .filter(booking -> resourcesById.containsKey(booking.getRoom()))
-                .sorted(java.util.Comparator
-                        .comparing(Booking::getStartDate)
-                        .thenComparing(
-                                booking -> Objects.toString(booking.getName(), ""),
-                                Collator.getInstance(locale)))
-                .toList();
-        addResourceNames(bookings);
-
-        response.setContentType("application/pdf");
-        response.setHeader(
-                "Content-Disposition",
-                "attachment; filename=booking-report-" + resourceType + "-" + LocalDate.now() + ".pdf");
-        new BookingsPDFExporter(bookings, resources, resourceType, startDate, endDate, locale)
-                .export(response);
-    }
-
-    /** Get all bookings visible to the current user based on their role. */
-    private List<Booking> getAllBookingsForReport() {
-        User currentUser = getCurrentUser();
-        if (currentUser == null) {
-            return List.of();
-        }
-        // All authenticated roles can view all bookings; mutation permissions differ.
-        return bookingRepository.findAllByOrderByStartDateAsc();
-    }
-
-    public String report(String fromDateEuroFmt, String toDateEuroFmt, Locale locale) {
-
-        log.debug("/booking/report fromDate={} toDate={}", fromDateEuroFmt, toDateEuroFmt);
-
-        LocalDate stDate = LocalDate.parse(fromDateEuroFmt, BookingsUtils.formatterEURO);
-        LocalDate edDate = LocalDate.parse(toDateEuroFmt, BookingsUtils.formatterEURO);
-
-        // Use role-aware filtering
-        List<Booking> all = getAllBookingsForReport().stream()
-                .filter(booking -> {
-                    LocalDate bookingStart = BookingsUtils.parseStoredDate(booking.getStartDate());
-                    LocalDate bookingEnd = BookingsUtils.parseStoredDate(booking.getEndDate());
-                    return !bookingStart.isBefore(stDate) && !bookingEnd.isAfter(edDate);
-                })
-                .toList();
-        addResourceNames(all);
-
-        return BookingsHtmlTemplate.report(fromDateEuroFmt, toDateEuroFmt, all, locale);
-
     }
 
     @Transactional
