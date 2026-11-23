@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BookingPage } from './components/BookingPage.jsx';
-import { ReportsPage } from './components/ReportsPage.jsx';
-import { ResourcesPage } from './components/ResourcesPage.jsx';
-import { UserManagement } from './components/admin/UserManagement.jsx';
 import { getInitialTheme } from './theme.js';
 import { LanguageProvider } from './i18n.jsx';
+
+const ReportsPage = lazy(() => import('./components/ReportsPage.jsx').then((m) => ({ default: m.ReportsPage })));
+const ResourcesPage = lazy(() => import('./components/ResourcesPage.jsx').then((m) => ({ default: m.ResourcesPage })));
+const UserManagement = lazy(() => import('./components/admin/UserManagement.jsx').then((m) => ({ default: m.UserManagement })));
 
 const rootElement = document.getElementById('root');
 
@@ -26,7 +27,9 @@ document.documentElement.dataset.theme = getInitialTheme();
 createRoot(rootElement).render(
   <React.StrictMode>
     <LanguageProvider>
-      <App />
+      <Suspense fallback={null}>
+        <App />
+      </Suspense>
     </LanguageProvider>
   </React.StrictMode>,
 );

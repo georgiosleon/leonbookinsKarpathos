@@ -14,6 +14,7 @@ export default defineConfig({
     setupFiles: './tests/setup.js',
     include: ['src/**/*.{test,spec}.{js,jsx}'],
     css: false,
+    pool: 'vmThreads',
   },
   server: {
     proxy: {
@@ -35,6 +36,13 @@ export default defineConfig({
         entryFileNames: 'main.js',
         chunkFileNames: '[name].js',
         assetFileNames: '[name][extname]',
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('react-dom') || id.includes('/react/')) return 'vendor-react';
+            if (id.includes('i18next')) return 'vendor-i18n';
+            return 'vendor';
+          }
+        },
       },
     },
   },
