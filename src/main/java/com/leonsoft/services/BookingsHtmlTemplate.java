@@ -1,6 +1,5 @@
 package com.leonsoft.services;
 
-import com.leonsoft.models.Booking;
 import com.leonsoft.models.BookingStatus;
 import com.leonsoft.models.BookingTotals;
 import java.time.LocalDate;
@@ -14,12 +13,12 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class BookingsHtmlTemplate {
 
-    public static String report(String fromDateEuroFmt, String toDateEuroFmt, List<Booking> all) {
+    public static String report(String fromDateEuroFmt, String toDateEuroFmt, List<BookingReportView> all) {
         return report(fromDateEuroFmt, toDateEuroFmt, all, Locale.ENGLISH);
     }
 
     public static String report(
-          String fromDateEuroFmt, String toDateEuroFmt, List<Booking> all, Locale locale) {
+          String fromDateEuroFmt, String toDateEuroFmt, List<BookingReportView> all, Locale locale) {
         log.debug("/booking/report fromDate={} toDate={}", fromDateEuroFmt, toDateEuroFmt);
 
         StringBuilder report = new StringBuilder();
@@ -66,60 +65,59 @@ public class BookingsHtmlTemplate {
 
         BookingTotals  totals  =  new BookingTotals();
 
-        for (Booking booking : all) {
+        for (BookingReportView booking : all) {
 
 
             ////// pre processing
-            LocalDate stDt = BookingsUtils.parseStoredDate(booking.getStartDate());
-            LocalDate edDt = BookingsUtils.parseStoredDate(booking.getEndDate());
+            LocalDate stDt = BookingsUtils.parseStoredDate(booking.startDate());
+            LocalDate edDt = BookingsUtils.parseStoredDate(booking.endDate());
 
-            String statusClass = BookingStatus.isCancelled(booking.getStatus())
+            String statusClass = BookingStatus.isCancelled(booking.status())
                   ? " class=\"cancelled-status\""
                   : "";
 
             /////Calc totals
-            totals.setTotBalance(totals.getTotBalance() + booking.getBalance()  );
-            totals.setTotCharge(totals.getTotCharge() + booking.getCharge()  );
-            totals.setTotCommission(totals.getTotCommission() + booking.getCommission()  );
-            totals.setTotReceived(totals.getTotReceived()+ booking.getReceived()  );
-            totals.setTotGuests( totals.getTotGuests() + booking.getNumOfGuests()  );
-            totals.setTotNights( totals.getTotNights() + booking.getNumOfNights()  );
+            totals.setTotBalance(totals.getTotBalance() + n(booking.balance()));
+            totals.setTotCharge(totals.getTotCharge() + n(booking.charge()));
+            totals.setTotCommission(totals.getTotCommission() + n(booking.commission()));
+            totals.setTotReceived(totals.getTotReceived() + n(booking.received()));
+            totals.setTotGuests(totals.getTotGuests() + n(booking.numOfGuests()));
+            totals.setTotNights(totals.getTotNights() + n(booking.numOfNights()));
 
             // build a row
             report.append("<tr>")
 
                   .append("<td").append(statusClass).append(">")
-                  .append(htmlEscape(status(locale, booking.getStatus()))).append("</td>")
+                  .append(htmlEscape(status(locale, booking.status()))).append("</td>")
 
                   .append("<td>").append(dateFormatter.format(stDt)).append("</td>")
                   .append("<td>").append(dateFormatter.format(edDt)).append("</td>")
 
-                  .append("<td>").append(htmlEscape(
-                        booking.getRoomName() == null ? booking.getRoom() : booking.getRoomName()))
+                  .append("<td>").append(htmlEscape(booking.roomName()))
                   .append("</td>")
-                  .append("<td>").append(htmlEscape(booking.getName())).append("</td>")
-                  .append("<td>").append(htmlEscape(booking.getAgency())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.name())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.agency())).append("</td>")
 
-                  .append("<td>").append(booking.getNumOfGuests()).append("</td>")
-                  .append("<td>").append(booking.getNumOfNights()).append("</td>")
+                  .append("<td>").append(n(booking.numOfGuests())).append("</td>")
+                  .append("<td>").append(n(booking.numOfNights())).append("</td>")
 
-                  .append("<td>").append(booking.getCharge() == null ? "0.0" : booking.getCharge()).append("</td>")
-                  .append("<td>").append(booking.getCommission() == null ? "0.0" : booking.getCommission()).append("</td>")
-                  .append("<td>").append(booking.getReceived() == null ? "0.0" : booking.getReceived()).append("</td>")
-                  .append("<td>").append(booking.getBalance() == null ? "0.0" : booking.getBalance()).append("</td>")
+                  .append("<td>").append(n(booking.charge())).append("</td>")
+                  .append("<td>").append(n(booking.commission())).append("</td>")
+                  .append("<td>").append(n(booking.received())).append("</td>")
+                  .append("<td>").append(n(booking.balance())).append("</td>")
 
-                  .append("<td>").append(htmlEscape(booking.getCountry())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.country())).append("</td>")
 
-                  .append("<td>").append(htmlEscape(booking.getIdentification())).append("</td>")
-                  .append("<td>").append(htmlEscape(booking.getAfm())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.identification())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.afm())).append("</td>")
 
-                  .append("<td>").append(htmlEscape(booking.getVoucher())).append("</td>")
-                  .append("<td>").append(htmlEscape(booking.getTaxRefNumber())).append("</td>")
-                  .append("<td>").append(htmlEscape(booking.getInvoiceNumber())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.voucher())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.taxRefNumber())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.invoiceNumber())).append("</td>")
 
-                  .append("<td>").append(htmlEscape(booking.getEmail())).append("</td>")
-                  .append("<td>").append(htmlEscape(booking.getTel())).append("</td>")
-                  .append("<td>").append(htmlEscape(booking.getExtraInfo())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.email())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.tel())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.extraInfo())).append("</td>")
 
                   .append(" </tr>");
 
@@ -175,6 +173,15 @@ public class BookingsHtmlTemplate {
         };
     }
 
+
+
+    private static double n(Double value) {
+        return value == null ? 0.0 : value;
+    }
+
+    private static int n(Integer value) {
+        return value == null ? 0 : value;
+    }
     private static String htmlEscape(String value) {
         if (value == null) {
             return "";

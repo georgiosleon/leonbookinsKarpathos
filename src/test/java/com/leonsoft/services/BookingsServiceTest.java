@@ -4,7 +4,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -49,12 +48,6 @@ class BookingsServiceTest {
     void setUp() {
         bookingsService = new BookingsService(
               bookingRepository, resourceService, new BookingAvailabilityPolicy(true, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository));
-        lenient().doAnswer(inv -> {
-            List<Booking> bs = inv.getArgument(0);
-            Map<String, String> names = resourceService.namesById();
-            bs.forEach(b -> b.setRoomName(names.getOrDefault(b.getRoom(), b.getRoom())));
-            return null;
-        }).when(resourceService).populateResourceNames(any());
         User admin = new User();
         admin.setId(1);
         admin.setUsername("admin");
@@ -261,22 +254,17 @@ class BookingsServiceTest {
     }
 
     @Test
-    void getAllReturnsBookingsWithResourceNamesWithoutMutatingDates() {
+    void getAllReturnsBookingsWithoutMutatingDates() {
         Booking legacyBooking = savedBooking("legacy", "20/11/2026", "23/11/2026", "active");
         Booking isoBooking = savedBooking("iso", "2026-11-24", "2026-11-27", "active");
-        legacyBooking.setRoom("r1");
-        isoBooking.setRoom("r2");
         when(bookingRepository.findAllByOrderByStartDateAsc()).thenReturn(List.of(legacyBooking, isoBooking));
-        when(resourceService.namesById()).thenReturn(Map.of("r1", "Room 1", "r2", "Room 2"));
 
         List<Booking> bookings = bookingsService.getAll();
 
         assertEquals("20/11/2026", bookings.get(0).getStartDate());
         assertEquals("23/11/2026", bookings.get(0).getEndDate());
-        assertEquals("Room 1", bookings.get(0).getRoomName());
         assertEquals("2026-11-24", bookings.get(1).getStartDate());
         assertEquals("2026-11-27", bookings.get(1).getEndDate());
-        assertEquals("Room 2", bookings.get(1).getRoomName());
     }
 
     @Test
@@ -295,7 +283,6 @@ class BookingsServiceTest {
         own.setUser(regular);
         Booking other = savedBooking("other", "2026-06-24", "2026-06-26", "active");
         when(bookingRepository.findAllByOrderByStartDateAsc()).thenReturn(List.of(own, other));
-        when(resourceService.namesById()).thenReturn(Map.of());
 
         List<Booking> bookings = bookingsService.getAll();
 

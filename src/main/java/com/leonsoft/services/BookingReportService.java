@@ -65,15 +65,16 @@ public class BookingReportService {
         Map<String, BookingResource> resourcesById = resources.stream()
                 .collect(Collectors.toMap(BookingResource::getId, resource -> resource));
 
-        List<Booking> bookings = allBookings.stream()
+        Map<String, String> namesById = resourceService.namesById();
+        List<BookingReportView> bookings = allBookings.stream()
                 .filter(booking -> resourcesById.containsKey(booking.getRoom()))
                 .sorted(Comparator
                         .comparing(Booking::getStartDate)
                         .thenComparing(
                                 booking -> Objects.toString(booking.getName(), ""),
                                 Collator.getInstance(locale)))
+                .map(booking -> BookingReportView.from(booking, namesById.get(booking.getRoom())))
                 .toList();
-        resourceService.populateResourceNames(bookings);
 
         response.setContentType("application/pdf");
         response.setHeader(
@@ -90,14 +91,15 @@ public class BookingReportService {
         LocalDate stDate = LocalDate.parse(fromDateEuroFmt, BookingsUtils.formatterEURO);
         LocalDate edDate = LocalDate.parse(toDateEuroFmt, BookingsUtils.formatterEURO);
 
-        List<Booking> all = getAllBookingsForReport().stream()
+        Map<String, String> namesById = resourceService.namesById();
+        List<BookingReportView> all = getAllBookingsForReport().stream()
                 .filter(booking -> {
                     LocalDate bookingStart = BookingsUtils.parseStoredDate(booking.getStartDate());
                     LocalDate bookingEnd = BookingsUtils.parseStoredDate(booking.getEndDate());
                     return !bookingStart.isBefore(stDate) && !bookingEnd.isAfter(edDate);
                 })
+                .map(booking -> BookingReportView.from(booking, namesById.get(booking.getRoom())))
                 .toList();
-        resourceService.populateResourceNames(all);
 
         return BookingsHtmlTemplate.report(fromDateEuroFmt, toDateEuroFmt, all, locale);
     }

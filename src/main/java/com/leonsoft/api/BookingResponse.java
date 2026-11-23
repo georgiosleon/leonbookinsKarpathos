@@ -32,6 +32,11 @@ public record BookingResponse(
         LocalDateTime requestDateTime) {
 
     public static BookingResponse from(Booking booking) {
+        return from(booking, booking.getRoomName());
+    }
+
+    public static BookingResponse from(Booking booking, String roomName) {
+        String resolvedRoomName = roomName == null || roomName.isBlank() ? booking.getRoom() : roomName;
         return new BookingResponse(
                 booking.getId(),
                 formatDate(booking.getStartDate()),
@@ -44,7 +49,7 @@ public record BookingResponse(
                 booking.getName(),
                 booking.getAgency(),
                 booking.getRoom(),
-                booking.getRoomName(),
+                resolvedRoomName,
                 booking.getNumOfGuests(),
                 booking.getCountry(),
                 booking.getVoucher(),

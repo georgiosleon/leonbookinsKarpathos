@@ -1,6 +1,5 @@
 package com.leonsoft.services;
 
-import com.leonsoft.models.Booking;
 import com.leonsoft.models.BookingStatus;
 import com.leonsoft.models.BookingResource;
 import com.lowagie.text.Document;
@@ -32,7 +31,7 @@ public class BookingsPDFExporter {
             "status", "arrival", "departure", "resource", "name", "agency",
             "guests", "nights", "charge", "received", "balance");
 
-    private final List<Booking> bookings;
+    private final List<BookingReportView> bookings;
     private final List<BookingResource> resources;
     private final String resourceType;
     private final LocalDate startDate;
@@ -43,7 +42,7 @@ public class BookingsPDFExporter {
     private BaseFont reportBaseFont;
 
     public BookingsPDFExporter(
-          List<Booking> bookings,
+          List<BookingReportView> bookings,
           List<BookingResource> resources,
           String resourceType,
           LocalDate startDate,
@@ -82,10 +81,10 @@ public class BookingsPDFExporter {
     }
 
     private void addSummary(Document document) throws DocumentException {
-        List<Booking> bookable = bookings.stream().filter(this::isBookable).toList();
-        long cancelled = bookings.stream().filter(booking -> BookingStatus.isCancelled(booking.getStatus())).count();
-        int guests = sumInt(bookable, Booking::getNumOfGuests);
-        int nights = sumInt(bookable, Booking::getNumOfNights);
+        List<BookingReportView> bookable = bookings.stream().filter(this::isBookable).toList();
+        long cancelled = bookings.stream().filter(booking -> BookingStatus.isCancelled(booking.status())).count();
+        int guests = sumInt(bookable, BookingReportView::numOfGuests);
+        int nights = sumInt(bookable, BookingReportView::numOfNights);
 
         PdfPTable summary = new PdfPTable(7);
         summary.setWidthPercentage(100);
@@ -94,9 +93,9 @@ public class BookingsPDFExporter {
         addSummaryCell(summary, text("cancelledBookings"), String.valueOf(cancelled));
         addSummaryCell(summary, text("guests"), String.valueOf(guests));
         addSummaryCell(summary, text("nights"), String.valueOf(nights));
-        addSummaryCell(summary, text("charge"), formatMoney(sum(bookable, Booking::getCharge)));
-        addSummaryCell(summary, text("received"), formatMoney(sum(bookable, Booking::getReceived)));
-        addSummaryCell(summary, text("balance"), formatMoney(sum(bookable, Booking::getBalance)));
+        addSummaryCell(summary, text("charge"), formatMoney(sum(bookable, BookingReportView::charge)));
+        addSummaryCell(summary, text("received"), formatMoney(sum(bookable, BookingReportView::received)));
+        addSummaryCell(summary, text("balance"), formatMoney(sum(bookable, BookingReportView::balance)));
         document.add(summary);
 
         Font noteFont = reportFont(8);
@@ -119,19 +118,19 @@ public class BookingsPDFExporter {
               text("charge"), text("received"), text("balance")));
 
         for (BookingResource resource : resources) {
-            List<Booking> rows = bookings.stream()
+            List<BookingReportView> rows = bookings.stream()
                   .filter(this::isBookable)
-                  .filter(booking -> resource.getId().equals(booking.getRoom()))
+                  .filter(booking -> resource.getId().equals(booking.room()))
                   .toList();
             addCell(table, resource.getName(), reportFont(8), Element.ALIGN_LEFT);
             addCell(table, String.valueOf(rows.size()), reportFont(8), Element.ALIGN_RIGHT);
-            addCell(table, String.valueOf(sumInt(rows, Booking::getNumOfGuests)),
+            addCell(table, String.valueOf(sumInt(rows, BookingReportView::numOfGuests)),
                   reportFont(8), Element.ALIGN_RIGHT);
-            addCell(table, String.valueOf(sumInt(rows, Booking::getNumOfNights)),
+            addCell(table, String.valueOf(sumInt(rows, BookingReportView::numOfNights)),
                   reportFont(8), Element.ALIGN_RIGHT);
-            addCell(table, formatMoney(sum(rows, Booking::getCharge)), reportFont(8), Element.ALIGN_RIGHT);
-            addCell(table, formatMoney(sum(rows, Booking::getReceived)), reportFont(8), Element.ALIGN_RIGHT);
-            addCell(table, formatMoney(sum(rows, Booking::getBalance)), reportFont(8), Element.ALIGN_RIGHT);
+            addCell(table, formatMoney(sum(rows, BookingReportView::charge)), reportFont(8), Element.ALIGN_RIGHT);
+            addCell(table, formatMoney(sum(rows, BookingReportView::received)), reportFont(8), Element.ALIGN_RIGHT);
+            addCell(table, formatMoney(sum(rows, BookingReportView::balance)), reportFont(8), Element.ALIGN_RIGHT);
         }
         table.setHeaderRows(1);
         document.add(table);
@@ -158,21 +157,20 @@ public class BookingsPDFExporter {
             table.addCell(empty);
         } else {
             Font font = reportFont(7);
-            for (Booking booking : bookings) {
-                addCell(table, status(booking.getStatus()), font, Element.ALIGN_LEFT);
-                addCell(table, formatBookingDate(booking.getStartDate()), font, Element.ALIGN_LEFT);
-                addCell(table, formatBookingDate(booking.getEndDate()), font, Element.ALIGN_LEFT);
-                addCell(table, booking.getRoomName() == null ? booking.getRoom() : booking.getRoomName(),
-                      font, Element.ALIGN_LEFT);
-                addCell(table, booking.getName(), font, Element.ALIGN_LEFT);
-                addCell(table, agency(booking.getAgency()), font, Element.ALIGN_LEFT);
-                addCell(table, String.valueOf(Objects.requireNonNullElse(booking.getNumOfGuests(), 0)),
+            for (BookingReportView booking : bookings) {
+                addCell(table, status(booking.status()), font, Element.ALIGN_LEFT);
+                addCell(table, formatBookingDate(booking.startDate()), font, Element.ALIGN_LEFT);
+                addCell(table, formatBookingDate(booking.endDate()), font, Element.ALIGN_LEFT);
+                addCell(table, booking.roomName(), font, Element.ALIGN_LEFT);
+                addCell(table, booking.name(), font, Element.ALIGN_LEFT);
+                addCell(table, agency(booking.agency()), font, Element.ALIGN_LEFT);
+                addCell(table, String.valueOf(Objects.requireNonNullElse(booking.numOfGuests(), 0)),
                       font, Element.ALIGN_RIGHT);
-                addCell(table, String.valueOf(Objects.requireNonNullElse(booking.getNumOfNights(), 0)),
+                addCell(table, String.valueOf(Objects.requireNonNullElse(booking.numOfNights(), 0)),
                       font, Element.ALIGN_RIGHT);
-                addCell(table, formatMoney(number(booking.getCharge())), font, Element.ALIGN_RIGHT);
-                addCell(table, formatMoney(number(booking.getReceived())), font, Element.ALIGN_RIGHT);
-                addCell(table, formatMoney(number(booking.getBalance())), font, Element.ALIGN_RIGHT);
+                addCell(table, formatMoney(number(booking.charge())), font, Element.ALIGN_RIGHT);
+                addCell(table, formatMoney(number(booking.received())), font, Element.ALIGN_RIGHT);
+                addCell(table, formatMoney(number(booking.balance())), font, Element.ALIGN_RIGHT);
             }
         }
         document.add(table);
@@ -241,11 +239,11 @@ public class BookingsPDFExporter {
         return ReportMessages.text(locale, key.startsWith("status.") ? key : "report." + key);
     }
 
-    private boolean isBookable(Booking booking) {
-        return BookingStatus.isBookable(booking.getStatus());
+    private boolean isBookable(BookingReportView booking) {
+        return BookingStatus.isBookable(booking.status());
     }
 
-    private static double sum(List<Booking> rows, Function<Booking, Double> getter) {
+    private static double sum(List<BookingReportView> rows, Function<BookingReportView, Double> getter) {
         return rows.stream().map(getter).filter(Objects::nonNull).mapToDouble(Double::doubleValue).sum();
     }
 
@@ -253,7 +251,7 @@ public class BookingsPDFExporter {
         return value == null ? 0 : value;
     }
 
-    private static int sumInt(List<Booking> rows, Function<Booking, Integer> getter) {
+    private static int sumInt(List<BookingReportView> rows, Function<BookingReportView, Integer> getter) {
         return rows.stream().map(getter).filter(Objects::nonNull).mapToInt(Integer::intValue).sum();
     }
 

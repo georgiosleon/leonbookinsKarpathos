@@ -2,8 +2,10 @@ package com.leonsoft.api;
 
 import com.leonsoft.models.Booking;
 import com.leonsoft.services.BookingReportService;
+import com.leonsoft.services.BookingResourceService;
 import com.leonsoft.services.BookingsService;
 import com.leonsoft.services.ReportMessages;
+import java.util.Map;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -32,10 +34,12 @@ public class BookingsRestController {
 
     private final BookingsService bookingsService;
     private final BookingReportService bookingReportService;
+    private final BookingResourceService bookingResourceService;
 
-    public BookingsRestController(BookingsService bookingsService, BookingReportService bookingReportService) {
+    public BookingsRestController(BookingsService bookingsService, BookingReportService bookingReportService, BookingResourceService bookingResourceService) {
         this.bookingsService = bookingsService;
         this.bookingReportService = bookingReportService;
+        this.bookingResourceService = bookingResourceService;
     }
 
     @GetMapping("/export/pdf")

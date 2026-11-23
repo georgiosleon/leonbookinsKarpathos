@@ -32,7 +32,7 @@ class BookingsPDFExporterTest {
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         new BookingsPDFExporter(
-              List.of(booking),
+              List.of(BookingReportView.from(booking, "Δωμάτιο")),
               List.of(new BookingResource("APT2", "rooms", "Δωμάτιο")),
               "rooms",
               LocalDate.of(2026, 11, 1),
@@ -57,7 +57,7 @@ class BookingsPDFExporterTest {
 
     @Test
     void exportsTheSummaryResourceBreakdownAndRepeatedBookingHeaders() throws Exception {
-        List<Booking> bookings = new ArrayList<>();
+        List<BookingReportView> bookings = new ArrayList<>();
         for (int index = 0; index < 70; index++) {
             Booking booking = new Booking();
             booking.setId("booking-" + index);
@@ -73,7 +73,7 @@ class BookingsPDFExporterTest {
             booking.setCharge(200.0);
             booking.setReceived(50.0);
             booking.setBalance(150.0);
-            bookings.add(booking);
+            bookings.add(BookingReportView.from(booking, "APT 2"));
         }
         MockHttpServletResponse response = new MockHttpServletResponse();
         BookingsPDFExporter exporter = new BookingsPDFExporter(

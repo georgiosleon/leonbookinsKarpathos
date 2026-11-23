@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import com.leonsoft.config.CustomErrorHandler;
 import com.leonsoft.models.Booking;
 import com.leonsoft.services.BookingReportService;
+import com.leonsoft.services.BookingResourceService;
 import com.leonsoft.services.BookingsService;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,13 +26,15 @@ class BookingsRestControllerTest {
     private MockMvc mockMvc;
     private BookingsService bookingsService;
     private BookingReportService bookingReportService;
+    private BookingResourceService bookingResourceService;
 
     @BeforeEach
     void setUp() {
         bookingsService = org.mockito.Mockito.mock(BookingsService.class);
         bookingReportService = org.mockito.Mockito.mock(BookingReportService.class);
+        bookingResourceService = org.mockito.Mockito.mock(BookingResourceService.class);
         mockMvc = MockMvcBuilders
-              .standaloneSetup(new BookingsRestController(bookingsService, bookingReportService))
+              .standaloneSetup(new BookingsRestController(bookingsService, bookingReportService, bookingResourceService))
               .setControllerAdvice(new CustomErrorHandler())
               .build();
     }
@@ -102,6 +105,7 @@ class BookingsRestControllerTest {
     void getAllReturnsBookingResponseWithEuropeanDates() throws Exception {
         Booking booking = booking("2026-06-20", "2026-06-23");
         org.mockito.Mockito.when(bookingsService.getAll()).thenReturn(List.of(booking));
+        org.mockito.Mockito.when(bookingResourceService.namesById()).thenReturn(java.util.Map.of("APT2", "APT 2"));
 
         mockMvc.perform(get("/api/v1/booking/getAll"))
               .andExpect(status().isOk())

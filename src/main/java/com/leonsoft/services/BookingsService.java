@@ -151,8 +151,6 @@ public class BookingsService {
             return List.of();
         }
         // All authenticated roles can view all bookings; mutation permissions differ.
-        List<Booking> all = bookingRepository.findAllByOrderByStartDateAsc();
-        resourceService.populateResourceNames(all);
-        return all;
+        return bookingRepository.findAllByOrderByStartDateAsc();
     }
 }

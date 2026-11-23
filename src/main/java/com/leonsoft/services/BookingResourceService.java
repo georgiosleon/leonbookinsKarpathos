@@ -44,11 +44,4 @@ public class BookingResourceService {
         return resourceRepository.findAllByOrderByTypeAscNameAsc().stream()
               .collect(Collectors.toMap(BookingResource::getId, BookingResource::getName));
     }
-
-    public void populateResourceNames(List<com.leonsoft.models.Booking> bookings) {
-        Map<String, String> namesById = namesById();
-        for (com.leonsoft.models.Booking booking : bookings) {
-            booking.setRoomName(namesById.getOrDefault(booking.getRoom(), booking.getRoom()));
-        }
-    }
 }
