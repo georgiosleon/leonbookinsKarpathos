@@ -17,7 +17,7 @@ Boot process also serves the React UI.
 
 | Layer | Technology |
 |--------|------------|
-| Backend | Java 25, Spring Boot 3.5 (MVC, Security, JPA, Validation) |
+| Backend | Java 25, Spring Boot 4.1 (MVC, Security, JPA, Validation) |
 | Database | SQLite |
 | Frontend | React 19 + Vite, i18next, vis-timeline |
 | Reports | OpenPDF + localized HTML templates |

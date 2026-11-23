@@ -1,0 +1,35 @@
+name: Repo hygiene
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  hygiene:
+    name: Artifact and secret checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for tracked forbidden artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          forbidden_pattern='\.(db|db-journal|db-shm|db-wal|sqlite3|sqlite3\.enc|jar)$|^backups/|^target/|^install/dist/|^\.env$'
+          matches="$(git ls-files | grep -E "$forbidden_pattern" | grep -Ev '^\.mvn/wrapper/maven-wrapper\.jar$' || true)"
+          if [[ -n "$matches" ]]; then
+            echo "::error::Forbidden tracked files detected:"
+            echo "$matches"
+            exit 1
+          fi
+          echo "No forbidden tracked artifacts found."
+
+      - name: Scan for secrets
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
