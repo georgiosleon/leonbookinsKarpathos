@@ -261,9 +261,13 @@ remain available.
 ## API versioning
 
 The frontend uses the major-versioned `/api/v1` routes, such as
-`/api/v1/booking/getAll` and `/api/v1/csrf`. Existing `/booking/...` and
-`/csrf` routes remain available for older clients. Breaking API changes should
-use a new major prefix, such as `/api/v2`, rather than changing v1 behavior.
+`/api/v1/booking/getAll` and `/api/v1/csrf`. Legacy `/booking/...` and `/csrf`
+routes remain available for backward compatibility but are **deprecated**;
+clients should migrate to `/api/v1/...`. Legacy requests include deprecation
+headers (`Deprecation`, `Warning`). These aliases are planned for removal in a
+future major API version (v2) once clients have migrated. Breaking API changes
+should use a new major prefix, such as `/api/v2`, rather than changing v1
+behavior.
 
 ## Developer documentation
 
