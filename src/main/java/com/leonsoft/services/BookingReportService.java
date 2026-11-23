@@ -82,10 +82,6 @@ public class BookingReportService {
                 .map(booking -> BookingReportView.from(booking, namesById.get(booking.getResourceId())))
                 .toList();
 
-        response.setContentType("application/pdf");
-        response.setHeader(
-                "Content-Disposition",
-                "attachment; filename=booking-report-" + resourceType + "-" + LocalDate.now() + ".pdf");
         pdfReportRenderer.export(bookings, resources, resourceType, startDate, endDate, locale, response);
     }
 

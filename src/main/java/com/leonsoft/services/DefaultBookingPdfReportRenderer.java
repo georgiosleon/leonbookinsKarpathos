@@ -21,6 +21,10 @@ public class DefaultBookingPdfReportRenderer implements BookingPdfReportRenderer
             LocalDate endDate,
             Locale locale,
             HttpServletResponse response) throws DocumentException, IOException {
+        response.setContentType("application/pdf");
+        response.setHeader(
+                "Content-Disposition",
+                "attachment; filename=booking-report-" + resourceType + "-" + LocalDate.now() + ".pdf");
         new BookingsPDFExporter(bookings, resources, resourceType, startDate, endDate, locale)
                 .export(response);
     }
