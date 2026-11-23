@@ -14,6 +14,7 @@ vi.mock('../bookingApi.js', () => ({
   fetchBookingReport: vi.fn(),
   bookingPdfUrl: vi.fn(),
   logout: vi.fn(),
+  isAuthRedirectError: (error) => error?.name === 'AuthRedirectError',
 }));
 
 vi.mock('../i18n.jsx', () => ({
