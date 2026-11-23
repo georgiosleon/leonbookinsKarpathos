@@ -32,7 +32,7 @@ class BookingsPDFExporterTest {
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         new BookingsPDFExporter(
-              List.of(BookingReportView.from(booking, "Δωμάτιο")),
+              List.of(BookingReportView.from(booking, "Δωμάτιο", null, null)),
               List.of(new BookingResource("APT2", "rooms", "Δωμάτιο")),
               "rooms",
               LocalDate.of(2026, 11, 1),
@@ -73,7 +73,7 @@ class BookingsPDFExporterTest {
             booking.setCharge(new java.math.BigDecimal("200.0"));
             booking.setReceived(new java.math.BigDecimal("50.0"));
             booking.setBalance(new java.math.BigDecimal("150.0"));
-            bookings.add(BookingReportView.from(booking, "APT 2"));
+            bookings.add(BookingReportView.from(booking, "APT 2", null, null));
         }
         MockHttpServletResponse response = new MockHttpServletResponse();
         BookingsPDFExporter exporter = new BookingsPDFExporter(

@@ -267,5 +267,11 @@
   "Financials": "Financiën",
   "Balance = Total − Received − Commission − Rental tax": "Saldo = Totaal − Ontvangen − Commissie − Huurbelasting",
   "Show financials": "Financiën tonen",
-  "Hide financials": "Financiën verbergen"
+  "Hide financials": "Financiën verbergen",
+  "Registration number": "Registratienummer",
+  "Property address": "Adres van accommodatie",
+  "Tax category": "Belastingcategorie",
+  "e.g. Climate resilience fee": "bijv. Klimaatveerkrachtbelasting",
+  "Platform reservation ID": "Platformreserverings-ID",
+  "Export CSV": "CSV exporteren"
 }

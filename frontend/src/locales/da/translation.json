@@ -267,5 +267,11 @@
   "Financials": "Økonomi",
   "Balance = Total − Received − Commission − Rental tax": "Saldo = Total − Modtaget − Provision − Lejeskat",
   "Show financials": "Vis økonomi",
-  "Hide financials": "Skjul økonomi"
+  "Hide financials": "Skjul økonomi",
+  "Registration number": "Registreringsnummer",
+  "Property address": "Ejendomsadresse",
+  "Tax category": "Skattekategori",
+  "e.g. Climate resilience fee": "f.eks. Klimamodstandsafgift",
+  "Platform reservation ID": "Platformreservations-ID",
+  "Export CSV": "Eksportér CSV"
 }

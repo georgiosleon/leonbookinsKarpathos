@@ -71,6 +71,7 @@ function emptyForm() {
     voucher: '',
     taxRefNumber: '',
     invoiceNumber: '',
+    platformReservationId: '',
     extraInfo: '',
   };
 }

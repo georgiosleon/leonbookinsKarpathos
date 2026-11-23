@@ -267,5 +267,11 @@
   "Financials": "Finanzen",
   "Balance = Total − Received − Commission − Rental tax": "Saldo = Gesamt − Erhalten − Provision − Mietsteuer",
   "Show financials": "Finanzen anzeigen",
-  "Hide financials": "Finanzen ausblenden"
+  "Hide financials": "Finanzen ausblenden",
+  "Registration number": "Registrierungsnummer",
+  "Property address": "Objektadresse",
+  "Tax category": "Steuerkategorie",
+  "e.g. Climate resilience fee": "z. B. Klimaresilienzabgabe",
+  "Platform reservation ID": "Plattform-Reservierungs-ID",
+  "Export CSV": "CSV exportieren"
 }

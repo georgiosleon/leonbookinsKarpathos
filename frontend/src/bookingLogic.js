@@ -106,6 +106,7 @@ export function bookingToForm(booking) {
     voucher: booking.voucher ?? '',
     taxRefNumber: booking.taxRefNumber ?? '',
     invoiceNumber: booking.invoiceNumber ?? '',
+    platformReservationId: booking.platformReservationId ?? '',
     extraInfo: booking.extraInfo ?? '',
   };
 }

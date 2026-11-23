@@ -40,8 +40,10 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
               .append("<th>").append(label(locale, "arrival")).append("</th>")
               .append("<th>").append(label(locale, "departure")).append("</th>")
               .append("<th>").append(label(locale, "room")).append("</th>")
+              .append("<th>").append(label(locale, "registrationNumber")).append("</th>")
               .append("<th>").append(label(locale, "name")).append("</th>")
               .append("<th>").append(label(locale, "agency")).append("</th>")
+              .append("<th>").append(label(locale, "platformReservationId")).append("</th>")
               .append("<th>").append(label(locale, "guests")).append("</th>")
               .append("<th>").append(label(locale, "nights")).append("</th>")
               .append("<th>").append(label(locale, "rentalTaxPerNight")).append("</th>")
@@ -96,8 +98,10 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
 
                   .append("<td>").append(htmlEscape(booking.resourceName()))
                   .append("</td>")
+                  .append("<td>").append(htmlEscape(booking.resourceRegistrationNumber())).append("</td>")
                   .append("<td>").append(htmlEscape(booking.name())).append("</td>")
                   .append("<td>").append(htmlEscape(booking.agency())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.platformReservationId())).append("</td>")
 
                   .append("<td>").append(n(booking.numOfGuests())).append("</td>")
                   .append("<td>").append(n(booking.numOfNights())).append("</td>")

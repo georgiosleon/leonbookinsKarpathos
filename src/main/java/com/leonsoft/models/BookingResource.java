@@ -34,6 +34,15 @@ public class BookingResource {
     @Column(name = "rental_tax_per_night", columnDefinition = "integer")
     private BigDecimal rentalTaxPerNight = BigDecimal.ZERO;
 
+    @Column(name = "registration_number")
+    private String registrationNumber;
+
+    @Column(name = "property_address")
+    private String propertyAddress;
+
+    @Column(name = "tax_category")
+    private String taxCategory;
+
     public BookingResource(String id, String type, String name) {
         this.id = id;
         this.type = type;

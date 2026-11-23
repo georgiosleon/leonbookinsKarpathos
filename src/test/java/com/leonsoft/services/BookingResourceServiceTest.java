@@ -31,7 +31,7 @@ class BookingResourceServiceTest {
 
     @Test
     void createsNamedResourceWithGeneratedId() {
-        BookingResourceRequest request = new BookingResourceRequest("rooms", "  Suite 1  ", new java.math.BigDecimal("2.50"));
+        BookingResourceRequest request = new BookingResourceRequest("rooms", "  Suite 1  ", new java.math.BigDecimal("2.50"), "AMA-1", "Addr 1", "climate_fee");
         when(resourceRepository.save(any(BookingResource.class)))
               .thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -50,7 +50,7 @@ class BookingResourceServiceTest {
 
         ResponseStatusException exception = assertThrows(
               ResponseStatusException.class,
-              () -> resourceService.create(new BookingResourceRequest("cars", "Car 1", java.math.BigDecimal.ZERO)));
+              () -> resourceService.create(new BookingResourceRequest("cars", "Car 1", java.math.BigDecimal.ZERO, null, null, null)));
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
     }
@@ -88,7 +88,7 @@ class BookingResourceServiceTest {
         when(resourceRepository.save(any(BookingResource.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         BookingResource updated = resourceService.update("r1",
-                new BookingResourceUpdateRequest("  APT 2  ", new java.math.BigDecimal("2.50"), false));
+                new BookingResourceUpdateRequest("  APT 2  ", new java.math.BigDecimal("2.50"), false, "REG-2", "Addr 2", "climate_fee"));
 
         assertEquals("APT 2", updated.getName());
         assertEquals(new java.math.BigDecimal("2.50"), updated.getRentalTaxPerNight());
@@ -102,7 +102,7 @@ class BookingResourceServiceTest {
         when(resourceRepository.existsByTypeAndNameIgnoreCaseAndIdNot("rooms", "APT 2", "r1")).thenReturn(true);
 
         ResponseStatusException exception = assertThrows(ResponseStatusException.class,
-                () -> resourceService.update("r1", new BookingResourceUpdateRequest("APT 2", java.math.BigDecimal.ZERO, true)));
+                () -> resourceService.update("r1", new BookingResourceUpdateRequest("APT 2", java.math.BigDecimal.ZERO, true, null, null, null)));
 
         assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
     }

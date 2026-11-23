@@ -29,6 +29,7 @@ public record BookingResponse(
         String afm,
         String tel,
         String extraInfo,
+        String platformReservationId,
         String status,
         LocalDateTime requestDateTime) {
 
@@ -62,6 +63,7 @@ public record BookingResponse(
                 booking.getAfm(),
                 booking.getTel(),
                 booking.getExtraInfo(),
+                booking.getPlatformReservationId(),
                 booking.getStatus() == null ? null : booking.getStatus().getValue(),
                 booking.getRequestDateTime());
     }

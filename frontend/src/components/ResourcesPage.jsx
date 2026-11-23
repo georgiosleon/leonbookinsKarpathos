@@ -16,10 +16,13 @@ export function ResourcesPage() {
   );
   const [name, setName] = useState('');
   const [rentalTaxPerNight, setRentalTaxPerNight] = useState('0');
+  const [registrationNumber, setRegistrationNumber] = useState('');
+  const [propertyAddress, setPropertyAddress] = useState('');
+  const [taxCategory, setTaxCategory] = useState('');
   const [loading, setLoading] = useState(true);
   const [busy, setBusy] = useState(false);
   const [editingId, setEditingId] = useState(null);
-  const [draft, setDraft] = useState({ name: '', rentalTaxPerNight: '0', active: true });
+  const [draft, setDraft] = useState({ name: '', rentalTaxPerNight: '0', active: true, registrationNumber: '', propertyAddress: '', taxCategory: '' });
   const [error, setError] = useState('');
   const [errorPopupOpen, setErrorPopupOpen] = useState(false);
   const [notice, setNotice] = useState('');
@@ -71,12 +74,15 @@ export function ResourcesPage() {
 
     setBusy(true);
     try {
-      const resource = await createResource({ type, name: name.trim(), rentalTaxPerNight: rentalTaxPerNight === '' ? 0 : Number(rentalTaxPerNight) });
+      const resource = await createResource({ type, name: name.trim(), rentalTaxPerNight: rentalTaxPerNight === '' ? 0 : Number(rentalTaxPerNight), registrationNumber: registrationNumber.trim(), propertyAddress: propertyAddress.trim(), taxCategory: taxCategory.trim() });
       setResources((current) => [...current, resource].sort(
         (left, right) => left.type.localeCompare(right.type) || left.name.localeCompare(right.name),
       ));
       setName('');
       setRentalTaxPerNight('0');
+      setRegistrationNumber('');
+      setPropertyAddress('');
+      setTaxCategory('');
       setNotice(t('Resource added.'));
     } catch (requestError) {
       showError(t('Could not add resource: {error}', { error: requestError.message }));
@@ -93,6 +99,9 @@ export function ResourcesPage() {
       name: resource.name ?? '',
       rentalTaxPerNight: resource.rentalTaxPerNight == null ? '0' : String(resource.rentalTaxPerNight),
       active: resource.active !== false,
+      registrationNumber: resource.registrationNumber ?? '',
+      propertyAddress: resource.propertyAddress ?? '',
+      taxCategory: resource.taxCategory ?? '',
     });
   }
 
@@ -113,6 +122,9 @@ export function ResourcesPage() {
         name: draft.name.trim(),
         rentalTaxPerNight: draft.rentalTaxPerNight === '' ? 0 : Number(draft.rentalTaxPerNight),
         active: Boolean(draft.active),
+        registrationNumber: (draft.registrationNumber ?? '').trim(),
+        propertyAddress: (draft.propertyAddress ?? '').trim(),
+        taxCategory: (draft.taxCategory ?? '').trim(),
       });
       setResources((current) => current
         .map((item) => (item.id === resource.id ? updated : item))
@@ -217,6 +229,18 @@ export function ResourcesPage() {
               onChange={(event) => setRentalTaxPerNight(event.target.value)}
             />
           </label>
+          <label className="field">
+            <span>{t('Registration number')}</span>
+            <input maxLength="120" value={registrationNumber} onChange={(event) => setRegistrationNumber(event.target.value)} />
+          </label>
+          <label className="field">
+            <span>{t('Property address')}</span>
+            <input maxLength="255" value={propertyAddress} onChange={(event) => setPropertyAddress(event.target.value)} />
+          </label>
+          <label className="field">
+            <span>{t('Tax category')}</span>
+            <input maxLength="120" value={taxCategory} onChange={(event) => setTaxCategory(event.target.value)} placeholder={t('e.g. Climate resilience fee')} />
+          </label>
           <div className="form-actions">
             <button type="submit" className="button button-primary" disabled={busy}>
               {busy ? t('Saving…') : t('Add resource')}
@@ -236,6 +260,9 @@ export function ResourcesPage() {
                     <th>{t('Resource type')}</th>
                     <th>{t('Resource name')}</th>
                     <th>{t('Rental tax per night (€)')}</th>
+                    <th>{t('Registration number')}</th>
+                    <th>{t('Property address')}</th>
+                    <th>{t('Tax category')}</th>
                     <th>{t('Active')}</th>
                     <th>{t('Actions')}</th>
                   </tr>
@@ -266,6 +293,9 @@ export function ResourcesPage() {
                             />
                           ) : Number(resource.rentalTaxPerNight ?? 0).toFixed(2)}
                         </td>
+                        <td>{editing ? <input value={draft.registrationNumber} maxLength="120" onChange={(event) => setDraft((d) => ({ ...d, registrationNumber: event.target.value }))} /> : (resource.registrationNumber || '—')}</td>
+                        <td>{editing ? <input value={draft.propertyAddress} maxLength="255" onChange={(event) => setDraft((d) => ({ ...d, propertyAddress: event.target.value }))} /> : (resource.propertyAddress || '—')}</td>
+                        <td>{editing ? <input value={draft.taxCategory} maxLength="120" onChange={(event) => setDraft((d) => ({ ...d, taxCategory: event.target.value }))} /> : (resource.taxCategory || '—')}</td>
                         <td>
                           {editing ? (
                             <input
@@ -289,7 +319,7 @@ export function ResourcesPage() {
                     );
                   })}
                   {resources.length === 0 && (
-                    <tr><td colSpan="5" className="report-empty-row">{t('No resources have been added.')}</td></tr>
+                    <tr><td colSpan="8" className="report-empty-row">{t('No resources have been added.')}</td></tr>
                   )}
                 </tbody>
               </table>

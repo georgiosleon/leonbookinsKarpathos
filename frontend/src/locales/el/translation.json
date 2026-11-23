@@ -267,5 +267,11 @@
   "Financials": "Οικονομικά",
   "Balance = Total − Received − Commission − Rental tax": "Υπόλοιπο = Σύνολο − Εισπραχθέντα − Προμήθεια − Φόρος ενοικίασης",
   "Show financials": "Εμφάνιση οικονομικών",
-  "Hide financials": "Απόκρυψη οικονομικών"
+  "Hide financials": "Απόκρυψη οικονομικών",
+  "Registration number": "Αριθμός καταχώρισης",
+  "Property address": "Διεύθυνση ακινήτου",
+  "Tax category": "Κατηγορία φόρου",
+  "e.g. Climate resilience fee": "π.χ. Τέλος ανθεκτικότητας στην κλιματική κρίση",
+  "Platform reservation ID": "ID κράτησης πλατφόρμας",
+  "Export CSV": "Εξαγωγή CSV"
 }

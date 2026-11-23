@@ -79,7 +79,10 @@ public class BookingReportService {
                         .thenComparing(
                                 booking -> Objects.toString(booking.getName(), ""),
                                 Collator.getInstance(locale)))
-                .map(booking -> BookingReportView.from(booking, namesById.get(booking.getResourceId())))
+                .map(booking -> {
+                    BookingResource r = resourcesById.get(booking.getResourceId());
+                    return BookingReportView.from(booking, namesById.get(booking.getResourceId()), r == null ? null : r.getRegistrationNumber(), r == null ? null : r.getTaxCategory());
+                })
                 .toList();
 
         pdfReportRenderer.export(bookings, resources, resourceType, startDate, endDate, locale, response);
@@ -93,13 +96,18 @@ public class BookingReportService {
         LocalDate edDate = LocalDate.parse(toDateEuroFmt, BookingsUtils.formatterEURO);
 
         Map<String, String> namesById = resourceService.namesById();
+        Map<String, BookingResource> resourcesById = resourceService.getAll().stream()
+                .collect(Collectors.toMap(BookingResource::getId, r -> r, (a, b) -> a));
         List<BookingReportView> all = getAllBookingsForReport().stream()
                 .filter(booking -> {
                     LocalDate bookingStart = booking.getStartDate();
                     LocalDate bookingEnd = booking.getEndDate();
                     return !bookingStart.isBefore(stDate) && !bookingEnd.isAfter(edDate);
                 })
-                .map(booking -> BookingReportView.from(booking, namesById.get(booking.getResourceId())))
+                .map(booking -> {
+                    BookingResource r = resourcesById.get(booking.getResourceId());
+                    return BookingReportView.from(booking, namesById.get(booking.getResourceId()), r == null ? null : r.getRegistrationNumber(), r == null ? null : r.getTaxCategory());
+                })
                 .toList();
 
         return htmlReportRenderer.render(fromDateEuroFmt, toDateEuroFmt, all, locale);

@@ -267,5 +267,11 @@
   "Financials": "Financials",
   "Balance = Total − Received − Commission − Rental tax": "Balance = Total − Received − Commission − Rental tax",
   "Show financials": "Show financials",
-  "Hide financials": "Hide financials"
+  "Hide financials": "Hide financials",
+  "Registration number": "Registration number",
+  "Property address": "Property address",
+  "Tax category": "Tax category",
+  "e.g. Climate resilience fee": "e.g. Climate resilience fee",
+  "Platform reservation ID": "Platform reservation ID",
+  "Export CSV": "Export CSV"
 }

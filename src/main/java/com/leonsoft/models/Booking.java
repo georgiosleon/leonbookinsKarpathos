@@ -93,6 +93,9 @@ public class Booking {
     @Column(name = "extra_info")
     private String extraInfo;
 
+    @Column(name = "platform_reservation_id")
+    private String platformReservationId;
+
     @Column(name = "status", nullable = false)
     private BookingStatus status;
 

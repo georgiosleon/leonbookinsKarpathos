@@ -8,7 +8,10 @@ public record BookingResourceResponse(
         String type,
         String name,
         boolean active,
-        BigDecimal rentalTaxPerNight) {
+        BigDecimal rentalTaxPerNight,
+        String registrationNumber,
+        String propertyAddress,
+        String taxCategory) {
 
     public static BookingResourceResponse from(BookingResource resource) {
         return new BookingResourceResponse(
@@ -16,6 +19,9 @@ public record BookingResourceResponse(
                 resource.getType(),
                 resource.getName(),
                 resource.isActive(),
-                resource.getRentalTaxPerNight());
+                resource.getRentalTaxPerNight(),
+                resource.getRegistrationNumber(),
+                resource.getPropertyAddress(),
+                resource.getTaxCategory());
     }
 }

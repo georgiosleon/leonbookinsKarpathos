@@ -28,7 +28,7 @@ class BookingsHtmlTemplateTest {
         booking.setNumOfNights(2);
         booking.setExtraInfo("<script>alert(1)</script>");
 
-        String report = new BookingsHtmlTemplate().render("20/06/2026", "30/06/2026", List.of(BookingReportView.from(booking, booking.getResourceId())), Locale.ENGLISH);
+        String report = new BookingsHtmlTemplate().render("20/06/2026", "30/06/2026", List.of(BookingReportView.from(booking, booking.getResourceId(), null, null)), Locale.ENGLISH);
 
         assertTrue(report.contains("&lt;svg onload=&#39;alert(1)&#39;&gt;"));
         assertTrue(report.contains("&lt;img src=x onerror=alert(1)&gt; &amp; guest"));
@@ -53,7 +53,7 @@ class BookingsHtmlTemplateTest {
         booking.setNumOfNights(2);
 
         String report = new BookingsHtmlTemplate().render(
-              "20/06/2026", "30/06/2026", List.of(BookingReportView.from(booking, booking.getResourceId())), Locale.forLanguageTag("el-GR"));
+              "20/06/2026", "30/06/2026", List.of(BookingReportView.from(booking, booking.getResourceId(), null, null)), Locale.forLanguageTag("el-GR"));
 
         assertTrue(report.contains("<th>Κατάσταση</th>"));
         assertTrue(report.contains(">Ακυρωμένη</td>"));

@@ -267,5 +267,11 @@
   "Financials": "Finances",
   "Balance = Total − Received − Commission − Rental tax": "Solde = Total − Reçu − Commission − Taxe de location",
   "Show financials": "Afficher les finances",
-  "Hide financials": "Masquer les finances"
+  "Hide financials": "Masquer les finances",
+  "Registration number": "Numéro d'enregistrement",
+  "Property address": "Adresse de la propriété",
+  "Tax category": "Catégorie de taxe",
+  "e.g. Climate resilience fee": "ex. Taxe de résilience climatique",
+  "Platform reservation ID": "ID de réservation plateforme",
+  "Export CSV": "Exporter CSV"
 }

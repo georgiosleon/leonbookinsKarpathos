@@ -47,6 +47,9 @@ public class BookingResourceService {
         resource.setName(name);
         resource.setRentalTaxPerNight(request.rentalTaxPerNight() == null ? BigDecimal.ZERO : request.rentalTaxPerNight());
         resource.setActive(Boolean.TRUE.equals(request.active()));
+        resource.setRegistrationNumber(trimToNull(request.registrationNumber()));
+        resource.setPropertyAddress(trimToNull(request.propertyAddress()));
+        resource.setTaxCategory(trimToNull(request.taxCategory()));
         return resourceRepository.save(resource);
     }
 
@@ -67,5 +70,11 @@ public class BookingResourceService {
     public Map<String, String> namesById() {
         return resourceRepository.findAllByOrderByTypeAscNameAsc().stream()
               .collect(Collectors.toMap(BookingResource::getId, BookingResource::getName));
+    }
+
+    private static String trimToNull(String value) {
+        if (value == null) return null;
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

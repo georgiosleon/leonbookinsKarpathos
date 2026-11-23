@@ -12,6 +12,7 @@ const detailFields = [
   { name: 'voucher', label: 'Voucher' },
   { name: 'taxRefNumber', label: 'Tax reference' },
   { name: 'invoiceNumber', label: 'Invoice number' },
+  { name: 'platformReservationId', label: 'Platform reservation ID' },
 ];
 
 export function BookingForm({

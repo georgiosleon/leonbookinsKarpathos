@@ -27,9 +27,12 @@ public record BookingReportView(
         java.math.BigDecimal balance,
         String tel,
         String status,
-        String extraInfo) {
+        String extraInfo,
+        String platformReservationId,
+        String resourceRegistrationNumber,
+        String resourceTaxCategory) {
 
-    public static BookingReportView from(Booking booking, String resourceName) {
+    public static BookingReportView from(Booking booking, String resourceName, String resourceRegistrationNumber, String resourceTaxCategory) {
         String resolvedName = resourceName == null || resourceName.isBlank()
                 ? booking.getResourceId()
                 : resourceName;
@@ -57,6 +60,9 @@ public record BookingReportView(
                 booking.getBalance(),
                 booking.getTel(),
                 booking.getStatus() == null ? null : booking.getStatus().getValue(),
-                booking.getExtraInfo());
+                booking.getExtraInfo(),
+                booking.getPlatformReservationId(),
+                resourceRegistrationNumber,
+                resourceTaxCategory);
     }
 }
