@@ -279,5 +279,10 @@
   "View reports / export": "View reports / export",
   "Manage rooms & cars": "Manage rooms & cars",
   "Support": "Support",
-  "Save mode": "Save mode"
+  "Save mode": "Save mode",
+  "Diagnostic information for troubleshooting.": "Diagnostic information for troubleshooting.",
+  "Loading...": "Loading...",
+  "Could not load support information.": "Could not load support information.",
+  "Update mode": "Update mode",
+  "Remove & add mode": "Remove & add mode"
 }

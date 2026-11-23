@@ -279,5 +279,10 @@
   "View reports / export": "Se rapporter / eksport",
   "Manage rooms & cars": "Administrer værelser & biler",
   "Support": "Support",
-  "Save mode": "Gemmetilstand"
+  "Save mode": "Gemmetilstand",
+  "Diagnostic information for troubleshooting.": "Diagnostiske oplysninger til fejlfinding.",
+  "Loading...": "Indlæser...",
+  "Could not load support information.": "Kunne ikke indlæse supportoplysninger.",
+  "Update mode": "Opdateringstilstand",
+  "Remove & add mode": "Tilstand fjern & tilføj"
 }

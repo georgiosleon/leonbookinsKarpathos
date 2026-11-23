@@ -279,5 +279,10 @@
   "View reports / export": "Berichte anzeigen / exportieren",
   "Manage rooms & cars": "Zimmer & Fahrzeuge verwalten",
   "Support": "Support",
-  "Save mode": "Speichermodus"
+  "Save mode": "Speichermodus",
+  "Diagnostic information for troubleshooting.": "Diagnoseinformationen zur Fehlerbehebung.",
+  "Loading...": "Laden...",
+  "Could not load support information.": "Supportinformationen konnten nicht geladen werden.",
+  "Update mode": "Aktualisierungsmodus",
+  "Remove & add mode": "Modus Entfernen & Hinzufügen"
 }

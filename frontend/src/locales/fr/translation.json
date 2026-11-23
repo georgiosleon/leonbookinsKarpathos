@@ -279,5 +279,10 @@
   "View reports / export": "Voir rapports / exporter",
   "Manage rooms & cars": "Gérer chambres & véhicules",
   "Support": "Assistance",
-  "Save mode": "Mode d’enregistrement"
+  "Save mode": "Mode d’enregistrement",
+  "Diagnostic information for troubleshooting.": "Informations de diagnostic pour le dépannage.",
+  "Loading...": "Chargement...",
+  "Could not load support information.": "Impossible de charger les informations d’assistance.",
+  "Update mode": "Mode mise à jour",
+  "Remove & add mode": "Mode supprimer & ajouter"
 }

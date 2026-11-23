@@ -279,5 +279,10 @@
   "View reports / export": "Rapporten bekijken / exporteren",
   "Manage rooms & cars": "Kamers & auto's beheren",
   "Support": "Ondersteuning",
-  "Save mode": "Opbergmodus"
+  "Save mode": "Opbergmodus",
+  "Diagnostic information for troubleshooting.": "Diagnostische informatie voor probleemoplossing.",
+  "Loading...": "Laden...",
+  "Could not load support information.": "Ondersteuningsinformatie kon niet worden geladen.",
+  "Update mode": "Updatemodus",
+  "Remove & add mode": "Modus verwijderen & toevoegen"
 }

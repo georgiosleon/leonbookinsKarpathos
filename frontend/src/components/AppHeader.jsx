@@ -64,7 +64,6 @@ export function AppHeader({
           <ThemeToggle theme={theme} onToggle={onToggleTheme} />
           <LanguageSelector />
           <HelpButton />
-          <AppSupportActions showVersion={false} />
           <button type="button" className="button button-muted" onClick={onLogout}>
             <span aria-hidden="true">🚪 </span>{t('Sign out')}
           </button>

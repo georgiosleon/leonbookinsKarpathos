@@ -139,7 +139,7 @@ export function BookingForm({
                   onClick={onSaveModeChange}
                 >
                   <span aria-hidden="true">{saveMode === 'edit' ? '✏️' : '📝'}</span>
-                  <span>{t('Edit selected booking')}</span>
+                  <span>{saveMode === 'edit' ? t('Update mode') : t('Remove & add mode')}</span>
                 </button>
               </div>
             ) : null}

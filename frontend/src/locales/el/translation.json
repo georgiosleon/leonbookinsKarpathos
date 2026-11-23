@@ -279,5 +279,10 @@
   "View reports / export": "Προβολή αναφορών / εξαγωγή",
   "Manage rooms & cars": "Διαχείριση δωματίων & αυτοκινήτων",
   "Support": "Υποστήριξη",
-  "Save mode": "Λειτουργία αποθήκευσης"
+  "Save mode": "Λειτουργία αποθήκευσης",
+  "Diagnostic information for troubleshooting.": "Διαγνωστικές πληροφορίες για αντιμετώπιση προβλημάτων.",
+  "Loading...": "Φόρτωση...",
+  "Could not load support information.": "Δεν ήταν δυνατή η φόρτωση των πληροφοριών υποστήριξης.",
+  "Update mode": "Λειτουργία ενημέρωσης",
+  "Remove & add mode": "Λειτουργία αφαίρεσης & προσθήκης"
 }
