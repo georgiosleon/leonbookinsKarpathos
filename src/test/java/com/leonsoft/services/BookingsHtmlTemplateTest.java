@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
-class BookinsHtmlTemplateTest {
+class BookingsHtmlTemplateTest {
 
     @Test
     void escapesBookingValuesAndDoesNotEmitExecutableActions() {
@@ -28,7 +28,7 @@ class BookinsHtmlTemplateTest {
         booking.setNumOfNights(2);
         booking.setExtraInfo("<script>alert(1)</script>");
 
-        String report = BookinsHtmlTemplate.report("20/06/2026", "30/06/2026", List.of(booking));
+        String report = BookingsHtmlTemplate.report("20/06/2026", "30/06/2026", List.of(booking));
 
         assertTrue(report.contains("&lt;svg onload=&#39;alert(1)&#39;&gt;"));
         assertTrue(report.contains("&lt;img src=x onerror=alert(1)&gt; &amp; guest"));
@@ -52,7 +52,7 @@ class BookinsHtmlTemplateTest {
         booking.setNumOfGuests(1);
         booking.setNumOfNights(2);
 
-        String report = BookinsHtmlTemplate.report(
+        String report = BookingsHtmlTemplate.report(
               "20/06/2026", "30/06/2026", List.of(booking), Locale.forLanguageTag("el-GR"));
 
         assertTrue(report.contains("<th>Κατάσταση</th>"));
@@ -64,7 +64,7 @@ class BookinsHtmlTemplateTest {
 
     @Test
     void rendersFrenchLabelsWithoutAnInaccuratePdfLink() {
-        String report = BookinsHtmlTemplate.report(
+        String report = BookingsHtmlTemplate.report(
               "20/06/2026", "30/06/2026", List.of(), Locale.FRANCE);
 
         assertTrue(report.contains("<th>Arrivée</th>"));

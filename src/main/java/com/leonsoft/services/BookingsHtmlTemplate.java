@@ -11,7 +11,7 @@ import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
-public class BookinsHtmlTemplate {
+public class BookingsHtmlTemplate {
 
     public static String report(String fromDateEuroFmt, String toDateEuroFmt, List<Booking> all) {
         return report(fromDateEuroFmt, toDateEuroFmt, all, Locale.ENGLISH);

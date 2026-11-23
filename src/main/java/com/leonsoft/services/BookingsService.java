@@ -148,7 +148,7 @@ public class BookingsService {
                 .toList();
         addResourceNames(all);
 
-        return BookinsHtmlTemplate.report(fromDateEuroFmt, toDateEuroFmt, all, locale);
+        return BookingsHtmlTemplate.report(fromDateEuroFmt, toDateEuroFmt, all, locale);
 
     }
 
