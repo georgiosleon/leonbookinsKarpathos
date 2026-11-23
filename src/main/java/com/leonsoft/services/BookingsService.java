@@ -40,16 +40,19 @@ public class BookingsService {
     private final UserRepository userRepository;
     private final BookingResourceService resourceService;
     private final BookingAvailabilityPolicy availabilityPolicy;
+    private final BookingOverlapChecker overlapChecker;
 
     public BookingsService(
             BookingRepository bookingRepository,
             UserRepository userRepository,
             BookingResourceService resourceService,
-            BookingAvailabilityPolicy availabilityPolicy) {
+            BookingAvailabilityPolicy availabilityPolicy,
+            BookingOverlapChecker overlapChecker) {
         this.bookingRepository = bookingRepository;
         this.userRepository = userRepository;
         this.resourceService = resourceService;
         this.availabilityPolicy = availabilityPolicy;
+        this.overlapChecker = overlapChecker;
     }
 
     /** Get the currently authenticated user, or null if no user is logged in */
@@ -194,9 +197,9 @@ public class BookingsService {
         LocalDate edDate = LocalDate.parse(booking.getEndDate(), BookingsUtils.formatterEURO);
 
         if (edDate.isAfter(stDate)
-                && isBookable(booking.getStatus())
+                && overlapChecker.isBookable(booking.getStatus())
                 && availabilityPolicy.preventsOverlap(resource.getType())
-                && hasOverlappingBooking(booking, stDate, edDate)) {
+                && overlapChecker.hasOverlap(booking, stDate, edDate)) {
             String unavailableMessage = "rooms".equals(resource.getType())
                     ? "Room is not available for those dates."
                     : "Vehicle is not available for those dates.";
@@ -215,19 +218,6 @@ public class BookingsService {
         booking = bookingRepository.save(booking);
         booking.setRoomName(resource.getName());
         return booking;
-    }
-
-    private boolean hasOverlappingBooking(Booking candidate, LocalDate startDate, LocalDate endDate) {
-        return bookingRepository.findByRoomAndStatusIn(
-                        candidate.getRoom(), List.of("active", "paid"))
-                .stream()
-                .filter(existing -> !Objects.equals(existing.getId(), candidate.getId()))
-                .anyMatch(existing -> existing.getStartDate().compareTo(endDate.toString()) < 0
-                        && startDate.toString().compareTo(existing.getEndDate()) < 0);
-    }
-
-    private static boolean isBookable(String status) {
-        return "active".equals(status) || "paid".equals(status);
     }
 
     public Boolean deleteObject(String bookingId) {

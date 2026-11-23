@@ -47,7 +47,7 @@ class BookingsServiceTest {
     @BeforeEach
     void setUp() {
         bookingsService = new BookingsService(
-              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(true, true));
+              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(true, true), new BookingOverlapChecker(bookingRepository));
         User admin = new User();
         admin.setId(1);
         admin.setUsername("admin");
@@ -230,7 +230,7 @@ class BookingsServiceTest {
     @Test
     void roomFlagCanAllowOverlapsWithoutDisablingVehicleProtection() {
         bookingsService = new BookingsService(
-              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(false, true));
+              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository));
         when(resourceService.requireActive("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -241,7 +241,7 @@ class BookingsServiceTest {
               .findByRoomAndStatusIn("APT2", List.of("active", "paid"));
 
         bookingsService = new BookingsService(
-              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(false, true));
+              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository));
         Booking existingVehicleBooking = savedBooking("vehicle-existing", "2026-06-20", "2026-06-23", "paid");
         existingVehicleBooking.setRoom("CAR1");
         when(resourceService.requireActive("CAR1"))

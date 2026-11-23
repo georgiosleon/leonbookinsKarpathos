@@ -68,7 +68,7 @@ class BookingsReportPdfServiceTest {
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         BookingsService service = new BookingsService(
-              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(true, true));
+              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(true, true), new BookingOverlapChecker(bookingRepository));
 
         service.exportReportToPDF(response, "01/06/2026", "30/06/2026", "rooms", Locale.UK);
 
