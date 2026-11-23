@@ -31,10 +31,10 @@ public class DatabaseInitializer {
     @Value("${APP_ADMIN_PASSWORD:change-me-admin-password}")
     private String adminPassword;
 
-    @Value("${APP_OPERATOR_USERNAME:${APP_USER_USERNAME:user}}")
+    @Value("${APP_OPERATOR_USERNAME:user}")
     private String operatorUsername;
 
-    @Value("${APP_OPERATOR_PASSWORD:${APP_USER_PASSWORD:change-me-user-password}}")
+    @Value("${APP_OPERATOR_PASSWORD:change-me-user-password}")
     private String operatorPassword;
 
     @Value("${APP_GUEST_USERNAME:guest}")

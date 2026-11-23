@@ -37,7 +37,7 @@ Main screens use query parameters:
 
 Authentication uses database-backed users with `ADMIN`, `OPERATOR`, and `GUEST`
 roles. On first startup, default accounts are seeded only when missing; set
-`APP_ADMIN_USERNAME/PASSWORD`, `APP_OPERATOR_USERNAME/PASSWORD` (or legacy `APP_USER_*`), and
+`APP_ADMIN_USERNAME/PASSWORD`, `APP_OPERATOR_USERNAME/PASSWORD`, and
 `APP_GUEST_USERNAME/PASSWORD` in the environment to control those seed accounts.
 Run it with Docker Compose, `./mvnw generate-resources spring-boot:run`, or a
 desktop package under `install/`. An offline `db backup|restore` CLI is
