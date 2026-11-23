@@ -315,6 +315,7 @@ export function ReportsPage() {
                     <th>{t('Agency')}</th>
                     <th>{t('Guests')}</th>
                     <th>{t('Nights')}</th>
+                    <th>{t('Rental tax per night (€)')}</th>
                     <th>{t('Charge')}</th>
                     <th>{t('Received')}</th>
                     <th>{t('Rental tax (€)')}</th>
@@ -332,6 +333,7 @@ export function ReportsPage() {
                       <td>{t(mode.agencies.find((agency) => agency.id === booking.agency)?.text ?? booking.agency)}</td>
                       <td>{booking.numOfGuests ?? 0}</td>
                       <td>{booking.numOfNights ?? 0}</td>
+                      <td>{formatMoney((Number(booking.numOfNights) || 0) > 0 ? (Number(booking.rentalTax) || 0) / (Number(booking.numOfNights) || 1) : 0, locale)}</td>
                       <td>{formatMoney(Number(booking.charge) || 0, locale)}</td>
                       <td>{formatMoney(Number(booking.received) || 0, locale)}</td>
                       <td>{formatMoney(Number(booking.rentalTax) || 0, locale)}</td>
@@ -340,7 +342,7 @@ export function ReportsPage() {
                   ))}
                   {filteredBookings.length === 0 && (
                     <tr>
-                      <td colSpan="12" className="report-empty-row">{t('No bookings start in this period.')}</td>
+                      <td colSpan="13" className="report-empty-row">{t('No bookings start in this period.')}</td>
                     </tr>
                   )}
                 </tbody>

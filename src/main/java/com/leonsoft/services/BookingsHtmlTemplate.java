@@ -44,6 +44,7 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
               .append("<th>").append(label(locale, "agency")).append("</th>")
               .append("<th>").append(label(locale, "guests")).append("</th>")
               .append("<th>").append(label(locale, "nights")).append("</th>")
+              .append("<th>").append(label(locale, "rentalTaxPerNight")).append("</th>")
               .append("<th>").append(label(locale, "total")).append("</th>")
               .append("<th>").append(label(locale, "commission")).append("</th>")
               .append("<th>").append(label(locale, "received")).append("</th>")
@@ -100,6 +101,7 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
 
                   .append("<td>").append(n(booking.numOfGuests())).append("</td>")
                   .append("<td>").append(n(booking.numOfNights())).append("</td>")
+                  .append("<td>").append(booking.numOfNights() != null && booking.numOfNights() > 0 ? n(booking.rentalTax()) / booking.numOfNights() : 0.0).append("</td>")
 
                   .append("<td>").append(n(booking.charge())).append("</td>")
                   .append("<td>").append(n(booking.commission())).append("</td>")

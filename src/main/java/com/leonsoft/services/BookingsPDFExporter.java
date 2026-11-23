@@ -29,7 +29,7 @@ import java.util.function.Function;
 public class BookingsPDFExporter {
     private static final List<String> BOOKING_HEADERS = List.of(
             "status", "arrival", "departure", "resource", "name", "agency",
-            "guests", "nights", "charge", "received", "rentalTax", "balance");
+            "guests", "nights", "rentalTaxPerNight", "charge", "received", "rentalTax", "balance");
 
     private final List<BookingReportView> bookings;
     private final List<BookingResource> resources;
@@ -146,7 +146,7 @@ public class BookingsPDFExporter {
 
         PdfPTable table = new PdfPTable(BOOKING_HEADERS.size());
         table.setWidthPercentage(100);
-        table.setWidths(new float[] {8, 8, 8, 10, 13, 11, 5, 5, 8, 8, 8, 8});
+        table.setWidths(new float[] {7, 8, 8, 10, 12, 10, 5, 5, 7, 7, 7, 7, 7});
         addHeader(table, BOOKING_HEADERS.stream()
               .map(key -> "resource".equals(key) ? text(resourceType) : text(key))
               .toList());
@@ -170,6 +170,9 @@ public class BookingsPDFExporter {
                       font, Element.ALIGN_RIGHT);
                 addCell(table, String.valueOf(Objects.requireNonNullElse(booking.numOfNights(), 0)),
                       font, Element.ALIGN_RIGHT);
+                double nights = Objects.requireNonNullElse(booking.numOfNights(), 0);
+                double nightlyRate = nights > 0 ? number(booking.rentalTax()) / nights : 0.0;
+                addCell(table, formatMoney(nightlyRate), font, Element.ALIGN_RIGHT);
                 addCell(table, formatMoney(number(booking.charge())), font, Element.ALIGN_RIGHT);
                 addCell(table, formatMoney(number(booking.received())), font, Element.ALIGN_RIGHT);
                 addCell(table, formatMoney(number(booking.rentalTax())), font, Element.ALIGN_RIGHT);
