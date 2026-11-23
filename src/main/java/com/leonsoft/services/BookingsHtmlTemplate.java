@@ -1,6 +1,7 @@
 package com.leonsoft.services;
 
 import com.leonsoft.models.Booking;
+import com.leonsoft.models.BookingStatus;
 import com.leonsoft.models.BookingTotals;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -72,7 +73,7 @@ public class BookingsHtmlTemplate {
             LocalDate stDt = BookingsUtils.parseStoredDate(booking.getStartDate());
             LocalDate edDt = BookingsUtils.parseStoredDate(booking.getEndDate());
 
-            String statusClass = Objects.equals(booking.getStatus(), "cancelled")
+            String statusClass = BookingStatus.isCancelled(booking.getStatus())
                   ? " class=\"cancelled-status\""
                   : "";
 

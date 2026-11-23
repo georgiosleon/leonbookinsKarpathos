@@ -2,6 +2,7 @@ package com.leonsoft.services;
 
 import com.leonsoft.models.Booking;
 import com.leonsoft.models.BookingResource;
+import com.leonsoft.models.BookingStatus;
 import com.leonsoft.models.User;
 import com.leonsoft.repositories.BookingRepository;
 import java.time.LocalDate;
@@ -95,7 +96,7 @@ public class BookingsService {
                 && overlapChecker.isBookable(booking.getStatus())
                 && availabilityPolicy.preventsOverlap(resource.getType())
                 && overlapChecker.hasOverlap(booking, stDate, edDate)) {
-            String unavailableMessage = "rooms".equals(resource.getType())
+            String unavailableMessage = com.leonsoft.models.BookingResourceType.ROOMS.equals(resource.getType())
                     ? "Room is not available for those dates."
                     : "Vehicle is not available for those dates.";
             throw new ResponseStatusException(HttpStatus.CONFLICT, unavailableMessage);
@@ -132,7 +133,7 @@ public class BookingsService {
         log.debug("Delete cancelled booking {}", bookingId);
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found."));
-        if (!"cancelled".equals(booking.getStatus())) {
+        if (!BookingStatus.isCancelled(booking.getStatus())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only cancelled bookings can be deleted.");
         }
 
@@ -143,6 +144,7 @@ public class BookingsService {
         bookingRepository.deleteById(bookingId);
     }
 
+    @Transactional(readOnly = true)
     public List<Booking> getAll() {
         User currentUser = currentUserProvider.getCurrentUser().orElse(null);
         if (currentUser == null) {

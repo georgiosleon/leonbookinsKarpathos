@@ -18,6 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 @Service
@@ -38,6 +39,7 @@ public class BookingReportService {
         this.currentUserProvider = currentUserProvider;
     }
 
+    @Transactional(readOnly = true)
     public void exportReportToPDF(
             HttpServletResponse response,
             String fromDateEuroFmt,
@@ -45,7 +47,7 @@ public class BookingReportService {
             String resourceType,
             Locale locale) throws DocumentException, IOException {
 
-        if (!"rooms".equals(resourceType) && !"cars".equals(resourceType)) {
+        if (!com.leonsoft.models.BookingResourceType.isSupported(resourceType)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid report resource type.");
         }
 
@@ -81,6 +83,7 @@ public class BookingReportService {
                 .export(response);
     }
 
+    @Transactional(readOnly = true)
     public String report(String fromDateEuroFmt, String toDateEuroFmt, Locale locale) {
         log.debug("/booking/report fromDate={} toDate={}", fromDateEuroFmt, toDateEuroFmt);
 

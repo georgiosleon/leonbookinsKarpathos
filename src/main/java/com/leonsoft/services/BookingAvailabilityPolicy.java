@@ -18,8 +18,8 @@ public class BookingAvailabilityPolicy {
 
     public boolean preventsOverlap(String resourceType) {
         return switch (resourceType) {
-            case "rooms" -> roomsPreventOverlap;
-            case "cars" -> carsPreventOverlap;
+            case com.leonsoft.models.BookingResourceType.ROOMS -> roomsPreventOverlap;
+            case com.leonsoft.models.BookingResourceType.CARS -> carsPreventOverlap;
             default -> true;
         };
     }

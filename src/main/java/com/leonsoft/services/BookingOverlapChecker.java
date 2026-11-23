@@ -1,9 +1,9 @@
 package com.leonsoft.services;
 
 import com.leonsoft.models.Booking;
+import com.leonsoft.models.BookingStatus;
 import com.leonsoft.repositories.BookingRepository;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +17,7 @@ public class BookingOverlapChecker {
     }
 
     public boolean hasOverlap(Booking candidate, LocalDate startDate, LocalDate endDate) {
-        return bookingRepository.findByRoomAndStatusIn(candidate.getRoom(), List.of("active", "paid"))
+        return bookingRepository.findByRoomAndStatusIn(candidate.getRoom(), BookingStatus.BOOKABLE)
                 .stream()
                 .filter(existing -> !Objects.equals(existing.getId(), candidate.getId()))
                 .anyMatch(existing -> existing.getStartDate().compareTo(endDate.toString()) < 0
@@ -25,6 +25,6 @@ public class BookingOverlapChecker {
     }
 
     public boolean isBookable(String status) {
-        return "active".equals(status) || "paid".equals(status);
+        return BookingStatus.isBookable(status);
     }
 }

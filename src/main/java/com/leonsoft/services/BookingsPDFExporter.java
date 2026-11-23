@@ -1,6 +1,7 @@
 package com.leonsoft.services;
 
 import com.leonsoft.models.Booking;
+import com.leonsoft.models.BookingStatus;
 import com.leonsoft.models.BookingResource;
 import com.lowagie.text.Document;
 import com.lowagie.text.DocumentException;
@@ -82,7 +83,7 @@ public class BookingsPDFExporter {
 
     private void addSummary(Document document) throws DocumentException {
         List<Booking> bookable = bookings.stream().filter(this::isBookable).toList();
-        long cancelled = bookings.stream().filter(booking -> "cancelled".equals(booking.getStatus())).count();
+        long cancelled = bookings.stream().filter(booking -> BookingStatus.isCancelled(booking.getStatus())).count();
         int guests = sumInt(bookable, Booking::getNumOfGuests);
         int nights = sumInt(bookable, Booking::getNumOfNights);
 
@@ -241,7 +242,7 @@ public class BookingsPDFExporter {
     }
 
     private boolean isBookable(Booking booking) {
-        return "active".equals(booking.getStatus()) || "paid".equals(booking.getStatus());
+        return BookingStatus.isBookable(booking.getStatus());
     }
 
     private static double sum(List<Booking> rows, Function<Booking, Double> getter) {
