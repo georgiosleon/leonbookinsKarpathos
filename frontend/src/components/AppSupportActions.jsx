@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { fetchApplicationInfo } from '../bookingApi.js';
 import { useLanguage } from '../i18n.jsx';
 
-export function AppSupportActions() {
+export function AppSupportActions({ showVersion = true, showDiagnostics = true, className = '' }) {
   const [version, setVersion] = useState('');
   const { t } = useLanguage();
 
@@ -21,13 +21,17 @@ export function AppSupportActions() {
   }, []);
 
   return (
-    <div className="app-support-actions">
-      <span className="app-version">
-        {version ? t('Version {version}', { version }) : t('Version unavailable')}
-      </span>
-      <a className="button button-muted" href="/api/v1/diagnostics">
-        {t('Export diagnostics')}
-      </a>
+    <div className={`app-support-actions ${className}`.trim()}>
+      {showVersion ? (
+        <span className="app-version">
+          {version ? t('Version {version}', { version }) : t('Version unavailable')}
+        </span>
+      ) : null}
+      {showDiagnostics ? (
+        <a className="button button-muted" href="/api/v1/diagnostics">
+          {t('Support')}
+        </a>
+      ) : null}
     </div>
   );
 }

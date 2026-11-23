@@ -2,6 +2,17 @@ import { formatDateForApi } from './bookingLogic.js';
 import { defaultLanguage, languageStorageKey, resolveLanguage } from './localeConfig.js';
 
 let csrfToken;
+let redirectingToLogin = false;
+
+export function isAuthRedirectError(error) {
+  return error?.name === 'AuthRedirectError';
+}
+
+function authRedirectError() {
+  const error = new Error('Authentication required.');
+  error.name = 'AuthRedirectError';
+  return error;
+}
 
 export async function request(url, options) {
   const response = await fetch(url, {
@@ -12,8 +23,11 @@ export async function request(url, options) {
     },
   });
   if (response.status === 401) {
-    window.location.assign('/login');
-    throw new Error('Your session has expired. Please sign in again.');
+    if (!redirectingToLogin && !window.location.pathname.startsWith('/login')) {
+      redirectingToLogin = true;
+      window.location.assign('/login');
+    }
+    throw authRedirectError();
   }
   if (response.status === 403) {
     const message = (await response.text()).trim();

@@ -1,13 +1,10 @@
 import { useEffect, useState } from 'react';
-import { logout } from '../../bookingApi.js';
+import { isAuthRedirectError, logout } from '../../bookingApi.js';
 import { createUser, deleteUser, fetchUsers, updateUser } from '../../usersApi.js';
-import { LanguageSelector } from '../LanguageSelector.jsx';
 import { useLanguage } from '../../i18n.jsx';
-import { ThemeToggle } from '../ThemeToggle.jsx';
 import { useTheme } from '../../useTheme.js';
 import { FeedbackDialog } from '../FeedbackDialog.jsx';
-import { HelpButton } from '../HelpButton.jsx';
-import { AppSupportActions } from '../AppSupportActions.jsx';
+import { AppHeader } from '../AppHeader.jsx';
 
 const roleOptions = ['ADMIN', 'OPERATOR', 'GUEST'];
 
@@ -43,7 +40,7 @@ export function UserManagement() {
         if (active) setUsers(data);
       })
       .catch((requestError) => {
-        if (active) {
+        if (active && !isAuthRedirectError(requestError)) {
           showError(t('Could not load users: {error}', { error: requestError.message }));
         }
       })
@@ -134,28 +131,15 @@ export function UserManagement() {
 
   return (
     <main className="app-shell">
-      <header className="app-header">
-        <div>
-          <p className="eyebrow">{t('Karpathos booking planner')}</p>
-          <h1>{t('Manage users')}</h1>
-        </div>
-        <div className="header-meta">
-          <nav aria-label={t('Main navigation')}>
-            <a href="/?type=rooms">{t('Rooms')}</a>
-            <a href="/?type=cars">{t('Cars')}</a>
-            <a href="/?page=reports">{t('Reports')}</a>
-            <a href="/?page=resources">{t('Manage rooms and cars')}</a>
-            <a href="/?page=users" aria-current="page">{t('Manage users')}</a>
-          </nav>
-          <HelpButton />
-          <LanguageSelector />
-          <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          <AppSupportActions />
-          <button type="button" className="button button-muted" onClick={handleLogout}>
-            {t('Sign out')}
-          </button>
-        </div>
-      </header>
+      <AppHeader
+        title={t('Manage users')}
+        currentPage="users"
+        isAdmin={true}
+        canAccessReports={true}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onLogout={handleLogout}
+      />
 
       {error && <p className="feedback feedback-error" role="alert">{error}</p>}
       {notice && <p className="feedback feedback-success" role="status">{notice}</p>}

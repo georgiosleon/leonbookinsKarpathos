@@ -58,6 +58,10 @@ textarea {
   gap: 8px;
 }
 
+.app-support-actions a {
+  text-decoration: none;
+}
+
 .app-version {
   color: #657187;
   font-size: 0.85rem;
@@ -118,15 +122,14 @@ textarea {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  color: #33415a;
   font-size: 0.88rem;
   font-weight: 650;
 }
 
-.save-mode-toggle input {
-  width: 18px;
-  height: 18px;
-  accent-color: #1769aa;
+.save-mode-toggle[aria-pressed="true"] {
+  background: #e9f2fb;
+  border-color: #1769aa;
+  color: #1769aa;
 }
 
 .save-mode-toggle small {
@@ -155,6 +158,117 @@ textarea {
 .nav-icon {
   width: 18px;
   height: 18px;
+}
+
+.app-header-command-bar {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 14px;
+}
+
+.app-header-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.app-brand-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 14px;
+  margin-bottom: 4px;
+}
+
+.app-brand-row .eyebrow {
+  margin: 0;
+}
+
+.app-brand-version.app-support-actions {
+  gap: 0;
+}
+
+.app-header-top-meta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px 12px;
+  color: #53627a;
+  font-size: 0.9rem;
+}
+
+.header-date,
+.header-clock {
+  white-space: nowrap;
+  font-weight: 600;
+  color: #53627a;
+}
+
+.app-command-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 12px;
+  border: 1px solid #dfe5ef;
+  border-radius: 10px;
+  background: #f8fafc;
+}
+
+.app-nav-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.app-nav-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 8px;
+  color: #33415a;
+  font-weight: 650;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.app-nav-tab:hover {
+  background: #e9f2fb;
+  color: #1769aa;
+}
+
+.app-nav-tab.is-current {
+  background: #fff;
+  border-color: #bfd3ea;
+  color: #1769aa;
+  box-shadow: 0 1px 2px rgb(23 32 51 / 6%);
+}
+
+.app-nav-emoji {
+  font-size: 1rem;
+  line-height: 1;
+}
+
+.app-utility-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.app-utility-cluster .button,
+.app-utility-cluster .language-selector select,
+.app-utility-cluster .theme-toggle,
+.app-header-top-meta .button,
+.app-header-top-meta .language-selector select,
+.app-header-top-meta .theme-toggle,
+.app-header-top-meta .save-mode-toggle {
+  min-height: 40px;
 }
 
 .panel {
@@ -220,6 +334,12 @@ textarea {
   color: #33415a;
   font-size: 0.88rem;
   font-weight: 600;
+}
+
+.field-hint {
+  color: #657187;
+  font-size: 0.78rem;
+  font-weight: 400;
 }
 
 .field input,
@@ -669,12 +789,49 @@ textarea {
   color: #a7b3c5;
 }
 
+[data-theme="dark"] .field-hint {
+  color: #a7b3c5;
+}
+
+[data-theme="dark"] .save-mode-toggle[aria-pressed="true"] {
+  background: #23344d;
+  border-color: #4a6a92;
+  color: #a9ccff;
+}
+
 [data-theme="dark"] .header-meta a {
   color: #a9ccff;
 }
 
 [data-theme="dark"] .header-meta a[aria-current="page"] {
   color: #f0f4fb;
+}
+
+[data-theme="dark"] .app-header-top-meta,
+[data-theme="dark"] .header-date,
+[data-theme="dark"] .header-clock {
+  color: #a7b3c5;
+}
+
+[data-theme="dark"] .app-command-bar {
+  background: #182233;
+  border-color: #2a384d;
+}
+
+[data-theme="dark"] .app-nav-tab {
+  color: #d3dceb;
+}
+
+[data-theme="dark"] .app-nav-tab:hover {
+  background: #23344d;
+  color: #a9ccff;
+}
+
+[data-theme="dark"] .app-nav-tab.is-current {
+  background: #101925;
+  border-color: #4a6a92;
+  color: #a9ccff;
+  box-shadow: none;
 }
 
 [data-theme="dark"] .language-selector select {
@@ -876,6 +1033,15 @@ textarea {
   .details-grid {
     grid-template-columns: repeat(2, minmax(130px, 1fr));
   }
+
+  .app-header-top {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app-header-top-meta {
+    justify-content: flex-start;
+  }
 }
 
 @media (max-width: 560px) {
@@ -910,6 +1076,27 @@ textarea {
   .header-meta > .button,
   .save-mode-toggle {
     min-height: 44px;
+  }
+
+  .app-header-top,
+  .app-command-bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .app-header-top-meta,
+  .app-utility-cluster {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .app-nav-tabs {
+    width: 100%;
+  }
+
+  .app-nav-tab {
+    flex: 1 1 auto;
+    justify-content: center;
   }
 
   .panel {

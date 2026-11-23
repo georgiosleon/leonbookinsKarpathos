@@ -43,11 +43,12 @@ public class SecurityConfig {
 
         http
               .authorizeHttpRequests(authorize -> authorize
-                    // Public SPA shell, static assets, and login/error pages.
-                    .requestMatchers("/", "/index.html", "/favicon.ico", "/error",
-                                     "/rooms.html", "/cars.html",
+                    // Public static assets and login/error pages.
+                    .requestMatchers("/favicon.ico", "/error",
                                      "/css/**", "/js/**", "/react-assets/**").permitAll()
                     .requestMatchers("/login", "/logout").permitAll()
+                    // SPA shells require authentication; form login redirects unauthenticated users.
+                    .requestMatchers("/", "/index.html", "/rooms.html", "/cars.html").authenticated()
                     .requestMatchers("/api/v1/csrf").authenticated()
                     // The current user is available to every authenticated user.
                     .requestMatchers("/api/v1/users/me").authenticated()
@@ -87,7 +88,7 @@ public class SecurityConfig {
                     .anyRequest().denyAll())
               .formLogin(form -> form
                     .loginPage("/login")
-                    .defaultSuccessUrl("/")
+                    .defaultSuccessUrl("/", true)
                     .permitAll())
               .logout(logout -> logout
                     .logoutUrl("/logout")

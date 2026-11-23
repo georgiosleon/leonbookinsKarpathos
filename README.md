@@ -483,7 +483,7 @@ Seed account passwords must be at least 12 characters. Browser sessions use CSRF
 | Create/edit/manage rooms & cars | Yes | No | No |
 | Manage users | Yes | No | No |
 | View app version/info | Yes | Yes | Yes |
-| Export diagnostics | Yes | Yes | Yes |
+| Support | Yes | Yes | Yes |
 
 The system prevents removing, deactivating, or deleting the last active ADMIN or last active OPERATOR account.
 

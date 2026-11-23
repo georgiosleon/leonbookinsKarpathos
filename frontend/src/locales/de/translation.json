@@ -69,7 +69,6 @@
   "Sign out": "Abmelden",
   "Version {version}": "Version {version}",
   "Version unavailable": "Version nicht verfügbar",
-  "Export diagnostics": "Diagnosedaten exportieren",
   "Booking details": "Buchungsdetails",
   "Enter a new booking or select one on the timeline to review it.": "Geben Sie eine neue Buchung ein oder wählen Sie sie in der Zeitleiste aus.",
   "Balance: {amount}": "Restbetrag: {amount}",
@@ -278,5 +277,7 @@
   "View all bookings": "Alle Buchungen anzeigen",
   "Create/edit/delete bookings": "Buchungen erstellen/bearbeiten/löschen",
   "View reports / export": "Berichte anzeigen / exportieren",
-  "Manage rooms & cars": "Zimmer & Fahrzeuge verwalten"
+  "Manage rooms & cars": "Zimmer & Fahrzeuge verwalten",
+  "Support": "Support",
+  "Save mode": "Speichermodus"
 }

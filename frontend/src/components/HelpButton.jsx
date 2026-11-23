@@ -152,7 +152,7 @@ export function HelpButton() {
                         <tr><td>{t('View reports / export')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('No')}</td></tr>
                         <tr><td>{t('Manage rooms & cars')}</td><td>{t('Yes')}</td><td>{t('No')}</td><td>{t('No')}</td></tr>
                         <tr><td>{t('Manage users')}</td><td>{t('Yes')}</td><td>{t('No')}</td><td>{t('No')}</td></tr>
-                        <tr><td>{t('Export diagnostics')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td></tr>
+                        <tr><td>{t('Support')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td></tr>
                       </tbody>
                     </table>
                   </div>

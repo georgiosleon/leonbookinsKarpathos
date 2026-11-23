@@ -69,7 +69,6 @@
   "Sign out": "Afmelden",
   "Version {version}": "Versie {version}",
   "Version unavailable": "Versie niet beschikbaar",
-  "Export diagnostics": "Diagnostische gegevens exporteren",
   "Booking details": "Boekingsgegevens",
   "Enter a new booking or select one on the timeline to review it.": "Voer een nieuwe boeking in of selecteer een boeking op de tijdlijn.",
   "Balance: {amount}": "Saldo: {amount}",
@@ -278,5 +277,7 @@
   "View all bookings": "Alle boekingen bekijken",
   "Create/edit/delete bookings": "Boekingen maken/bewerken/verwijderen",
   "View reports / export": "Rapporten bekijken / exporteren",
-  "Manage rooms & cars": "Kamers & auto's beheren"
+  "Manage rooms & cars": "Kamers & auto's beheren",
+  "Support": "Ondersteuning",
+  "Save mode": "Opbergmodus"
 }
