@@ -1,6 +1,5 @@
 package com.leonsoft.config;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import com.leonsoft.repositories.UserRepository;
 import org.springframework.http.HttpMethod;
 import org.springframework.context.annotation.Bean;
@@ -22,8 +21,11 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 @EnableMethodSecurity
 public class SecurityConfig {
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
+
+    public SecurityConfig(UserRepository userRepository) {
+        this.userRepository = userRepository;
+    }
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -111,7 +113,7 @@ public class SecurityConfig {
                         .authorities(user.getAuthorities())
                         .disabled(!user.isEnabled())
                         .build())
-                .orElseThrow(() -> new IllegalArgumentException("User not found: " + username));
+                .orElseThrow(() -> new org.springframework.security.core.userdetails.UsernameNotFoundException("User not found: " + username));
     }
 
     @Bean

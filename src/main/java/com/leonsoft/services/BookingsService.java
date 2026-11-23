@@ -63,12 +63,6 @@ public class BookingsService {
         return userRepository.findByUsername(username).orElse(null);
     }
 
-    /** Check if the current user is an admin */
-    private boolean isCurrentUserAdmin() {
-        User user = getCurrentUser();
-        return user != null && user.isAdmin();
-    }
-
     /** Operators can create/update/delete any booking; admins and guests cannot. */
     private boolean canModifyBooking(Booking booking) {
         User currentUser = getCurrentUser();
@@ -136,9 +130,7 @@ public class BookingsService {
 
     public String report(String fromDateEuroFmt, String toDateEuroFmt, Locale locale) {
 
-        log.debug("/booking/report");
-        log.debug("fromDate param  " + fromDateEuroFmt);
-        log.debug("toDate param  " + toDateEuroFmt);
+        log.debug("/booking/report fromDate={} toDate={}", fromDateEuroFmt, toDateEuroFmt);
 
         LocalDate stDate = LocalDate.parse(fromDateEuroFmt, BookingsUtils.formatterEURO);
         LocalDate edDate = LocalDate.parse(toDateEuroFmt, BookingsUtils.formatterEURO);
@@ -166,19 +158,9 @@ public class BookingsService {
         log.debug("Creating booking by user: {}", currentUser != null ? currentUser.getUsername() : "unknown");
         booking.setId(generatedId);
 
-        // Assign current user as the booking owner if authenticated
+        // Assign current user as the booking owner if authenticated.
         if (currentUser != null) {
-            User user = userRepository.findById(currentUser.getId())
-                    .orElseGet(() -> {
-                        // Save the user if not found (shouldn't happen if auth works)
-                        User u = new User();
-                        u.setId(currentUser.getId());
-                        u.setUsername(currentUser.getUsername());
-                        u.setRole(currentUser.getRole());
-                        u.setActive(true);
-                        return userRepository.save(u);
-                    });
-            booking.setUser(user);
+            booking.setUser(currentUser);
         }
 
         Booking saved = saveWithNormalizedValues(booking);
@@ -232,10 +214,6 @@ public class BookingsService {
 
         booking = bookingRepository.save(booking);
         booking.setRoomName(resource.getName());
-
-        booking.setStartDate(BookingsUtils.formatterEURO.format(stDate));
-        booking.setEndDate(BookingsUtils.formatterEURO.format(edDate));
-
         return booking;
     }
 
@@ -253,15 +231,9 @@ public class BookingsService {
     }
 
     public Boolean deleteObject(String bookingId) {
-        log.debug(" Delete    {}", bookingId);
-        if (!bookingRepository.existsById(bookingId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found.");
-        }
-
-        Booking booking = bookingRepository.findById(bookingId).orElse(null);
-        if (booking == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found.");
-        }
+        log.debug("Delete booking {}", bookingId);
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found."));
 
         if (!canModifyBooking(booking)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this booking.");
@@ -294,12 +266,6 @@ public class BookingsService {
         // All authenticated roles can view all bookings; mutation permissions differ.
         List<Booking> all = bookingRepository.findAllByOrderByStartDateAsc();
         addResourceNames(all);
-        for (Booking booking : all) {
-            LocalDate stDt = BookingsUtils.parseStoredDate(booking.getStartDate());
-            booking.setStartDate(BookingsUtils.formatterEURO.format(stDt));
-            LocalDate edDt = BookingsUtils.parseStoredDate(booking.getEndDate());
-            booking.setEndDate(BookingsUtils.formatterEURO.format(edDt));
-        }
         return all;
     }
 

@@ -54,9 +54,7 @@ public class BookingsRestController {
             @RequestParam(name = "fromDate") String fromDateEuroFmt,
             @RequestParam(name = "toDate") String toDateEuroFmt,
             @RequestParam(name = "lang", defaultValue = "en") String language) {
-        log.debug("/booking/report");
-        log.debug("fromDate param  " + fromDateEuroFmt);
-        log.debug("toDate param  " + toDateEuroFmt);
+        log.debug("/booking/report fromDate={} toDate={}", fromDateEuroFmt, toDateEuroFmt);
         return bookingsService.report(
                 fromDateEuroFmt, toDateEuroFmt, ReportMessages.supportedLocale(language));
 
@@ -64,14 +62,14 @@ public class BookingsRestController {
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('OPERATOR')")
-    Booking create(@Valid @RequestBody BookingRequest request) {
-        return bookingsService.create(request.toBooking());
+    BookingResponse create(@Valid @RequestBody BookingRequest request) {
+        return BookingResponse.from(bookingsService.create(request.toBooking()));
     }
 
     @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasRole('OPERATOR')")
-    Booking update(@Valid @RequestBody BookingRequest request) {
-        return bookingsService.update(request.toBooking());
+    BookingResponse update(@Valid @RequestBody BookingRequest request) {
+        return BookingResponse.from(bookingsService.update(request.toBooking()));
     }
 
 
@@ -92,7 +90,7 @@ public class BookingsRestController {
 
     @GetMapping(value = "/getAll", produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR', 'GUEST')")
-    List<Booking> getAll() {
-        return bookingsService.getAll();
+    List<BookingResponse> getAll() {
+        return bookingsService.getAll().stream().map(BookingResponse::from).toList();
     }
 }

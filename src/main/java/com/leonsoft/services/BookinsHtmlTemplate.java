@@ -19,9 +19,7 @@ public class BookinsHtmlTemplate {
 
     public static String report(
           String fromDateEuroFmt, String toDateEuroFmt, List<Booking> all, Locale locale) {
-        log.debug("/booking/report");
-        log.debug("fromDate param  " + fromDateEuroFmt);
-        log.debug("toDate param  " + toDateEuroFmt);
+        log.debug("/booking/report fromDate={} toDate={}", fromDateEuroFmt, toDateEuroFmt);
 
         StringBuilder report = new StringBuilder();
         DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy", locale);

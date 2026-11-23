@@ -86,8 +86,7 @@ class UserManagementTest {
     @Test
     void userDetailsCarryModelAuthoritiesAndActiveFlag() {
         UserRepository userRepository = mock(UserRepository.class);
-        SecurityConfig config = new SecurityConfig();
-        ReflectionTestUtils.setField(config, "userRepository", userRepository);
+        SecurityConfig config = new SecurityConfig(userRepository);
 
         User admin = new User();
         admin.setUsername("admin");
@@ -114,10 +113,9 @@ class UserManagementTest {
     @Test
     void securityUserDetailsForUnknownUserThrows() {
         UserRepository userRepository = mock(UserRepository.class);
-        SecurityConfig config = new SecurityConfig();
-        ReflectionTestUtils.setField(config, "userRepository", userRepository);
+        SecurityConfig config = new SecurityConfig(userRepository);
         when(userRepository.findByUsername("nobody")).thenReturn(Optional.empty());
-        assertThrows(IllegalArgumentException.class,
+        assertThrows(org.springframework.security.core.userdetails.UsernameNotFoundException.class,
                 () -> config.userDetailsService().loadUserByUsername("nobody"));
     }
 }

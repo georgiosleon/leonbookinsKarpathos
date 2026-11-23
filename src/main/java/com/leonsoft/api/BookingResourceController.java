@@ -1,6 +1,5 @@
 package com.leonsoft.api;
 
-import com.leonsoft.models.BookingResource;
 import com.leonsoft.services.BookingResourceService;
 import jakarta.validation.Valid;
 import java.util.List;
@@ -24,13 +23,13 @@ public class BookingResourceController {
     }
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    List<BookingResource> getAll() {
-        return resourceService.getAll();
+    List<BookingResourceResponse> getAll() {
+        return resourceService.getAll().stream().map(BookingResourceResponse::from).toList();
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
-    BookingResource create(@Valid @RequestBody BookingResourceRequest request) {
-        return resourceService.create(request);
+    BookingResourceResponse create(@Valid @RequestBody BookingResourceRequest request) {
+        return BookingResourceResponse.from(resourceService.create(request));
     }
 }

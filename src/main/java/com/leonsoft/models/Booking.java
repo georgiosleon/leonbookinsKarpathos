@@ -2,23 +2,16 @@ package com.leonsoft.models;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.NoArgsConstructor;
-import java.util.Collection;
-import java.util.List;
 
 @Getter
 @Setter
-@ToString(exclude = {"user"})
+@ToString(exclude = "user")
 @NoArgsConstructor
 @Entity
-@Data
-@EqualsAndHashCode(callSuper = false)
-
 public class Booking {
 
     @Id

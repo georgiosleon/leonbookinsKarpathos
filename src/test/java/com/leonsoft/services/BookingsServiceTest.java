@@ -84,8 +84,8 @@ class BookingsServiceTest {
         Booking result = bookingsService.create(booking);
 
         assertNotNull(result.getId());
-        assertEquals("20/06/2026", result.getStartDate());
-        assertEquals("23/06/2026", result.getEndDate());
+        assertEquals("2026-06-20", result.getStartDate());
+        assertEquals("2026-06-23", result.getEndDate());
         assertEquals(3, result.getNumOfNights());
         assertEquals(70.0, result.getBalance());
         assertEquals("APT 2", result.getRoomName());
@@ -269,18 +269,22 @@ class BookingsServiceTest {
     }
 
     @Test
-    void getAllReturnsBothLegacyEuropeanAndIsoStoredDatesInEuropeanFormat() {
+    void getAllReturnsBookingsWithResourceNamesWithoutMutatingDates() {
         Booking legacyBooking = savedBooking("legacy", "20/11/2026", "23/11/2026", "active");
         Booking isoBooking = savedBooking("iso", "2026-11-24", "2026-11-27", "active");
+        legacyBooking.setRoom("r1");
+        isoBooking.setRoom("r2");
         when(bookingRepository.findAllByOrderByStartDateAsc()).thenReturn(List.of(legacyBooking, isoBooking));
-        when(resourceService.namesById()).thenReturn(Map.of());
+        when(resourceService.namesById()).thenReturn(Map.of("r1", "Room 1", "r2", "Room 2"));
 
         List<Booking> bookings = bookingsService.getAll();
 
         assertEquals("20/11/2026", bookings.get(0).getStartDate());
         assertEquals("23/11/2026", bookings.get(0).getEndDate());
-        assertEquals("24/11/2026", bookings.get(1).getStartDate());
-        assertEquals("27/11/2026", bookings.get(1).getEndDate());
+        assertEquals("Room 1", bookings.get(0).getRoomName());
+        assertEquals("2026-11-24", bookings.get(1).getStartDate());
+        assertEquals("2026-11-27", bookings.get(1).getEndDate());
+        assertEquals("Room 2", bookings.get(1).getRoomName());
     }
 
     @Test
@@ -332,7 +336,7 @@ class BookingsServiceTest {
 
         Booking result = bookingsService.update(update);
 
-        assertEquals("21/06/2026", result.getStartDate());
+        assertEquals("2026-06-21", result.getStartDate());
         verify(bookingRepository).save(any(Booking.class));
     }
 
@@ -364,8 +368,6 @@ class BookingsServiceTest {
                     AuthorityUtils.createAuthorityList("ROLE_GUEST")));
 
         Booking existing = savedBooking("booking-1", "2026-06-20", "2026-06-23", "active");
-        when(bookingRepository.existsById("booking-1")).thenReturn(true);
-        when(bookingRepository.existsById("booking-1")).thenReturn(true);
         when(bookingRepository.findById("booking-1")).thenReturn(Optional.of(existing));
 
         ResponseStatusException exception = assertThrows(

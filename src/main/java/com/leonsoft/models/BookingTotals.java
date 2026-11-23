@@ -1,19 +1,10 @@
 package com.leonsoft.models;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 
-@Getter
-@Setter
-@ToString
-@NoArgsConstructor
 @Data
-@EqualsAndHashCode
-
+@NoArgsConstructor
 public class BookingTotals {
     private Double totCharge =  Double.valueOf(0.0);
     private Double totReceived =  Double.valueOf(0.0);
