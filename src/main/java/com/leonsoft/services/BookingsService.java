@@ -42,10 +42,10 @@ public class BookingsService {
         this.currentUserProvider = currentUserProvider;
     }
 
-    /** Operators can create/update/delete any booking; admins and guests cannot. */
+    /** Admins and operators can create/update/delete any booking; guests cannot. */
     private boolean canModifyBooking(Booking booking) {
         User currentUser = currentUserProvider.getCurrentUser().orElse(null);
-        return currentUser != null && currentUser.isOperator();
+        return currentUser != null && (currentUser.isAdmin() || currentUser.isOperator());
     }
 
     @Transactional

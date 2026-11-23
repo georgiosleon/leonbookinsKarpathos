@@ -381,17 +381,25 @@ class BookingSecurityTest {
     }
 
     @Test
-    void bookingMutationsAreOperatorOnly() throws Exception {
+    void bookingMutationsAreAllowedForAdminAndOperatorButNotGuest() throws Exception {
         String bookingJson = """
                 {"name":"Alice","numOfGuests":2,"agency":"direct","room":"APT2","startDate":"20/06/2026","endDate":"23/06/2026","charge":100,"commission":0,"received":0,"status":"active"}
                 """;
+        when(bookingsService.create(any(Booking.class))).thenAnswer(inv -> inv.getArgument(0));
 
         mockMvc.perform(post("/api/v1/booking/save")
                         .with(user("test-admin").roles("ADMIN"))
                         .with(csrf())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(bookingJson))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/v1/booking/save")
+                        .with(user("operator").roles("OPERATOR"))
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(bookingJson))
+                .andExpect(status().isOk());
 
         mockMvc.perform(post("/api/v1/booking/save")
                         .with(user("guest-1").roles("GUEST"))
@@ -399,14 +407,6 @@ class BookingSecurityTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(bookingJson))
                 .andExpect(status().isForbidden());
-
-        when(bookingsService.create(any(Booking.class))).thenAnswer(inv -> inv.getArgument(0));
-        mockMvc.perform(post("/api/v1/booking/save")
-                        .with(user("operator").roles("OPERATOR"))
-                        .with(csrf())
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(bookingJson))
-                .andExpect(status().isOk());
     }
 
     @Test

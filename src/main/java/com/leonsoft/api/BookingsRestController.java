@@ -71,20 +71,20 @@ public class BookingsRestController {
     }
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('OPERATOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
     BookingResponse create(@Valid @RequestBody BookingRequest request) {
         return BookingResponse.from(bookingsService.create(request.toBooking()));
     }
 
     @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('OPERATOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
     BookingResponse update(@Valid @RequestBody BookingRequest request) {
         return BookingResponse.from(bookingsService.update(request.toBooking()));
     }
 
 
     @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasRole('OPERATOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
     Boolean deleteObject(@Valid @RequestBody BookingDeleteRequest request) {
         log.debug(" Delete    {}", request.id());
         bookingsService.deleteObject(request.id());
@@ -92,7 +92,7 @@ public class BookingsRestController {
     }
 
     @PostMapping(value = "/del")
-    @PreAuthorize("hasRole('OPERATOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
     void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {
         log.debug(" Delete  a cancelled   {}", bookingId);
         bookingsService.delCancelledBooking(bookingId);

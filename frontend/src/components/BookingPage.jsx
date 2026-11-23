@@ -108,8 +108,9 @@ export function BookingPage() {
   const { language, locale, t } = useLanguage();
   const { currentUser } = useCurrentUser();
   const isAdmin = currentUser?.role === 'ADMIN';
-  const canManageBookings = currentUser?.role === 'OPERATOR';
-  const canSeeReports = isAdmin || canManageBookings;
+  const isOperator = currentUser?.role === 'OPERATOR';
+  const canManageBookings = isAdmin || isOperator;
+  const canSeeReports = isAdmin || isOperator;
   const [clock, setClock] = useState(() => formatClock(new Date(), locale));
 
   function showError(message) {

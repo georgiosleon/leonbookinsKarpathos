@@ -471,7 +471,7 @@ Compose stores SQLite data in a named volume and configures the app to listen
 inside the container. For remote access, configure a trusted HTTPS reverse
 proxy rather than exposing the application directly to the internet.
 
-Seed account passwords must be at least 12 characters. Role access: `ADMIN` manages users/resources/admin ops and can view reports (no booking mutations); `OPERATOR` can create/edit/delete any booking and view reports; `GUEST` has read-only booking visibility. Browser sessions use CSRF protection for write requests.
+Seed account passwords must be at least 12 characters. Role access: `ADMIN` manages users/resources/admin ops, can view reports, and can create/edit/delete bookings; `OPERATOR` can create/edit/delete any booking and view reports; `GUEST` has read-only booking visibility. Browser sessions use CSRF protection for write requests.
 
 For Vite hot-reload development, install Node.js/npm and run `npm ci` followed
 by `npm run dev` from `frontend/`, with Spring Boot running on port 8080.

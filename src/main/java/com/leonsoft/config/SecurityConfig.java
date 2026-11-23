@@ -65,15 +65,15 @@ public class SecurityConfig {
                                      "/api/v1/booking/report",
                                      "/api/v1/booking/export/pdf")
                         .hasAnyRole("ADMIN", "OPERATOR")
-                    // Booking mutations are operator-only. Admins are system-only.
+                    // Booking mutations are available to admins and operators.
                     .requestMatchers(HttpMethod.POST,
                                      "/api/v1/booking/save",
                                      "/api/v1/booking/delete",
                                      "/api/v1/booking/del")
-                        .hasRole("OPERATOR")
+                        .hasAnyRole("ADMIN", "OPERATOR")
                     .requestMatchers(HttpMethod.PUT,
                                      "/api/v1/booking/update")
-                        .hasRole("OPERATOR")
+                        .hasAnyRole("ADMIN", "OPERATOR")
                     // Resource management is admin-only.
                     .requestMatchers(HttpMethod.POST, "/api/v1/resources", "/api/v1/resources/**")
                         .hasRole("ADMIN")
