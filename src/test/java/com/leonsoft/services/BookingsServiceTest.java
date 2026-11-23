@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -47,7 +48,13 @@ class BookingsServiceTest {
     @BeforeEach
     void setUp() {
         bookingsService = new BookingsService(
-              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(true, true), new BookingOverlapChecker(bookingRepository));
+              bookingRepository, resourceService, new BookingAvailabilityPolicy(true, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository));
+        lenient().doAnswer(inv -> {
+            List<Booking> bs = inv.getArgument(0);
+            Map<String, String> names = resourceService.namesById();
+            bs.forEach(b -> b.setRoomName(names.getOrDefault(b.getRoom(), b.getRoom())));
+            return null;
+        }).when(resourceService).populateResourceNames(any());
         User admin = new User();
         admin.setId(1);
         admin.setUsername("admin");
@@ -215,7 +222,7 @@ class BookingsServiceTest {
     @Test
     void roomFlagCanAllowOverlapsWithoutDisablingVehicleProtection() {
         bookingsService = new BookingsService(
-              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository));
+              bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository));
         when(resourceService.requireActive("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -226,7 +233,7 @@ class BookingsServiceTest {
               .findByRoomAndStatusIn("APT2", List.of("active", "paid"));
 
         bookingsService = new BookingsService(
-              bookingRepository, userRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository));
+              bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository));
         Booking existingVehicleBooking = savedBooking("vehicle-existing", "2026-06-20", "2026-06-23", "paid");
         existingVehicleBooking.setRoom("CAR1");
         when(resourceService.requireActive("CAR1"))

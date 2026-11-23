@@ -4,18 +4,14 @@ import com.leonsoft.models.Booking;
 import com.leonsoft.models.BookingResource;
 import com.leonsoft.models.User;
 import com.leonsoft.repositories.BookingRepository;
-import com.leonsoft.repositories.UserRepository;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
@@ -27,45 +23,34 @@ public class BookingsService {
     private static final Logger log = LoggerFactory.getLogger(BookingsService.class);
 
     private final BookingRepository bookingRepository;
-    private final UserRepository userRepository;
     private final BookingResourceService resourceService;
     private final BookingAvailabilityPolicy availabilityPolicy;
     private final BookingOverlapChecker overlapChecker;
+    private final CurrentUserProvider currentUserProvider;
 
     public BookingsService(
             BookingRepository bookingRepository,
-            UserRepository userRepository,
             BookingResourceService resourceService,
             BookingAvailabilityPolicy availabilityPolicy,
-            BookingOverlapChecker overlapChecker) {
+            BookingOverlapChecker overlapChecker,
+            CurrentUserProvider currentUserProvider) {
         this.bookingRepository = bookingRepository;
-        this.userRepository = userRepository;
         this.resourceService = resourceService;
         this.availabilityPolicy = availabilityPolicy;
         this.overlapChecker = overlapChecker;
-    }
-
-    /** Get the currently authenticated user, or null if no user is logged in */
-    private User getCurrentUser() {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth == null || !auth.isAuthenticated()
-                || "anonymousUser".equals(auth.getPrincipal())) {
-            return null;
-        }
-        String username = auth.getName();
-        return userRepository.findByUsername(username).orElse(null);
+        this.currentUserProvider = currentUserProvider;
     }
 
     /** Operators can create/update/delete any booking; admins and guests cannot. */
     private boolean canModifyBooking(Booking booking) {
-        User currentUser = getCurrentUser();
+        User currentUser = currentUserProvider.getCurrentUser().orElse(null);
         return currentUser != null && currentUser.isOperator();
     }
 
     @Transactional
     public Booking create(Booking booking) {
 
-        User currentUser = getCurrentUser();
+        User currentUser = currentUserProvider.getCurrentUser().orElse(null);
         String generatedId = UUID.randomUUID().toString();
 
         log.debug("Creating booking by user: {}", currentUser != null ? currentUser.getUsername() : "unknown");
@@ -144,7 +129,7 @@ public class BookingsService {
     }
 
     public void delCancelledBooking(String bookingId) {
-        log.debug(" Delete  a cancelled   {}", bookingId);
+        log.debug("Delete cancelled booking {}", bookingId);
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found."));
         if (!"cancelled".equals(booking.getStatus())) {
@@ -159,20 +144,13 @@ public class BookingsService {
     }
 
     public List<Booking> getAll() {
-        User currentUser = getCurrentUser();
+        User currentUser = currentUserProvider.getCurrentUser().orElse(null);
         if (currentUser == null) {
             return List.of();
         }
         // All authenticated roles can view all bookings; mutation permissions differ.
         List<Booking> all = bookingRepository.findAllByOrderByStartDateAsc();
-        addResourceNames(all);
+        resourceService.populateResourceNames(all);
         return all;
-    }
-
-    private void addResourceNames(List<Booking> bookings) {
-        Map<String, String> namesById = resourceService.namesById();
-        for (Booking booking : bookings) {
-            booking.setRoomName(namesById.getOrDefault(booking.getRoom(), booking.getRoom()));
-        }
     }
 }

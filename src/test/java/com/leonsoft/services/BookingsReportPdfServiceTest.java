@@ -8,6 +8,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.when;
 
 import com.leonsoft.models.Booking;
@@ -71,12 +72,17 @@ class BookingsReportPdfServiceTest {
         when(resourceService.getAll()).thenReturn(List.of(
               new BookingResource("APT2", "rooms", "APT 2"),
               new BookingResource("CAR1", "cars", "CAR 1")));
-        when(resourceService.namesById()).thenReturn(Map.of("APT2", "APT 2", "CAR1", "CAR 1"));
+        doAnswer(inv -> {
+            List<Booking> bs = inv.getArgument(0);
+            Map<String, String> names = Map.of("APT2", "APT 2", "CAR1", "CAR 1");
+            bs.forEach(b -> b.setRoomName(names.getOrDefault(b.getRoom(), b.getRoom())));
+            return null;
+        }).when(resourceService).populateResourceNames(any());
         when(bookingRepository.findAllByOrderByStartDateAsc()).thenReturn(List.of(roomBooking, carBooking));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         BookingReportService service = new BookingReportService(
-              bookingRepository, userRepository, resourceService);
+              bookingRepository, resourceService, new CurrentUserProvider(userRepository));
 
         service.exportReportToPDF(response, "01/06/2026", "30/06/2026", "rooms", Locale.UK);
 
@@ -96,7 +102,7 @@ class BookingsReportPdfServiceTest {
     @Test
     void pdfExportRejectsUnsupportedResourceType() {
         BookingReportService service = new BookingReportService(
-              bookingRepository, userRepository, resourceService);
+              bookingRepository, resourceService, new CurrentUserProvider(userRepository));
 
         ResponseStatusException exception = assertThrows(
               ResponseStatusException.class,
