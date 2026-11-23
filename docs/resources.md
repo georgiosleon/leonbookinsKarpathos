@@ -8,12 +8,10 @@ form and timeline.
 ## Data model
 
 Resources are stored in the `booking_resources` SQLite table with a generated
-stable ID, type (`rooms` or `cars`), display name, and active flag. The
-existing `bookings.room` column stores the resource ID. No existing booking
-rows need to be rewritten. JPA/startup initialization ensures the table exists;
-existing bookings continue to resolve to their original resources.
+stable ID, type (`rooms` or `cars`), display name, and active flag. Bookings
+store the stable resource ID in `booking.resource_id` (`resourceId`).
 
-The API returns both the stable `room` ID and a display-only `roomName` on
+The API returns both `resourceId` and a display-only `resourceName` on
 booking records. This keeps assignment and availability comparisons stable
 while showing readable names in reports.
 

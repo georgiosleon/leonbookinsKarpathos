@@ -93,6 +93,6 @@ npm test
 ```
 
 Set seed/admin environment variables as needed before starting Spring Boot
-(`APP_ADMIN_*`, `APP_OPERATOR_*` or legacy `APP_USER_*`, `APP_GUEST_*`). The Vite
+(`APP_ADMIN_*`, `APP_OPERATOR_*`, `APP_GUEST_*`). The Vite
 app communicates with the local backend; consult the Vite configuration and
 package scripts in `frontend/` for the current development proxy and commands.

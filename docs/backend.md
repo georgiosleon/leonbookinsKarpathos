@@ -89,12 +89,11 @@ major prefix (for example `/api/v2`).
 ## Security
 
 Authentication uses database-backed users in the `users` table with roles
-`ADMIN`, `OPERATOR`, and `GUEST` (legacy `USER` is accepted/migrated to
-`OPERATOR`). Spring Security enforces role-based access and CSRF protection for
+`ADMIN`, `OPERATOR`, and `GUEST`. Spring Security enforces role-based access and CSRF protection for
 browser state-changing requests.
 
 Default seed accounts are created only when missing, using `APP_ADMIN_*`,
-`APP_OPERATOR_*` (or legacy `APP_USER_*`), and `APP_GUEST_*` environment
+`APP_OPERATOR_*`, and `APP_GUEST_*` environment
 variables. Seed passwords must be at least 12 characters; built-in `change-me-*`
 defaults are rejected in production.
 
@@ -119,14 +118,12 @@ running locally.
 
 `BookingResource` and `BookingResourceRepository` manage the room/car catalog
 in the `booking_resources` table. `User` and `UserRepository` manage
-database-backed user accounts. A booking continues to store the resource ID in
-its existing `room` column.
+database-backed user accounts. Bookings store the stable resource ID in
+`resourceId` (`resource_id` column) and expose a display `resourceName`.
 
-Database initialization currently uses JPA `ddl-auto=update` and
-`DatabaseInitializer` for idempotent seed/migration logic (default accounts and
-legacy role normalization). This is not a versioned migration system. Back up
-existing customer databases before upgrading and test releases against copies;
-adopt Liquibase/Flyway before schema-altering changes.
+Schema changes are managed with Flyway migrations (`ddl-auto=validate`).
+`DatabaseInitializer` seeds default accounts when missing. Back up existing
+customer databases before upgrading and test releases against copies.
 
 For LAN use, clients connect to the host running the app; the SQLite database
 stays on that host. Do not point multiple application instances at the same

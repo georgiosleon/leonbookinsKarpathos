@@ -304,7 +304,7 @@ screen. Existing bookings keep their stored resource assignments.
   The backend validates required values, dates, status, email, and financial
   amounts, then calculates nights and balance itself.
 - Authentication uses database-backed users with `ADMIN`, `OPERATOR`, and `GUEST`
-  roles (legacy `USER` accepted/migrated to `OPERATOR`). Admins manage users, resources, and admin ops and can view reports; operators manage bookings and view reports; guests have read-only booking/resource visibility. Browser writes include CSRF protection. The
+  roles. Admins manage users, resources, and admin ops and can view reports; operators manage bookings and view reports; guests have read-only booking/resource visibility. Browser writes include CSRF protection. The
   `booking_resources` table stores the managed room and vehicle catalog; the
   existing bookings table and its resource assignments are preserved.
 - The detailed HTML report escapes booking data before rendering. The SPA
