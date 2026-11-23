@@ -273,5 +273,10 @@
   "Tax category": "Κατηγορία φόρου",
   "e.g. Climate resilience fee": "π.χ. Τέλος ανθεκτικότητας στην κλιματική κρίση",
   "Platform reservation ID": "ID κράτησης πλατφόρμας",
-  "Export CSV": "Εξαγωγή CSV"
+  "Export CSV": "Εξαγωγή CSV",
+  "Capability": "Δυνατότητα",
+  "View all bookings": "Προβολή όλων των κρατήσεων",
+  "Create/edit/delete bookings": "Δημιουργία/επεξεργασία/διαγραφή κρατήσεων",
+  "View reports / export": "Προβολή αναφορών / εξαγωγή",
+  "Manage rooms & cars": "Διαχείριση δωματίων & αυτοκινήτων"
 }

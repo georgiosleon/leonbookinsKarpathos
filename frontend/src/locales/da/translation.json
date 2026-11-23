@@ -273,5 +273,10 @@
   "Tax category": "Skattekategori",
   "e.g. Climate resilience fee": "f.eks. Klimamodstandsafgift",
   "Platform reservation ID": "Platformreservations-ID",
-  "Export CSV": "Eksportér CSV"
+  "Export CSV": "Eksportér CSV",
+  "Capability": "Funktion",
+  "View all bookings": "Se alle bookinger",
+  "Create/edit/delete bookings": "Opret/rediger/slet bookinger",
+  "View reports / export": "Se rapporter / eksport",
+  "Manage rooms & cars": "Administrer værelser & biler"
 }

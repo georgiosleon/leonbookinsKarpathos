@@ -273,5 +273,10 @@
   "Tax category": "Belastingcategorie",
   "e.g. Climate resilience fee": "bijv. Klimaatveerkrachtbelasting",
   "Platform reservation ID": "Platformreserverings-ID",
-  "Export CSV": "CSV exporteren"
+  "Export CSV": "CSV exporteren",
+  "Capability": "Mogelijkheid",
+  "View all bookings": "Alle boekingen bekijken",
+  "Create/edit/delete bookings": "Boekingen maken/bewerken/verwijderen",
+  "View reports / export": "Rapporten bekijken / exporteren",
+  "Manage rooms & cars": "Kamers & auto's beheren"
 }

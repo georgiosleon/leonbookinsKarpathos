@@ -273,5 +273,10 @@
   "Tax category": "Catégorie de taxe",
   "e.g. Climate resilience fee": "ex. Taxe de résilience climatique",
   "Platform reservation ID": "ID de réservation plateforme",
-  "Export CSV": "Exporter CSV"
+  "Export CSV": "Exporter CSV",
+  "Capability": "Fonctionnalité",
+  "View all bookings": "Voir toutes les réservations",
+  "Create/edit/delete bookings": "Créer/modifier/supprimer des réservations",
+  "View reports / export": "Voir rapports / exporter",
+  "Manage rooms & cars": "Gérer chambres & véhicules"
 }
