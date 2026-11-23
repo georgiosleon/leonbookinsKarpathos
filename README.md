@@ -267,7 +267,7 @@ new major prefix, such as `/api/v2`, rather than changing v1 behavior.
 ## Releases
 
 Release tags use the `v<major>.<minor>.<patch>` format and trigger the desktop
-installer workflow.
+installer workflow. See [CHANGELOG.md](CHANGELOG.md) for curated release notes.
 
 ## Developer documentation
 
