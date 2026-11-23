@@ -18,8 +18,8 @@ class BookingsPDFExporterTest {
     @Test
     void preservesGreekUnicodeAndPunctuationInPdfText() throws Exception {
         Booking booking = new Booking();
-        booking.setStartDate("2026-11-20");
-        booking.setEndDate("2026-11-29");
+        booking.setStartDate(java.time.LocalDate.parse("2026-11-20"));
+        booking.setEndDate(java.time.LocalDate.parse("2026-11-29"));
         booking.setStatus(com.leonsoft.models.BookingStatus.CANCELLED);
         booking.setRoom("APT2");
         booking.setRoomName("Δωμάτιο");
@@ -61,8 +61,8 @@ class BookingsPDFExporterTest {
         for (int index = 0; index < 70; index++) {
             Booking booking = new Booking();
             booking.setId("booking-" + index);
-            booking.setStartDate("2026-06-20");
-            booking.setEndDate("2026-06-22");
+            booking.setStartDate(java.time.LocalDate.parse("2026-06-20"));
+            booking.setEndDate(java.time.LocalDate.parse("2026-06-22"));
             booking.setStatus(index == 0 ? com.leonsoft.models.BookingStatus.CANCELLED : com.leonsoft.models.BookingStatus.ACTIVE);
             booking.setRoom("APT2");
             booking.setRoomName("APT 2");

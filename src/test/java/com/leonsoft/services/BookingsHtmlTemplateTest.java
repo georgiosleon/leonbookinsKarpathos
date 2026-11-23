@@ -14,8 +14,8 @@ class BookingsHtmlTemplateTest {
     void escapesBookingValuesAndDoesNotEmitExecutableActions() {
         Booking booking = new Booking();
         booking.setId("booking-1");
-        booking.setStartDate("2026-06-20");
-        booking.setEndDate("2026-06-22");
+        booking.setStartDate(java.time.LocalDate.parse("2026-06-20"));
+        booking.setEndDate(java.time.LocalDate.parse("2026-06-22"));
         booking.setStatus(com.leonsoft.models.BookingStatus.CANCELLED);
         booking.setRoom("<svg onload='alert(1)'>");
         booking.setName("<img src=x onerror=alert(1)> & guest");
@@ -42,8 +42,8 @@ class BookingsHtmlTemplateTest {
     @Test
     void rendersGreekReportLabelsAndLocaleSpecificNumberFormatting() {
         Booking booking = new Booking();
-        booking.setStartDate("2026-06-20");
-        booking.setEndDate("2026-06-22");
+        booking.setStartDate(java.time.LocalDate.parse("2026-06-20"));
+        booking.setEndDate(java.time.LocalDate.parse("2026-06-22"));
         booking.setStatus(com.leonsoft.models.BookingStatus.CANCELLED);
         booking.setCharge(new java.math.BigDecimal("1234.5"));
         booking.setCommission(new java.math.BigDecimal("0.0"));

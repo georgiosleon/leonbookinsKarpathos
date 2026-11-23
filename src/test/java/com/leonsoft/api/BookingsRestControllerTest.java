@@ -148,8 +148,8 @@ class BookingsRestControllerTest {
         booking.setAgency("agency");
         booking.setRoom("room-1");
         booking.setRoomName("APT 2");
-        booking.setStartDate(startDate);
-        booking.setEndDate(endDate);
+        booking.setStartDate(java.time.LocalDate.parse(startDate));
+        booking.setEndDate(java.time.LocalDate.parse(endDate));
         booking.setNumOfGuests(2);
         booking.setNumOfNights(3);
         booking.setStatus(com.leonsoft.models.BookingStatus.ACTIVE);

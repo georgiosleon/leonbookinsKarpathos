@@ -64,11 +64,10 @@ public record BookingResponse(
                 booking.getRequestDateTime());
     }
 
-    private static String formatDate(String date) {
-        if (date == null || date.isBlank()) {
-            return date;
+    private static String formatDate(LocalDate date) {
+        if (date == null) {
+            return null;
         }
-        LocalDate parsed = BookingsUtils.parseStoredDate(date);
-        return BookingsUtils.formatterEURO.format(parsed);
+        return BookingsUtils.formatterEURO.format(date);
     }
 }

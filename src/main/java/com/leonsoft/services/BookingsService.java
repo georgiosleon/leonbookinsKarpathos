@@ -89,8 +89,11 @@ public class BookingsService {
     @Transactional
     private Booking saveWithNormalizedValues(Booking booking) {
         BookingResource resource = resourceService.requireActive(booking.getRoom());
-        LocalDate stDate = BookingsUtils.parseEuroDate(booking.getStartDate());
-        LocalDate edDate = BookingsUtils.parseEuroDate(booking.getEndDate());
+        LocalDate stDate = booking.getStartDate();
+        LocalDate edDate = booking.getEndDate();
+        if (stDate == null || edDate == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid request.");
+        }
 
         if (edDate.isAfter(stDate)
                 && overlapChecker.isBookable(booking.getStatus())
@@ -102,8 +105,8 @@ public class BookingsService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, unavailableMessage);
         }
 
-        booking.setStartDate(stDate.format(DateTimeFormatter.ISO_DATE));
-        booking.setEndDate(edDate.format(DateTimeFormatter.ISO_DATE));
+        booking.setStartDate(stDate);
+        booking.setEndDate(edDate);
 
         booking.setNumOfNights(Math.toIntExact(ChronoUnit.DAYS.between(stDate, edDate)));
         booking.setCharge(BookingsUtils.normalizeMoney(booking.getCharge()));

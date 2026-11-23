@@ -116,8 +116,8 @@ class BookingsReportPdfServiceTest {
     private static Booking booking(String resourceId, String name) {
         Booking booking = new Booking();
         booking.setId(name);
-        booking.setStartDate("2026-06-12");
-        booking.setEndDate("2026-06-15");
+        booking.setStartDate(java.time.LocalDate.parse("2026-06-12"));
+        booking.setEndDate(java.time.LocalDate.parse("2026-06-15"));
         booking.setStatus(com.leonsoft.models.BookingStatus.ACTIVE);
         booking.setRoom(resourceId);
         booking.setName(name);

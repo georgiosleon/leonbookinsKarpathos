@@ -65,8 +65,8 @@ public record BookingRequest(
         booking.setAgency(agency);
         booking.setRoom(room);
         booking.setCountry(country);
-        booking.setStartDate(startDate);
-        booking.setEndDate(endDate);
+        booking.setStartDate(startDate == null ? null : com.leonsoft.services.BookingsUtils.parseEuroDate(startDate));
+        booking.setEndDate(endDate == null ? null : com.leonsoft.services.BookingsUtils.parseEuroDate(endDate));
         booking.setNumOfNights(numOfNights);
         booking.setCharge(charge);
         booking.setCommission(commission);

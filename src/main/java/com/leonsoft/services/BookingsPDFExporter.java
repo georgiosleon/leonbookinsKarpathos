@@ -205,8 +205,8 @@ public class BookingsPDFExporter {
         return moneyFormat.format(value);
     }
 
-    private String formatBookingDate(String value) {
-        return value == null ? "" : dateFormatter.format(BookingsUtils.parseStoredDate(value));
+    private String formatBookingDate(java.time.LocalDate value) {
+        return value == null ? "" : dateFormatter.format(value);
     }
 
     private String status(String value) {

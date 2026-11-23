@@ -12,8 +12,8 @@ class BookingResponseTest {
     @Test
     void fromFormatsIsoDatesToEuropeanDisplayFormat() {
         Booking booking = booking();
-        booking.setStartDate("2026-06-20");
-        booking.setEndDate("2026-06-23");
+        booking.setStartDate(java.time.LocalDate.parse("2026-06-20"));
+        booking.setEndDate(java.time.LocalDate.parse("2026-06-23"));
 
         BookingResponse response = BookingResponse.from(booking);
 
@@ -24,8 +24,8 @@ class BookingResponseTest {
     @Test
     void fromPreservesLegacyEuropeanDatesAsEuropeanDisplayFormat() {
         Booking booking = booking();
-        booking.setStartDate("20/06/2026");
-        booking.setEndDate("23/06/2026");
+        booking.setStartDate(java.time.LocalDate.of(2026,6,20));
+        booking.setEndDate(java.time.LocalDate.of(2026,6,23));
 
         BookingResponse response = BookingResponse.from(booking);
 
@@ -38,13 +38,13 @@ class BookingResponseTest {
         LocalDateTime requestDateTime = LocalDateTime.of(2026, 6, 1, 12, 30);
         Booking booking = booking();
         booking.setStartDate(null);
-        booking.setEndDate(" ");
+        booking.setEndDate(null);
         booking.setRequestDateTime(requestDateTime);
 
         BookingResponse response = BookingResponse.from(booking);
 
         assertNull(response.startDate());
-        assertEquals(" ", response.endDate());
+        assertNull(response.endDate());
         assertEquals("booking-1", response.id());
         assertEquals("Ada", response.name());
         assertEquals("APT 2", response.roomName());

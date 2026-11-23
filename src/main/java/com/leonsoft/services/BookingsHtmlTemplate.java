@@ -67,8 +67,8 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
 
 
             ////// pre processing
-            LocalDate stDt = BookingsUtils.parseStoredDate(booking.startDate());
-            LocalDate edDt = BookingsUtils.parseStoredDate(booking.endDate());
+            LocalDate stDt = booking.startDate();
+            LocalDate edDt = booking.endDate();
 
             String statusClass = BookingStatus.isCancelled(booking.status())
                   ? " class=\"cancelled-status\""

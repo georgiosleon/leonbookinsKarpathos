@@ -23,10 +23,10 @@ public class Booking {
     private User user;
 
     @Column(name = "start_date")
-    private String startDate; // "2023-03-06",   iso format  for saving  and EU for frontend  dd/MM/yyyy  06/03/2023
+    private java.time.LocalDate startDate;
 
     @Column(name = "end_date")
-    private String endDate; // iso format  for saving  and EU for frontend
+    private java.time.LocalDate endDate;
 
     @Column(name = "num_of_nights")
     private Integer numOfNights;

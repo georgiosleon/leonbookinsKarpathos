@@ -75,8 +75,8 @@ class BookingsServiceTest {
 
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> {
             Booking saved = invocation.getArgument(0);
-            assertEquals("2026-06-20", saved.getStartDate());
-            assertEquals("2026-06-23", saved.getEndDate());
+            assertEquals(java.time.LocalDate.parse("2026-06-20"), saved.getStartDate());
+            assertEquals(java.time.LocalDate.parse("2026-06-23"), saved.getEndDate());
             assertEquals(3, saved.getNumOfNights());
             assertEquals(new java.math.BigDecimal("70.00"), saved.getBalance());
             return saved;
@@ -85,8 +85,8 @@ class BookingsServiceTest {
         Booking result = bookingsService.create(booking);
 
         assertNotNull(result.getId());
-        assertEquals("2026-06-20", result.getStartDate());
-        assertEquals("2026-06-23", result.getEndDate());
+        assertEquals(java.time.LocalDate.parse("2026-06-20"), result.getStartDate());
+        assertEquals(java.time.LocalDate.parse("2026-06-23"), result.getEndDate());
         assertEquals(3, result.getNumOfNights());
         assertEquals(new java.math.BigDecimal("70.00"), result.getBalance());
         assertEquals("APT 2", result.getRoomName());
@@ -262,10 +262,10 @@ class BookingsServiceTest {
 
         List<Booking> bookings = bookingsService.getAll();
 
-        assertEquals("20/11/2026", bookings.get(0).getStartDate());
-        assertEquals("23/11/2026", bookings.get(0).getEndDate());
-        assertEquals("2026-11-24", bookings.get(1).getStartDate());
-        assertEquals("2026-11-27", bookings.get(1).getEndDate());
+        assertEquals(java.time.LocalDate.of(2026, 11, 20), bookings.get(0).getStartDate());
+        assertEquals(java.time.LocalDate.of(2026, 11, 23), bookings.get(0).getEndDate());
+        assertEquals(java.time.LocalDate.parse("2026-11-24"), bookings.get(1).getStartDate());
+        assertEquals(java.time.LocalDate.parse("2026-11-27"), bookings.get(1).getEndDate());
     }
 
     @Test
@@ -316,7 +316,7 @@ class BookingsServiceTest {
 
         Booking result = bookingsService.update(update);
 
-        assertEquals("2026-06-21", result.getStartDate());
+        assertEquals(java.time.LocalDate.parse("2026-06-21"), result.getStartDate());
         verify(bookingRepository).save(any(Booking.class));
     }
 
@@ -363,8 +363,8 @@ class BookingsServiceTest {
 
     private static Booking booking(String startDate, String endDate, String status) {
         Booking booking = new Booking();
-        booking.setStartDate(startDate);
-        booking.setEndDate(endDate);
+        booking.setStartDate(com.leonsoft.services.BookingsUtils.parseStoredDate(startDate));
+        booking.setEndDate(com.leonsoft.services.BookingsUtils.parseStoredDate(endDate));
         booking.setCharge(new java.math.BigDecimal("100.0"));
         booking.setCommission(new java.math.BigDecimal("10.0"));
         booking.setReceived(new java.math.BigDecimal("20.0"));
@@ -376,8 +376,8 @@ class BookingsServiceTest {
     private static Booking savedBooking(String id, String startDate, String endDate, String status) {
         Booking booking = new Booking();
         booking.setId(id);
-        booking.setStartDate(startDate);
-        booking.setEndDate(endDate);
+        booking.setStartDate(com.leonsoft.services.BookingsUtils.parseStoredDate(startDate));
+        booking.setEndDate(com.leonsoft.services.BookingsUtils.parseStoredDate(endDate));
         booking.setRoom("APT2");
         booking.setStatus(status == null ? null : com.leonsoft.models.BookingStatus.from(status));
         return booking;

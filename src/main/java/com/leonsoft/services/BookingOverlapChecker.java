@@ -20,8 +20,8 @@ public class BookingOverlapChecker {
         return bookingRepository.findByRoomAndStatusIn(candidate.getRoom(), BookingStatus.BOOKABLE)
                 .stream()
                 .filter(existing -> !Objects.equals(existing.getId(), candidate.getId()))
-                .anyMatch(existing -> existing.getStartDate().compareTo(endDate.toString()) < 0
-                        && startDate.toString().compareTo(existing.getEndDate()) < 0);
+                .anyMatch(existing -> existing.getStartDate().isBefore(endDate)
+                        && startDate.isBefore(existing.getEndDate()));
     }
 
     public boolean isBookable(BookingStatus status) {

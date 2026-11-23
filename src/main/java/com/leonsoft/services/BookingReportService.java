@@ -99,8 +99,8 @@ public class BookingReportService {
         Map<String, String> namesById = resourceService.namesById();
         List<BookingReportView> all = getAllBookingsForReport().stream()
                 .filter(booking -> {
-                    LocalDate bookingStart = BookingsUtils.parseStoredDate(booking.getStartDate());
-                    LocalDate bookingEnd = BookingsUtils.parseStoredDate(booking.getEndDate());
+                    LocalDate bookingStart = booking.getStartDate();
+                    LocalDate bookingEnd = booking.getEndDate();
                     return !bookingStart.isBefore(stDate) && !bookingEnd.isAfter(edDate);
                 })
                 .map(booking -> BookingReportView.from(booking, namesById.get(booking.getRoom())))
