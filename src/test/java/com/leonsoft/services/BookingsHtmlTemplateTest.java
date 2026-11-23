@@ -28,7 +28,7 @@ class BookingsHtmlTemplateTest {
         booking.setNumOfNights(2);
         booking.setExtraInfo("<script>alert(1)</script>");
 
-        String report = BookingsHtmlTemplate.report("20/06/2026", "30/06/2026", List.of(BookingReportView.from(booking, booking.getRoom())));
+        String report = new BookingsHtmlTemplate().render("20/06/2026", "30/06/2026", List.of(BookingReportView.from(booking, booking.getRoom())), Locale.ENGLISH);
 
         assertTrue(report.contains("&lt;svg onload=&#39;alert(1)&#39;&gt;"));
         assertTrue(report.contains("&lt;img src=x onerror=alert(1)&gt; &amp; guest"));
@@ -52,7 +52,7 @@ class BookingsHtmlTemplateTest {
         booking.setNumOfGuests(1);
         booking.setNumOfNights(2);
 
-        String report = BookingsHtmlTemplate.report(
+        String report = new BookingsHtmlTemplate().render(
               "20/06/2026", "30/06/2026", List.of(BookingReportView.from(booking, booking.getRoom())), Locale.forLanguageTag("el-GR"));
 
         assertTrue(report.contains("<th>Κατάσταση</th>"));
@@ -64,7 +64,7 @@ class BookingsHtmlTemplateTest {
 
     @Test
     void rendersFrenchLabelsWithoutAnInaccuratePdfLink() {
-        String report = BookingsHtmlTemplate.report(
+        String report = new BookingsHtmlTemplate().render(
               "20/06/2026", "30/06/2026", List.of(), Locale.FRANCE);
 
         assertTrue(report.contains("<th>Arrivée</th>"));

@@ -76,7 +76,8 @@ class BookingsReportPdfServiceTest {
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         BookingReportService service = new BookingReportService(
-              bookingRepository, resourceService, new CurrentUserProvider(userRepository));
+              bookingRepository, resourceService, new CurrentUserProvider(userRepository),
+              new BookingsHtmlTemplate(), new DefaultBookingPdfReportRenderer());
 
         service.exportReportToPDF(response, "01/06/2026", "30/06/2026", "rooms", Locale.UK);
 
@@ -96,7 +97,8 @@ class BookingsReportPdfServiceTest {
     @Test
     void pdfExportRejectsUnsupportedResourceType() {
         BookingReportService service = new BookingReportService(
-              bookingRepository, resourceService, new CurrentUserProvider(userRepository));
+              bookingRepository, resourceService, new CurrentUserProvider(userRepository),
+              new BookingsHtmlTemplate(), new DefaultBookingPdfReportRenderer());
 
         ResponseStatusException exception = assertThrows(
               ResponseStatusException.class,

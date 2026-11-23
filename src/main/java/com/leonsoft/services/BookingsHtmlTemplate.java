@@ -9,16 +9,14 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Component;
 
 @Slf4j
-public class BookingsHtmlTemplate {
+@Component
+public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
 
-    public static String report(String fromDateEuroFmt, String toDateEuroFmt, List<BookingReportView> all) {
-        return report(fromDateEuroFmt, toDateEuroFmt, all, Locale.ENGLISH);
-    }
-
-    public static String report(
-          String fromDateEuroFmt, String toDateEuroFmt, List<BookingReportView> all, Locale locale) {
+    @Override
+    public String render(String fromDateEuroFmt, String toDateEuroFmt, List<BookingReportView> all, Locale locale) {
         log.debug("/booking/report fromDate={} toDate={}", fromDateEuroFmt, toDateEuroFmt);
 
         StringBuilder report = new StringBuilder();

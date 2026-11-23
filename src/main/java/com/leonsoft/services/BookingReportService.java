@@ -29,14 +29,20 @@ public class BookingReportService {
     private final BookingRepository bookingRepository;
     private final BookingResourceService resourceService;
     private final CurrentUserProvider currentUserProvider;
+    private final BookingHtmlReportRenderer htmlReportRenderer;
+    private final BookingPdfReportRenderer pdfReportRenderer;
 
     public BookingReportService(
             BookingRepository bookingRepository,
             BookingResourceService resourceService,
-            CurrentUserProvider currentUserProvider) {
+            CurrentUserProvider currentUserProvider,
+            BookingHtmlReportRenderer htmlReportRenderer,
+            BookingPdfReportRenderer pdfReportRenderer) {
         this.bookingRepository = bookingRepository;
         this.resourceService = resourceService;
         this.currentUserProvider = currentUserProvider;
+        this.htmlReportRenderer = htmlReportRenderer;
+        this.pdfReportRenderer = pdfReportRenderer;
     }
 
     @Transactional(readOnly = true)
@@ -80,8 +86,7 @@ public class BookingReportService {
         response.setHeader(
                 "Content-Disposition",
                 "attachment; filename=booking-report-" + resourceType + "-" + LocalDate.now() + ".pdf");
-        new BookingsPDFExporter(bookings, resources, resourceType, startDate, endDate, locale)
-                .export(response);
+        pdfReportRenderer.export(bookings, resources, resourceType, startDate, endDate, locale, response);
     }
 
     @Transactional(readOnly = true)
@@ -101,7 +106,7 @@ public class BookingReportService {
                 .map(booking -> BookingReportView.from(booking, namesById.get(booking.getRoom())))
                 .toList();
 
-        return BookingsHtmlTemplate.report(fromDateEuroFmt, toDateEuroFmt, all, locale);
+        return htmlReportRenderer.render(fromDateEuroFmt, toDateEuroFmt, all, locale);
     }
 
     private List<Booking> getAllBookingsForReport() {
