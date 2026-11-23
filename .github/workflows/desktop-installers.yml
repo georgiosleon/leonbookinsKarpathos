@@ -17,7 +17,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: liberica
           java-version: "25"
       - name: Check tag matches Maven project version
         if: github.ref_type == 'tag'
@@ -54,7 +54,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-java@v4
         with:
-          distribution: temurin
+          distribution: liberica
           java-version: "25"
           cache: maven
       - name: Build Linux or macOS installer

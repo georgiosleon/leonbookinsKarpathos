@@ -138,9 +138,11 @@ missing_tools=()
 add_missing_tool() {
   local requested="$1"
   local existing
-  for existing in "${missing_tools[@]}"; do
-    [[ "$existing" != "$requested" ]] || return
-  done
+  if ((${#missing_tools[@]})); then
+    for existing in "${missing_tools[@]}"; do
+      [[ "$existing" != "$requested" ]] || return
+    done
+  fi
   missing_tools+=("$requested")
 }
 for tool in java javac jpackage; do
