@@ -191,7 +191,7 @@ Maven still builds the SPA for packaged runs.
    `bookings.db`; override with `APP_DB_URL`.
 3. **Desktop** — `install/package.sh` / `package.ps1` → portable archive / MSI /
    DMG with bundled JRE. See [`install/README.md`](../install/README.md).
-4. **CLI** — `java -jar target/leonbookinsKarpathos-1.0.0.jar db backup|restore …`
+4. **CLI** — `java -jar target/leonbookinsKarpathos-2.0.0.jar db backup|restore …`
    (dispatched in `Application.main` before Spring).
 
 Default bind is often loopback; LAN access needs `SERVER_ADDRESS=0.0.0.0` or
