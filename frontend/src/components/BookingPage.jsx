@@ -14,7 +14,6 @@ import {
   deleteBooking as deleteBookingRequest,
   logout as logoutRequest,
   fetchAvailabilitySettings,
-  fetchBookingReport,
   fetchBookings,
   fetchResources,
   saveBooking,
@@ -27,7 +26,6 @@ import { FeedbackDialog } from './FeedbackDialog.jsx';
 import { HelpButton } from './HelpButton.jsx';
 import { ThemeToggle } from './ThemeToggle.jsx';
 import { useTheme } from '../useTheme.js';
-import { reportDocument } from '../reportDocument.js';
 import { formatMoney, useLanguage } from '../i18n.jsx';
 import { LanguageSelector } from './LanguageSelector.jsx';
 import { AppSupportActions } from './AppSupportActions.jsx';
@@ -103,7 +101,6 @@ export function BookingPage() {
   const [errorPopupOpen, setErrorPopupOpen] = useState(false);
   const [notice, setNotice] = useState('');
   const [saveMode, setSaveMode] = useState(getInitialBookingSaveMode);
-  const [reportHtml, setReportHtml] = useState('');
   const [formVisible, setFormVisible] = useState(true);
   const { theme, toggleTheme } = useTheme();
   const { language, locale, t } = useLanguage();
@@ -229,20 +226,6 @@ export function BookingPage() {
     } catch (requestError) {
       showError(t('Could not delete booking: {error}', { error: requestError.message }));
       throw requestError;
-    }
-  }
-
-  async function handleReport() {
-    showError('');
-    setNotice('');
-    if (!form.startDate || !form.endDate || form.startDate > form.endDate) {
-      showError(t('Choose a valid date range for the report.'));
-      return;
-    }
-    try {
-      setReportHtml(await fetchBookingReport(form.startDate, form.endDate, language));
-    } catch (requestError) {
-      showError(t('Could not load report: {error}', { error: requestError.message }));
     }
   }
 
@@ -399,7 +382,6 @@ export function BookingPage() {
           <button type="button" className="button button-muted" onClick={() => handleDateNavigation(-30)}>{t('30 days back')}</button>
           <button type="button" className="button button-muted" onClick={() => handleDateNavigation(30)}>{t('30 days forward')}</button>
           <button type="button" className="button button-muted" onClick={() => handleDateNavigation(90)}>{t('90 days forward')}</button>
-          {canSeeReports && <button type="button" className="button button-primary" onClick={handleReport}>{t('Run report')}</button>}
         </div>
       </section>
 
@@ -429,19 +411,6 @@ export function BookingPage() {
         canDelete={canManageBookings}
       />
 
-      {reportHtml && (
-        <div className="dialog-backdrop" role="presentation" onMouseDown={(event) => {
-          if (event.target === event.currentTarget) setReportHtml('');
-        }}>
-          <section className="report-dialog" role="dialog" aria-modal="true" aria-labelledby="report-heading">
-            <div className="report-heading">
-              <h2 id="report-heading">{t('Booking report')}</h2>
-              <button type="button" className="button button-muted" onClick={() => setReportHtml('')}>{t('Close')}</button>
-            </div>
-            <iframe title={t('Booking report')} sandbox="allow-same-origin" srcDoc={reportDocument(reportHtml, theme, language)} />
-          </section>
-        </div>
-      )}
       <FeedbackDialog
         message={errorPopupOpen ? error : ''}
         onClose={() => setErrorPopupOpen(false)}
