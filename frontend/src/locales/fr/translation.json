@@ -260,5 +260,12 @@
   "Edit": "Modifier",
   "Save": "Enregistrer",
   "Yes": "Oui",
-  "No": "Non"
+  "No": "Non",
+  "Stay / Reservation": "Séjour / Réservation",
+  "Set dates, resource, status, and guests first.": "Définissez d'abord les dates, la ressource, le statut et les invités.",
+  "Guest & Channel": "Client & Canal",
+  "Financials": "Finances",
+  "Balance = Total − Received − Commission − Rental tax": "Solde = Total − Reçu − Commission − Taxe de location",
+  "Show financials": "Afficher les finances",
+  "Hide financials": "Masquer les finances"
 }

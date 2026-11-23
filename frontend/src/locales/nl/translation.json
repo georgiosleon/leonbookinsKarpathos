@@ -260,5 +260,12 @@
   "Edit": "Bewerken",
   "Save": "Opslaan",
   "Yes": "Ja",
-  "No": "Nee"
+  "No": "Nee",
+  "Stay / Reservation": "Verblijf / Reservering",
+  "Set dates, resource, status, and guests first.": "Stel eerst data, bron, status en gasten in.",
+  "Guest & Channel": "Gast & Kanaal",
+  "Financials": "Financiën",
+  "Balance = Total − Received − Commission − Rental tax": "Saldo = Totaal − Ontvangen − Commissie − Huurbelasting",
+  "Show financials": "Financiën tonen",
+  "Hide financials": "Financiën verbergen"
 }

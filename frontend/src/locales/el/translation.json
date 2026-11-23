@@ -260,5 +260,12 @@
   "Edit": "Επεξεργασία",
   "Save": "Αποθήκευση",
   "Yes": "Ναι",
-  "No": "Όχι"
+  "No": "Όχι",
+  "Stay / Reservation": "Διαμονή / Κράτηση",
+  "Set dates, resource, status, and guests first.": "Ορίστε πρώτα ημερομηνίες, πόρο, κατάσταση και επισκέπτες.",
+  "Guest & Channel": "Επισκέπτης & Κανάλι",
+  "Financials": "Οικονομικά",
+  "Balance = Total − Received − Commission − Rental tax": "Υπόλοιπο = Σύνολο − Εισπραχθέντα − Προμήθεια − Φόρος ενοικίασης",
+  "Show financials": "Εμφάνιση οικονομικών",
+  "Hide financials": "Απόκρυψη οικονομικών"
 }

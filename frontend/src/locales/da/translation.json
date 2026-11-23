@@ -260,5 +260,12 @@
   "Edit": "Rediger",
   "Save": "Gem",
   "Yes": "Ja",
-  "No": "Nej"
+  "No": "Nej",
+  "Stay / Reservation": "Ophold / Reservation",
+  "Set dates, resource, status, and guests first.": "Angiv først datoer, ressource, status og gæster.",
+  "Guest & Channel": "Gæst & Kanal",
+  "Financials": "Økonomi",
+  "Balance = Total − Received − Commission − Rental tax": "Saldo = Total − Modtaget − Provision − Lejeskat",
+  "Show financials": "Vis økonomi",
+  "Hide financials": "Skjul økonomi"
 }

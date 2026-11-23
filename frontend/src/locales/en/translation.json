@@ -260,5 +260,12 @@
   "Edit": "Edit",
   "Save": "Save",
   "Yes": "Yes",
-  "No": "No"
+  "No": "No",
+  "Stay / Reservation": "Stay / Reservation",
+  "Set dates, resource, status, and guests first.": "Set dates, resource, status, and guests first.",
+  "Guest & Channel": "Guest & Channel",
+  "Financials": "Financials",
+  "Balance = Total − Received − Commission − Rental tax": "Balance = Total − Received − Commission − Rental tax",
+  "Show financials": "Show financials",
+  "Hide financials": "Hide financials"
 }
