@@ -1,40 +1,83 @@
 package com.leonsoft.config;
 
-import org.hibernate.exception.ConstraintViolationException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.validation.ConstraintViolationException;
+import java.time.Instant;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.server.ResponseStatusException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.HttpRequestMethodNotSupportedException;
 
 @ControllerAdvice
 public class CustomErrorHandler {
 
     @ExceptionHandler({
           ConstraintViolationException.class,
+          org.hibernate.exception.ConstraintViolationException.class,
           HttpMessageNotReadableException.class,
-          MethodArgumentNotValidException.class
+          MethodArgumentNotValidException.class,
+          MethodArgumentTypeMismatchException.class,
+          MissingServletRequestParameterException.class,
+          IllegalArgumentException.class
     })
-    public ResponseEntity<ErrorResponse> handleInvalidRequest(java.util.Locale locale) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-              .body(new ErrorResponse("el".equals(locale.getLanguage())
-                    ? "Τα δεδομένα του αιτήματος δεν είναι έγκυρα."
-                    : "Invalid request."));
+    public ResponseEntity<ApiError> handleInvalidRequest(Exception exception, HttpServletRequest request, java.util.Locale locale) {
+        String message = "el".equals(locale.getLanguage())
+              ? "Τα δεδομένα του αιτήματος δεν είναι έγκυρα."
+              : "Invalid request.";
+        return build(HttpStatus.BAD_REQUEST, message, request);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
-    public ResponseEntity<ErrorResponse> handleStatusException(
-          ResponseStatusException exception, java.util.Locale locale) {
+    public ResponseEntity<ApiError> handleStatusException(
+          ResponseStatusException exception, HttpServletRequest request, java.util.Locale locale) {
+        HttpStatus status = HttpStatus.resolve(exception.getStatusCode().value());
+        if (status == null) {
+            status = HttpStatus.INTERNAL_SERVER_ERROR;
+        }
         String message = exception.getReason();
         if ("Booking not found.".equals(message) && "el".equals(locale.getLanguage())) {
             message = "Δεν βρέθηκε η κράτηση.";
         }
-        return ResponseEntity.status(exception.getStatusCode())
-              .body(new ErrorResponse(message == null ? "Request failed." : message));
+        if (message == null || message.isBlank()) {
+            message = status.is4xxClientError() ? "Request failed." : "Unexpected server error.";
+        }
+        return build(status, message, request);
     }
 
-    public record ErrorResponse(String message) {
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException exception, HttpServletRequest request) {
+        return build(HttpStatus.FORBIDDEN, "Access denied.", request);
+    }
+
+    @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
+    public ResponseEntity<ApiError> handleMethodNotSupported(HttpRequestMethodNotSupportedException exception, HttpServletRequest request) {
+        return build(HttpStatus.METHOD_NOT_ALLOWED, "Method not allowed.", request);
+    }
+
+    @ExceptionHandler(NoResourceFoundException.class)
+    public ResponseEntity<ApiError> handleNoResource(NoResourceFoundException exception, HttpServletRequest request) {
+        return build(HttpStatus.NOT_FOUND, "Not found.", request);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ApiError> handleUnexpected(Exception exception, HttpServletRequest request) {
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error.", request);
+    }
+
+    private ResponseEntity<ApiError> build(HttpStatus status, String message, HttpServletRequest request) {
+        String path = request == null ? "" : request.getRequestURI();
+        return ResponseEntity.status(status)
+              .body(new ApiError(Instant.now().toString(), status.value(), status.getReasonPhrase(), message, path));
+    }
+
+    public record ApiError(String timestamp, int status, String error, String message, String path) {
     }
 }

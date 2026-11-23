@@ -17,6 +17,11 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.time.Instant;
+
 @Configuration
 @EnableMethodSecurity
 public class SecurityConfig {
@@ -31,10 +36,9 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         CookieCsrfTokenRepository csrfTokenRepository = CookieCsrfTokenRepository.withHttpOnlyFalse();
         CsrfTokenRequestAttributeHandler csrfTokenRequestHandler = new CsrfTokenRequestAttributeHandler();
-        RequestMatcher bookingEndpoints = request -> {
+        RequestMatcher apiEndpoints = request -> {
             String path = request.getServletPath();
-            return path.equals("/api/v1/booking") || path.startsWith("/api/v1/booking/")
-                  || path.equals("/api/v1/resources") || path.startsWith("/api/v1/resources/");
+            return path != null && path.startsWith("/api/v1/");
         };
 
         http
@@ -96,8 +100,11 @@ public class SecurityConfig {
                     .csrfTokenRequestHandler(csrfTokenRequestHandler))
               .exceptionHandling(exceptions -> exceptions
                     .defaultAuthenticationEntryPointFor(
-                          new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED),
-                          bookingEndpoints));
+                          (request, response, authException) -> writeSecurityError(response, request, HttpStatus.UNAUTHORIZED, "Authentication required."),
+                          apiEndpoints)
+                    .defaultAccessDeniedHandlerFor(
+                          (request, response, accessDeniedException) -> writeSecurityError(response, request, HttpStatus.FORBIDDEN, "Access denied."),
+                          apiEndpoints));
 
         return http.build();
     }
@@ -118,5 +125,19 @@ public class SecurityConfig {
     @Bean
     PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    private void writeSecurityError(HttpServletResponse response, HttpServletRequest request, HttpStatus status, String message) throws IOException {
+        response.setStatus(status.value());
+        response.setContentType("application/json");
+        String path = request.getRequestURI() == null ? "" : request.getRequestURI().replace("\\", "\\\\").replace("\"", "\\\"");
+        String safeMessage = message.replace("\\", "\\\\").replace("\"", "\\\"");
+        String body = "{\"timestamp\":\""
+              + Instant.now()
+              + "\",\"status\":" + status.value()
+              + ",\"error\":\"" + status.getReasonPhrase()
+              + "\",\"message\":\"" + safeMessage
+              + "\",\"path\":\"" + path + "\"}";
+        response.getWriter().write(body);
     }
 }

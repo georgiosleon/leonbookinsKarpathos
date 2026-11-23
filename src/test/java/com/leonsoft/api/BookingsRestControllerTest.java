@@ -79,7 +79,11 @@ class BookingsRestControllerTest {
                           }
                           """))
               .andExpect(status().isBadRequest())
-              .andExpect(jsonPath("$.message").value("Invalid request."));
+              .andExpect(jsonPath("$.message").value("Invalid request."))
+              .andExpect(jsonPath("$.status").value(400))
+              .andExpect(jsonPath("$.error").value("Bad Request"))
+              .andExpect(jsonPath("$.path").value("/api/v1/booking/save"))
+              .andExpect(jsonPath("$.timestamp").exists());
     }
 
     @Test

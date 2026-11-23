@@ -3,6 +3,7 @@ package com.leonsoft.config;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.Resource;
@@ -28,25 +29,28 @@ public class NotFoundHandler {
     }
 
     @ExceptionHandler(NoHandlerFoundException.class)
-    public ResponseEntity<String> renderDefaultPage(
+    public ResponseEntity<?> renderDefaultPage(
           NoHandlerFoundException exception, HttpServletRequest request) {
         String accept = request.getHeader(HttpHeaders.ACCEPT);
-        if (!"GET".equalsIgnoreCase(exception.getHttpMethod())
-              || !"/".equals(request.getRequestURI())
-              || accept == null
-              || !accept.toLowerCase(java.util.Locale.ROOT).contains(MediaType.TEXT_HTML_VALUE)) {
-            return ResponseEntity.notFound().build();
+        if ("GET".equalsIgnoreCase(exception.getHttpMethod())
+              && "/".equals(request.getRequestURI())
+              && accept != null
+              && accept.toLowerCase(java.util.Locale.ROOT).contains(MediaType.TEXT_HTML_VALUE)) {
+            try (var inputStream = indexPage.getInputStream()) {
+                String body = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
+                return ResponseEntity.ok()
+                      .contentType(MediaType.TEXT_HTML)
+                      .body(body);
+            } catch (IOException exceptionReadingPage) {
+                log.error("Failed to load SPA entry page", exceptionReadingPage);
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                      .body(new CustomErrorHandler.ApiError(
+                            Instant.now().toString(), 500, "Internal Server Error",
+                            "There was an error completing the action.", request.getRequestURI()));
+            }
         }
-
-        try (var inputStream = indexPage.getInputStream()) {
-            String body = StreamUtils.copyToString(inputStream, StandardCharsets.UTF_8);
-            return ResponseEntity.ok()
-                  .contentType(MediaType.TEXT_HTML)
-                  .body(body);
-        } catch (IOException exceptionReadingPage) {
-            log.error("Failed to load SPA entry page", exceptionReadingPage);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                  .body("There was an error completing the action.");
-        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+              .body(new CustomErrorHandler.ApiError(
+                    Instant.now().toString(), 404, "Not Found", "Not found.", request.getRequestURI()));
     }
 }
