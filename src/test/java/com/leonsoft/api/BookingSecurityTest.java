@@ -67,7 +67,23 @@ class BookingSecurityTest {
     @Test
     void bookingEndpointsRequireAuthentication() throws Exception {
         mockMvc.perform(get("/api/v1/booking/getAll"))
-                .andExpect(status().isUnauthorized());
+                .andExpect(status().isUnauthorized())
+                .andExpect(jsonPath("$.status").value(401))
+                .andExpect(jsonPath("$.message").value("Authentication required."))
+                .andExpect(jsonPath("$.path").value("/api/v1/booking/getAll"));
+    }
+
+    @Test
+    void forbiddenApiRequestsReturnConsistentErrorBody() throws Exception {
+        mockMvc.perform(post("/api/v1/booking/save")
+                    .with(user("guest-1").roles("GUEST"))
+                    .with(csrf())
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("{}"))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.status").value(403))
+                .andExpect(jsonPath("$.message").exists())
+                .andExpect(jsonPath("$.path").value("/api/v1/booking/save"));
     }
 
     @Test

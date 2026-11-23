@@ -144,8 +144,8 @@ the application's SQLite persistence.
 
 ## Current boundaries and growth
 
-- **Authentication and permissions:** database-backed users with roles `ADMIN`, `OPERATOR`, and `GUEST` (legacy `USER` accepted/migrated to `OPERATOR`). Admins manage users/resources/admin ops and can view reports; operators manage bookings and view reports; guests have read-only booking visibility. The system prevents removing/deactivating/deleting the last active admin or operator.
-- **Resources:** rooms and vehicles are persisted as managed resources; the existing booking `room` column stores their stable resource IDs.
-- **Database:** SQLite with JPA `ddl-auto=update` and `DatabaseInitializer` bootstrap/migration logic. Adopt versioned migrations before schema-altering changes.
+- **Authentication and permissions:** database-backed users with roles `ADMIN`, `OPERATOR`, and `GUEST`. Admins manage users/resources/admin ops and can view reports; operators manage bookings and view reports; guests have read-only booking visibility. The system prevents removing/deactivating/deleting the last active admin or operator.
+- **Resources:** rooms and vehicles are persisted as managed resources; bookings store stable `resourceId` values.
+- **Database:** SQLite with Flyway migrations and `ddl-auto=validate`. `DatabaseInitializer` seeds default accounts when missing.
 - **Deployment:** the backend and compiled frontend are one application artifact. Desktop packaging, Docker, and direct Maven execution are alternative launch/deployment paths.
 - **API compatibility:** breaking external API changes should use a new major version prefix instead of changing `/api/v1` behavior.

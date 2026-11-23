@@ -65,8 +65,8 @@ Entity: `models/Booking.java` (table `Booking`).
 - Guest / ops: `name`, `agency`, `numOfGuests`, `country`, `email`, `tel`,
   `voucher`, `identification`, `invoiceNumber`, `taxRefNumber`, `afm`,
   `extraInfo`
-- Resource: `room` stores the **resource ID** (not the display name); transient
-  `roomName` is for display
+- Resource: `resourceId` stores the **stable resource ID**; `resourceName` is a
+display-only field resolved for responses/reports
 - `status`: `active` | `paid` | `cancelled` (validated on the request DTO)
 - `requestDateTime`
 
@@ -83,7 +83,7 @@ Entity: `models/BookingResource.java` (table `booking_resources`).
 Entity: `models/User.java` (table `users`). Users have `username`,
 `passwordHash`, `email`, `role` (`ADMIN`/`OPERATOR`/`GUEST`), and `active` flags.
 `DatabaseInitializer` seeds missing default accounts on startup using
-`APP_ADMIN_*`, `APP_OPERATOR_* (or legacy APP_USER_*)`, and `APP_GUEST_*` environment variables; existing
+`APP_ADMIN_*`, `APP_OPERATOR_*`, and `APP_GUEST_*` environment variables; existing
 accounts are not overwritten. Passwords are BCrypt-hashed.
 
 ### Features
@@ -148,7 +148,7 @@ Controllers include `BookingsRestController`, `BookingResourceController`,
 `ApplicationSupportController`, `LoginPageController`, and
 `ErrorRestController`.
 
-Security: database-backed users with `ADMIN`/`OPERATOR`/`GUEST` roles (legacy `USER` accepted/migrated).
+Security: database-backed users with `ADMIN`/`OPERATOR`/`GUEST` roles.
 Admins manage users, resources, and admin ops and can view reports; operators manage bookings and view reports;
 guests have read-only booking/resource visibility. CSRF cookie protects mutating browser calls. Frontend client modules:
 `frontend/src/bookingApi.js`, `frontend/src/usersApi.js`.
@@ -186,7 +186,7 @@ Maven still builds the SPA for packaged runs.
 1. **Docker** — `cp .env.example .env`, set seed account credentials,
    `docker compose up --build -d` → `http://localhost:8080`. Data lives in
    volume `booking-data`.
-2. **Maven** — set `APP_ADMIN_*` / `APP_OPERATOR_* (or legacy APP_USER_*)` / `APP_GUEST_*` as needed, then
+2. **Maven** — set `APP_ADMIN_*` / `APP_OPERATOR_*` / `APP_GUEST_*` as needed, then
    `./mvnw generate-resources spring-boot:run` (or `package`). Default DB is
    `bookings.db`; override with `APP_DB_URL`.
 3. **Desktop** — `install/package.sh` / `package.ps1` → portable archive / MSI /
@@ -215,5 +215,5 @@ unfinished swap. What remains transitional or deferred:
 
 One Spring Boot JAR embeds a React booking SPA, talks to itself over `/api/v1`,
 stores bookings, users, and a room/car catalog in SQLite, enforces database-backed
-role authorization (`ADMIN`/`OPERATOR`/`GUEST`, legacy `USER` migrated) with session + CSRF,
+role authorization (`ADMIN`/`OPERATOR`/`GUEST`) with session + CSRF,
 and can be launched as Docker, Maven, or a desktop wrapper with an offline backup CLI.
