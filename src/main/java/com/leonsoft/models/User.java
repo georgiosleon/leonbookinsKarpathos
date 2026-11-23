@@ -46,9 +46,7 @@ public class User implements UserDetails {
     private LocalDateTime createdAt = LocalDateTime.now();
 
     /**
-     * Canonical role name ('ADMIN', 'OPERATOR' or 'GUEST'). Legacy 'USER' and
-     * casing variants are normalized, so old and new data produce the same
-     * name used by the security layer.
+     * Canonical role name ('ADMIN', 'OPERATOR' or 'GUEST').
      */
     public String getRole() {
         return Role.from(role).name();
@@ -56,12 +54,6 @@ public class User implements UserDetails {
 
     public void setRole(String role) {
         this.role = Role.from(role).name();
-    }
-
-    /** Raw stored role value, used for legacy-role migration checks. */
-    @JsonIgnore
-    public String getStoredRole() {
-        return role;
     }
 
     /** True when the user's role is ADMIN. */

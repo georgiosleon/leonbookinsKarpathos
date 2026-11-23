@@ -131,8 +131,6 @@ class BookingSecurityTest {
         mockMvc.perform(get("/api/v1/booking/getAll").with(user("test-admin").roles("ADMIN")))
                 .andExpect(status().isOk());
 
-        mockMvc.perform(get("/booking/getAll").with(user("operator").roles("OPERATOR")))
-                .andExpect(status().isOk());
     }
 
     @Test

@@ -23,13 +23,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * Booking API. {@code /api/v1/booking} is the canonical base path.
- * {@code /booking} is a legacy compatibility alias, deprecated for clients and
- * planned for removal in a future major API version (v2). Legacy requests emit
- * deprecation headers.
+ * Booking API.
  */
 @RestController
-@RequestMapping({"/api/v1/booking", "/booking"})
+@RequestMapping("/api/v1/booking")
 public class BookingsRestController {
 
     private static final Logger log = LoggerFactory.getLogger(BookingsRestController.class);

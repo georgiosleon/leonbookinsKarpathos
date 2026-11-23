@@ -65,7 +65,7 @@ class BookingsRestControllerTest {
 
     @Test
     void rejectsMalformedBookingWithBadRequest() throws Exception {
-        mockMvc.perform(post("/booking/save")
+        mockMvc.perform(post("/api/v1/booking/save")
                     .contentType(MediaType.APPLICATION_JSON)
                     .content("""
                           {
@@ -78,15 +78,6 @@ class BookingsRestControllerTest {
                             "status": "active"
                           }
                           """))
-              .andExpect(status().isBadRequest())
-              .andExpect(jsonPath("$.message").value("Invalid request."));
-    }
-
-    @Test
-    void keepsLegacyBookingRoutesAvailable() throws Exception {
-        mockMvc.perform(post("/booking/save")
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .content("{}"))
               .andExpect(status().isBadRequest())
               .andExpect(jsonPath("$.message").value("Invalid request."));
     }

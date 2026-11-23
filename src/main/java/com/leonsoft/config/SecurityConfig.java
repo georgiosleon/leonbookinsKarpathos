@@ -33,8 +33,7 @@ public class SecurityConfig {
         CsrfTokenRequestAttributeHandler csrfTokenRequestHandler = new CsrfTokenRequestAttributeHandler();
         RequestMatcher bookingEndpoints = request -> {
             String path = request.getServletPath();
-            return path.equals("/booking") || path.startsWith("/booking/")
-                  || path.equals("/api/v1/booking") || path.startsWith("/api/v1/booking/")
+            return path.equals("/api/v1/booking") || path.startsWith("/api/v1/booking/")
                   || path.equals("/api/v1/resources") || path.startsWith("/api/v1/resources/");
         };
 
@@ -45,13 +44,13 @@ public class SecurityConfig {
                                      "/rooms.html", "/cars.html",
                                      "/css/**", "/js/**", "/react-assets/**").permitAll()
                     .requestMatchers("/login", "/logout").permitAll()
-                    .requestMatchers("/api/v1/csrf", "/csrf").authenticated()
+                    .requestMatchers("/api/v1/csrf").authenticated()
                     // The current user is available to every authenticated user.
                     .requestMatchers("/api/v1/users/me").authenticated()
                     // User administration is restricted to admins.
                     .requestMatchers("/api/v1/users", "/api/v1/users/**").hasRole("ADMIN")
                     // Read-only booking/resource/settings data for all authenticated roles.
-                    .requestMatchers(HttpMethod.GET, "/api/v1/booking/getAll", "/booking/getAll")
+                    .requestMatchers(HttpMethod.GET, "/api/v1/booking/getAll")
                         .hasAnyRole("ADMIN", "OPERATOR", "GUEST")
                     .requestMatchers(HttpMethod.GET, "/api/v1/resources")
                         .hasAnyRole("ADMIN", "OPERATOR", "GUEST")
@@ -59,17 +58,17 @@ public class SecurityConfig {
                         .hasAnyRole("ADMIN", "OPERATOR", "GUEST")
                     // Reports/export are available to admins and operators; guests are read-only.
                     .requestMatchers(HttpMethod.GET,
-                                     "/api/v1/booking/report", "/booking/report",
-                                     "/api/v1/booking/export/pdf", "/booking/export/pdf")
+                                     "/api/v1/booking/report",
+                                     "/api/v1/booking/export/pdf")
                         .hasAnyRole("ADMIN", "OPERATOR")
                     // Booking mutations are operator-only. Admins are system-only.
                     .requestMatchers(HttpMethod.POST,
-                                     "/api/v1/booking/save", "/booking/save",
-                                     "/api/v1/booking/delete", "/booking/delete",
-                                     "/api/v1/booking/del", "/booking/del")
+                                     "/api/v1/booking/save",
+                                     "/api/v1/booking/delete",
+                                     "/api/v1/booking/del")
                         .hasRole("OPERATOR")
                     .requestMatchers(HttpMethod.PUT,
-                                     "/api/v1/booking/update", "/booking/update")
+                                     "/api/v1/booking/update")
                         .hasRole("OPERATOR")
                     // Resource management is admin-only.
                     .requestMatchers(HttpMethod.POST, "/api/v1/resources", "/api/v1/resources/**")

@@ -56,22 +56,9 @@ public class DatabaseInitializer {
     @PostConstruct
     @Transactional
     public void init() {
-        migrateLegacyRoles();
         createUserIfAbsent(adminUsername, adminPassword, Role.ADMIN.name(), "admin@test.com");
         createUserIfAbsent(operatorUsername, operatorPassword, Role.OPERATOR.name(), "operator@test.com");
         createUserIfAbsent(guestUsername, guestPassword, Role.GUEST.name(), "guest@test.com");
-    }
-
-    private void migrateLegacyRoles() {
-        for (User user : userRepository.findAll()) {
-            String stored = user.getStoredRole();
-            String canonical = Role.from(stored).name();
-            if (stored == null || !canonical.equals(stored)) {
-                user.setRole(canonical);
-                userRepository.save(user);
-                log.info("Migrated legacy role for user '{}' to {}", user.getUsername(), canonical);
-            }
-        }
     }
 
     private void createUserIfAbsent(String username, String password, String role, String email) {

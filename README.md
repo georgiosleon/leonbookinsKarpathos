@@ -146,7 +146,7 @@ $env:APP_ADMIN_PASSWORD = Read-Host "Admin password"
 ```
 
 The default seed account credentials are read from `APP_ADMIN_*`,
-`APP_OPERATOR_*` (or legacy `APP_USER_*`), and `APP_GUEST_*` environment variables at startup. Missing seed
+`APP_OPERATOR_*`, and `APP_GUEST_*` environment variables at startup. Missing seed
 accounts are created in SQLite; existing user accounts are not overwritten.
 Passwords must be at least 12 characters. Protect the environment and avoid putting
 real credentials in source control.
@@ -261,13 +261,8 @@ remain available.
 ## API versioning
 
 The frontend uses the major-versioned `/api/v1` routes, such as
-`/api/v1/booking/getAll` and `/api/v1/csrf`. Legacy `/booking/...` and `/csrf`
-routes remain available for backward compatibility but are **deprecated**;
-clients should migrate to `/api/v1/...`. Legacy requests include deprecation
-headers (`Deprecation`, `Warning`). These aliases are planned for removal in a
-future major API version (v2) once clients have migrated. Breaking API changes
-should use a new major prefix, such as `/api/v2`, rather than changing v1
-behavior.
+`/api/v1/booking/getAll` and `/api/v1/csrf`. Breaking API changes should use a
+new major prefix, such as `/api/v2`, rather than changing v1 behavior.
 
 ## Developer documentation
 
@@ -283,7 +278,7 @@ The React/Vite source is in `frontend/`. It shares one booking screen between
 rooms and vehicles, uses the existing vis-timeline browser library, and calls
 the current Spring booking endpoints. Access is protected by database-backed
 user accounts with `ADMIN`, `OPERATOR`, and `GUEST` roles. Default seed accounts
-can be configured through `APP_ADMIN_*`, `APP_OPERATOR_*` (or legacy `APP_USER_*`), and `APP_GUEST_*`
+can be configured through `APP_ADMIN_*`, `APP_OPERATOR_*`, and `APP_GUEST_*`
 environment variables; existing accounts are not overwritten on startup.
 Active/paid bookings and cancelled bookings appear in separate timeline panels.
 Cancelled entries are stacked in their panel so overlapping cancellations,
