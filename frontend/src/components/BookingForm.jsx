@@ -164,6 +164,11 @@ export function BookingForm({
         </label>
 
         <label className="field">
+          <span>{t('Rental tax per night (€)')}</span>
+          <input readOnly value={formatMoney(Number(selectedResource?.rentalTaxPerNight) || 0, locale)} />
+        </label>
+
+        <label className="field">
           <span>{t('Total (€)')}</span>
           <input
             type="number"
