@@ -69,7 +69,7 @@ class BookingsServiceTest {
     void createNormalizesDatesAndRecalculatesNightsAndBalance() {
         Booking booking = booking("20/06/2026", "23/06/2026");
         booking.setNumOfNights(99);
-        booking.setBalance(999.0);
+        booking.setBalance(new java.math.BigDecimal("999.0"));
         when(resourceService.requireActive("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
 
@@ -78,7 +78,7 @@ class BookingsServiceTest {
             assertEquals("2026-06-20", saved.getStartDate());
             assertEquals("2026-06-23", saved.getEndDate());
             assertEquals(3, saved.getNumOfNights());
-            assertEquals(70.0, saved.getBalance());
+            assertEquals(new java.math.BigDecimal("70.00"), saved.getBalance());
             return saved;
         });
 
@@ -88,7 +88,7 @@ class BookingsServiceTest {
         assertEquals("2026-06-20", result.getStartDate());
         assertEquals("2026-06-23", result.getEndDate());
         assertEquals(3, result.getNumOfNights());
-        assertEquals(70.0, result.getBalance());
+        assertEquals(new java.math.BigDecimal("70.00"), result.getBalance());
         assertEquals("APT 2", result.getRoomName());
     }
 
@@ -365,9 +365,9 @@ class BookingsServiceTest {
         Booking booking = new Booking();
         booking.setStartDate(startDate);
         booking.setEndDate(endDate);
-        booking.setCharge(100.0);
-        booking.setCommission(10.0);
-        booking.setReceived(20.0);
+        booking.setCharge(new java.math.BigDecimal("100.0"));
+        booking.setCommission(new java.math.BigDecimal("10.0"));
+        booking.setReceived(new java.math.BigDecimal("20.0"));
         booking.setRoom("APT2");
         booking.setStatus(status == null ? null : com.leonsoft.models.BookingStatus.from(status));
         return booking;

@@ -61,10 +61,10 @@ class BookingResponseTest {
         booking.setRoomName("APT 2");
         booking.setNumOfGuests(2);
         booking.setNumOfNights(3);
-        booking.setCharge(100.0);
-        booking.setReceived(20.0);
-        booking.setCommission(10.0);
-        booking.setBalance(70.0);
+        booking.setCharge(new java.math.BigDecimal("100.0"));
+        booking.setReceived(new java.math.BigDecimal("20.0"));
+        booking.setCommission(new java.math.BigDecimal("10.0"));
+        booking.setBalance(new java.math.BigDecimal("70.0"));
         booking.setStatus(com.leonsoft.models.BookingStatus.ACTIVE);
         return booking;
     }

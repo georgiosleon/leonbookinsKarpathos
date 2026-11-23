@@ -20,10 +20,10 @@ class BookingsHtmlTemplateTest {
         booking.setRoom("<svg onload='alert(1)'>");
         booking.setName("<img src=x onerror=alert(1)> & guest");
         booking.setAgency("\" onmouseover=\"alert(1)");
-        booking.setCharge(100.0);
-        booking.setCommission(0.0);
-        booking.setReceived(0.0);
-        booking.setBalance(100.0);
+        booking.setCharge(new java.math.BigDecimal("100.0"));
+        booking.setCommission(new java.math.BigDecimal("0.0"));
+        booking.setReceived(new java.math.BigDecimal("0.0"));
+        booking.setBalance(new java.math.BigDecimal("100.0"));
         booking.setNumOfGuests(1);
         booking.setNumOfNights(2);
         booking.setExtraInfo("<script>alert(1)</script>");
@@ -45,10 +45,10 @@ class BookingsHtmlTemplateTest {
         booking.setStartDate("2026-06-20");
         booking.setEndDate("2026-06-22");
         booking.setStatus(com.leonsoft.models.BookingStatus.CANCELLED);
-        booking.setCharge(1234.5);
-        booking.setCommission(0.0);
-        booking.setReceived(0.0);
-        booking.setBalance(1234.5);
+        booking.setCharge(new java.math.BigDecimal("1234.5"));
+        booking.setCommission(new java.math.BigDecimal("0.0"));
+        booking.setReceived(new java.math.BigDecimal("0.0"));
+        booking.setBalance(new java.math.BigDecimal("1234.5"));
         booking.setNumOfGuests(1);
         booking.setNumOfNights(2);
 

@@ -31,17 +31,21 @@ public class Booking {
     @Column(name = "num_of_nights")
     private Integer numOfNights;
 
-    @Column(name = "charge")
-    private Double charge;
+    @Convert(converter = MoneyCentsConverter.class)
+    @Column(name = "charge", columnDefinition = "integer")
+    private java.math.BigDecimal charge;
 
-    @Column(name = "received")
-    private Double received;
+    @Convert(converter = MoneyCentsConverter.class)
+    @Column(name = "received", columnDefinition = "integer")
+    private java.math.BigDecimal received;
 
-    @Column(name = "commission")
-    private Double commission;
+    @Convert(converter = MoneyCentsConverter.class)
+    @Column(name = "commission", columnDefinition = "integer")
+    private java.math.BigDecimal commission;
 
-    @Column(name = "balance")
-    private Double balance;  // balance =   charge  -  ( received + commission )
+    @Convert(converter = MoneyCentsConverter.class)
+    @Column(name = "balance", columnDefinition = "integer")
+    private java.math.BigDecimal balance;  // balance =   charge  -  ( received + commission )
 
     @Column(name = "name")
     private String name;

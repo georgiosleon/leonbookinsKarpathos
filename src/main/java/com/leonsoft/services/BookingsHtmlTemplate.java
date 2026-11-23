@@ -177,6 +177,10 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
         return value == null ? 0.0 : value;
     }
 
+    private static double n(java.math.BigDecimal value) {
+        return value == null ? 0.0 : value.doubleValue();
+    }
+
     private static int n(Integer value) {
         return value == null ? 0 : value;
     }

@@ -26,9 +26,9 @@ class BookingsPDFExporterTest {
         booking.setName("Κράτηση");
         booking.setNumOfGuests(2);
         booking.setNumOfNights(9);
-        booking.setCharge(22000.0);
-        booking.setReceived(0.0);
-        booking.setBalance(22000.0);
+        booking.setCharge(new java.math.BigDecimal("22000.0"));
+        booking.setReceived(new java.math.BigDecimal("0.0"));
+        booking.setBalance(new java.math.BigDecimal("22000.0"));
 
         MockHttpServletResponse response = new MockHttpServletResponse();
         new BookingsPDFExporter(
@@ -70,9 +70,9 @@ class BookingsPDFExporterTest {
             booking.setAgency("abnb");
             booking.setNumOfGuests(2);
             booking.setNumOfNights(2);
-            booking.setCharge(200.0);
-            booking.setReceived(50.0);
-            booking.setBalance(150.0);
+            booking.setCharge(new java.math.BigDecimal("200.0"));
+            booking.setReceived(new java.math.BigDecimal("50.0"));
+            booking.setBalance(new java.math.BigDecimal("150.0"));
             bookings.add(BookingReportView.from(booking, "APT 2"));
         }
         MockHttpServletResponse response = new MockHttpServletResponse();

@@ -26,17 +26,17 @@ public final class BookingsUtils {
         return LocalDate.parse(date, formatterEURO);
     }
 
-    public static double normalizeMoney(Double value) {
+    public static BigDecimal normalizeMoney(BigDecimal value) {
         if (value == null) {
-            return 0.0;
+            return BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP);
         }
-        return BigDecimal.valueOf(value).setScale(2, RoundingMode.HALF_UP).doubleValue();
+        return value.setScale(2, RoundingMode.HALF_UP);
     }
 
-    public static double calculateBalance(Double charge, Double received, Double commission) {
-        BigDecimal result = BigDecimal.valueOf(normalizeMoney(charge))
-                .subtract(BigDecimal.valueOf(normalizeMoney(received)))
-                .subtract(BigDecimal.valueOf(normalizeMoney(commission)));
-        return result.setScale(2, RoundingMode.HALF_UP).doubleValue();
+    public static BigDecimal calculateBalance(BigDecimal charge, BigDecimal received, BigDecimal commission) {
+        return normalizeMoney(charge)
+                .subtract(normalizeMoney(received))
+                .subtract(normalizeMoney(commission))
+                .setScale(2, RoundingMode.HALF_UP);
     }
 }

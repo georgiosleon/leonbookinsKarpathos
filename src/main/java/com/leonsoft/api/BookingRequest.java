@@ -68,10 +68,10 @@ public record BookingRequest(
         booking.setStartDate(startDate);
         booking.setEndDate(endDate);
         booking.setNumOfNights(numOfNights);
-        booking.setCharge(toDouble(charge));
-        booking.setCommission(toDouble(commission));
-        booking.setReceived(toDouble(received));
-        booking.setBalance(toDouble(balance));
+        booking.setCharge(charge);
+        booking.setCommission(commission);
+        booking.setReceived(received);
+        booking.setBalance(balance);
         booking.setStatus(com.leonsoft.models.BookingStatus.from(status));
         booking.setIdentification(identification);
         booking.setAfm(afm);
@@ -84,7 +84,4 @@ public record BookingRequest(
         return booking;
     }
 
-    private static Double toDouble(BigDecimal value) {
-        return value == null ? null : value.doubleValue();
-    }
 }

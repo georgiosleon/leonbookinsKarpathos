@@ -124,9 +124,9 @@ class BookingsReportPdfServiceTest {
         booking.setAgency("abnb");
         booking.setNumOfGuests(2);
         booking.setNumOfNights(3);
-        booking.setCharge(300.0);
-        booking.setReceived(100.0);
-        booking.setBalance(200.0);
+        booking.setCharge(new java.math.BigDecimal("300.0"));
+        booking.setReceived(new java.math.BigDecimal("100.0"));
+        booking.setBalance(new java.math.BigDecimal("200.0"));
         return booking;
     }
 }

@@ -243,12 +243,12 @@ public class BookingsPDFExporter {
         return BookingStatus.isBookable(booking.status());
     }
 
-    private static double sum(List<BookingReportView> rows, Function<BookingReportView, Double> getter) {
-        return rows.stream().map(getter).filter(Objects::nonNull).mapToDouble(Double::doubleValue).sum();
+    private static double sum(List<BookingReportView> rows, Function<BookingReportView, java.math.BigDecimal> getter) {
+        return rows.stream().map(getter).filter(Objects::nonNull).mapToDouble(java.math.BigDecimal::doubleValue).sum();
     }
 
-    private static double number(Double value) {
-        return value == null ? 0 : value;
+    private static double number(java.math.BigDecimal value) {
+        return value == null ? 0 : value.doubleValue();
     }
 
     private static int sumInt(List<BookingReportView> rows, Function<BookingReportView, Integer> getter) {
