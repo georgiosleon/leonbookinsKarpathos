@@ -93,9 +93,10 @@ class BookingSecurityTest {
     }
 
     @Test
-    void applicationSupportEndpointsAllowVersionForAuthenticatedUsersButDiagnosticsAdminOnly() throws Exception {
+    void applicationSupportEndpointsAreAvailableToAuthenticatedUsers() throws Exception {
         when(applicationSupportService.appInfo())
                 .thenReturn(new ApplicationSupportService.AppInfo("1.0.0", "standalone"));
+        when(applicationSupportService.diagnostics()).thenReturn("diagnostics");
 
         mockMvc.perform(get("/api/v1/app-info"))
                 .andExpect(status().isUnauthorized());
@@ -113,7 +114,9 @@ class BookingSecurityTest {
                 .andExpect(jsonPath("$.version").value("1.0.0"));
 
         mockMvc.perform(get("/api/v1/diagnostics").with(user("operator").roles("OPERATOR")))
-                .andExpect(status().isForbidden());
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/diagnostics").with(user("guest").roles("GUEST")))
+                .andExpect(status().isOk());
     }
 
     @Test

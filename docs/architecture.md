@@ -153,7 +153,7 @@ the application's SQLite persistence.
   | Reports/export | Yes | Yes | No |
   | Manage rooms/cars | Yes | No | No |
   | Manage users | Yes | No | No |
-  | Diagnostics export | Yes | No | No |
+  | Diagnostics export | Yes | Yes | Yes |
 - **Resources:** rooms and vehicles are persisted as managed resources; bookings store stable `resourceId` values.
 - **Database:** SQLite with Flyway migrations and `ddl-auto=validate`. `DatabaseInitializer` seeds default accounts when missing.
 - **Deployment:** the backend and compiled frontend are one application artifact. Desktop packaging, Docker, and direct Maven execution are alternative launch/deployment paths.

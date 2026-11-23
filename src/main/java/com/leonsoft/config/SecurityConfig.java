@@ -81,9 +81,8 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
                     .requestMatchers(HttpMethod.DELETE, "/api/v1/resources", "/api/v1/resources/**")
                         .hasRole("ADMIN")
-                    // Operational endpoints: version visible to authenticated users, diagnostics admin-only.
-                    .requestMatchers("/api/v1/app-info").authenticated()
-                    .requestMatchers("/api/v1/diagnostics").hasRole("ADMIN")
+                    // Operational endpoints: visible to authenticated users.
+                    .requestMatchers("/api/v1/app-info", "/api/v1/diagnostics").authenticated()
                     // Deny-by-default for any unmapped endpoint.
                     .anyRequest().denyAll())
               .formLogin(form -> form
