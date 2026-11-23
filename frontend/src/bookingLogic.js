@@ -37,8 +37,8 @@ export function nightsBetween(startDate, endDate) {
   return Number.isInteger(days) ? days : 0;
 }
 
-export function calculateBalance(charge, received, commission) {
-  return (Number(charge) || 0) - (Number(received) || 0) - (Number(commission) || 0);
+export function calculateBalance(charge, received, commission, rentalTax = 0) {
+  return (Number(charge) || 0) - (Number(received) || 0) - (Number(commission) || 0) - (Number(rentalTax) || 0);
 }
 
 export function hasAvailabilityConflict(candidate, bookings, ignoredBookingId = null) {
@@ -72,7 +72,7 @@ export function toBookingPayload(form) {
     charge: form.charge === '' ? null : Number(form.charge),
     commission: form.commission === '' ? null : Number(form.commission),
     received: form.received === '' ? null : Number(form.received),
-    balance: calculateBalance(form.charge, form.received, form.commission),
+    balance: calculateBalance(form.charge, form.received, form.commission, form.rentalTax),
     status: form.status,
     identification: form.identification.trim(),
     afm: form.afm.trim(),
@@ -97,6 +97,7 @@ export function bookingToForm(booking) {
     charge: booking.charge == null ? '' : String(booking.charge),
     commission: booking.commission == null ? '' : String(booking.commission),
     received: booking.received == null ? '' : String(booking.received),
+    rentalTax: booking.rentalTax == null ? '' : String(booking.rentalTax),
     status: booking.status ?? 'active',
     identification: booking.identification ?? '',
     afm: booking.afm ?? '',
@@ -105,6 +106,7 @@ export function bookingToForm(booking) {
     voucher: booking.voucher ?? '',
     taxRefNumber: booking.taxRefNumber ?? '',
     invoiceNumber: booking.invoiceNumber ?? '',
+    platformReservationId: booking.platformReservationId ?? '',
     extraInfo: booking.extraInfo ?? '',
   };
 }

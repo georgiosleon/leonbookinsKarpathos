@@ -32,6 +32,7 @@ export function summarizeBookings(bookings, mode) {
       nights: resourceBookings.reduce((total, booking) => total + (Number(booking.numOfNights) || 0), 0),
       charge: sum(resourceBookings, 'charge'),
       received: sum(resourceBookings, 'received'),
+      rentalTax: sum(resourceBookings, 'rentalTax'),
       balance: sum(resourceBookings, 'balance'),
     };
   });
@@ -44,6 +45,7 @@ export function summarizeBookings(bookings, mode) {
     nights: bookableBookings.reduce((total, booking) => total + (Number(booking.numOfNights) || 0), 0),
     charge: sum(bookableBookings, 'charge'),
     received: sum(bookableBookings, 'received'),
+    rentalTax: sum(bookableBookings, 'rentalTax'),
     balance: sum(bookableBookings, 'balance'),
     resources,
   };

@@ -1,9 +1,11 @@
 package com.leonsoft.models;
 
 import jakarta.persistence.Column;
+import jakarta.persistence.Convert;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.math.BigDecimal;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -27,6 +29,19 @@ public class BookingResource {
 
     @Column(name = "active", nullable = false)
     private boolean active = true;
+
+    @Convert(converter = MoneyCentsConverter.class)
+    @Column(name = "rental_tax_per_night", columnDefinition = "integer")
+    private BigDecimal rentalTaxPerNight = BigDecimal.ZERO;
+
+    @Column(name = "registration_number")
+    private String registrationNumber;
+
+    @Column(name = "property_address")
+    private String propertyAddress;
+
+    @Column(name = "tax_category")
+    private String taxCategory;
 
     public BookingResource(String id, String type, String name) {
         this.id = id;

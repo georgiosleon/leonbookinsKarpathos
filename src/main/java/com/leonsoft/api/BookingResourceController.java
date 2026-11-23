@@ -6,7 +6,9 @@ import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -31,5 +33,10 @@ public class BookingResourceController {
     @ResponseStatus(HttpStatus.CREATED)
     BookingResourceResponse create(@Valid @RequestBody BookingResourceRequest request) {
         return BookingResourceResponse.from(resourceService.create(request));
+    }
+
+    @PutMapping(path = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
+    BookingResourceResponse update(@PathVariable String id, @Valid @RequestBody BookingResourceUpdateRequest request) {
+        return BookingResourceResponse.from(resourceService.update(id, request));
     }
 }

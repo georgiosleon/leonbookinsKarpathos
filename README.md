@@ -471,7 +471,21 @@ Compose stores SQLite data in a named volume and configures the app to listen
 inside the container. For remote access, configure a trusted HTTPS reverse
 proxy rather than exposing the application directly to the internet.
 
-Seed account passwords must be at least 12 characters. Role access: `ADMIN` manages users/resources/admin ops and can view reports (no booking mutations); `OPERATOR` can create/edit/delete any booking and view reports; `GUEST` has read-only booking visibility. Browser sessions use CSRF protection for write requests.
+Seed account passwords must be at least 12 characters. Browser sessions use CSRF protection for write requests.
+
+| Capability | ADMIN | OPERATOR | GUEST |
+|---|:---:|:---:|:---:|
+| View all bookings | Yes | Yes | Yes |
+| Create/edit/delete bookings | Yes | Yes | No |
+| View reports / detailed report / export PDF | Yes | Yes | No |
+| Export CSV (Reports page, client-side) | Yes | Yes | No |
+| View rooms/cars resources | Yes | Yes | Yes |
+| Create/edit/manage rooms & cars | Yes | No | No |
+| Manage users | Yes | No | No |
+| View app version/info | Yes | Yes | Yes |
+| Export diagnostics | Yes | Yes | Yes |
+
+The system prevents removing, deactivating, or deleting the last active ADMIN or last active OPERATOR account.
 
 For Vite hot-reload development, install Node.js/npm and run `npm ci` followed
 by `npm run dev` from `frontend/`, with Spring Boot running on port 8080.
@@ -479,3 +493,27 @@ Export the seed account environment variables before starting Spring Boot.
 The build writes the bundled React app to the ignored
 `src/main/resources/public/react-assets/` directory. `/rooms.html` and
 `/cars.html` remain as redirects to the shared screen.
+
+## Compliance scope (local only) and unsupported items
+
+> **Not legal advice.** This app is a local booking manager, not a compliance platform. It does **not** make external regulatory/API calls. Requirements vary by country, municipality, property type, and role (host/manager/platform).
+
+### Currently supported locally
+
+- **Resource compliance fields (manual):** registration number, property address, tax category, per-night rental tax rate.
+- **Booking compliance fields:** platform reservation ID, guest identity/contact fields already present (name, country, ID/passport, AFM, email, phone, voucher, tax/invoice refs).
+- **Tax calculation (manual):** per-resource daily rental tax rate; booking stores rental tax amount snapshot and balance = charge − received − commission − rental tax.
+- **Local reports/exports:** HTML/PDF report and client-side CSV export include compliance/financial columns for local record keeping.
+
+### Not supported currently
+
+| Area | Not supported | Notes |
+|---|---|---|
+| EU 2024/1028 STR data collection/sharing | No unit registration workflow integration, no registration-number verification, no single digital entry point submission, no platform activity-data transmission | App stores registration number locally only. |
+| DAC7 platform reporting | No DAC7 seller/host report generation/submission, no platform-grade seller identity/TIN/DOB/company-reg validation, no quarterly payout/withholding reporting package | Relevant mainly to platforms; app is not an OTA reporting platform. |
+| Greece TAKK / climate resilience fee automation | No seasonal/category automatic rate engine, no official TAKK category mapping, no AADE declaration/export/submission, no exemption handling | Rental tax is manual per resource and snapshot on booking. |
+| Greek STR registration/operational compliance | No AMA/MHTE registry integration, no property permit/licence workflow, no legal display/compliance checks | Registration number can be stored manually. |
+| Guest identity/compliance data | No structured DOB/nationality/document type/expiry/country-of-residence capture, no police/guest-register submission, no ID verification | Only basic ID/passport and contact fields exist. |
+| Tax/invoicing compliance | No VAT/tax breakdown, no tax jurisdiction rules, no e-invoicing/myDATA/AADE integration, no immutable fiscal ledger | Invoice/tax reference fields are plain text. |
+| Audit/GDPR compliance tooling | No immutable compliance audit log, no consent/legal-basis tracking, no retention/deletion/anonymization workflows, no subject export/erasure tooling | Handle personal data carefully and define local operational procedures. |
+| External integrations | No external API calls, no OTA sync, no government/registry connections, no automated compliance submissions | Intentional by design for local/offline operation. |

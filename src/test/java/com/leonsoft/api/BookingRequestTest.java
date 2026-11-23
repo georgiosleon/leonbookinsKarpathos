@@ -18,7 +18,7 @@ class BookingRequestTest {
               null, "Ada", 2, "agency", "room-1", "Greece",
               "20/06/2026", "22/06/2026", 2,
               null, null, null, null, "active",
-              null, null, "ada@example.com", null, null, null, null, null);
+              null, null, "ada@example.com", null, null, null, null, null, "PLAT-123");
 
         assertTrue(validator.validate(request).isEmpty());
     }
@@ -29,7 +29,7 @@ class BookingRequestTest {
               null, "Ada", 2, "agency", "room-1", "Greece",
               "31/02/2026", "22/06/2026", 2,
               null, null, null, null, "unknown",
-              null, null, null, null, null, null, null, null);
+              null, null, null, null, null, null, null, null, null);
 
         Set<ConstraintViolation<BookingRequest>> violations = validator.validate(request);
 
@@ -45,7 +45,7 @@ class BookingRequestTest {
               null, " ", 0, "", "", "Greece",
               "20/06/2026", "22/06/2026", 2,
               new BigDecimal("-1"), new BigDecimal("-1"), new BigDecimal("-1"), null, "active",
-              null, null, "not-an-email", null, null, null, null, null);
+              null, null, "not-an-email", null, null, null, null, null, null);
 
         Set<ConstraintViolation<BookingRequest>> violations = validator.validate(request);
 
@@ -65,7 +65,7 @@ class BookingRequestTest {
               "id-1", "Ada", 2, "agency", "room-1", "Greece",
               "20/06/2026", "22/06/2026", 2,
               new BigDecimal("100.00"), new BigDecimal("10.00"), new BigDecimal("50.00"), new BigDecimal("40.00"), "active",
-              "id", "afm", "ada@example.com", "tel", "voucher", "tax", "inv", "extra");
+              "id", "afm", "ada@example.com", "tel", "voucher", "tax", "inv", "extra", "PLAT-123");
 
         var booking = request.toBooking();
 
@@ -75,5 +75,6 @@ class BookingRequestTest {
         assertEquals(java.time.LocalDate.of(2026, 6, 22), booking.getEndDate());
         assertEquals(new BigDecimal("100.00"), booking.getCharge());
         assertEquals(com.leonsoft.models.BookingStatus.ACTIVE, booking.getStatus());
+        assertEquals("PLAT-123", booking.getPlatformReservationId());
     }
 }

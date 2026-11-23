@@ -49,6 +49,7 @@ class BookingResponseTest {
         assertEquals("Ada", response.name());
         assertEquals("APT 2", response.resourceName());
         assertEquals("active", response.status());
+        assertEquals(new java.math.BigDecimal("5.00"), response.rentalTax());
         assertEquals(requestDateTime, response.requestDateTime());
     }
 
@@ -64,7 +65,8 @@ class BookingResponseTest {
         booking.setCharge(new java.math.BigDecimal("100.0"));
         booking.setReceived(new java.math.BigDecimal("20.0"));
         booking.setCommission(new java.math.BigDecimal("10.0"));
-        booking.setBalance(new java.math.BigDecimal("70.0"));
+        booking.setRentalTax(new java.math.BigDecimal("5.00"));
+        booking.setBalance(new java.math.BigDecimal("65.0"));
         booking.setStatus(com.leonsoft.models.BookingStatus.ACTIVE);
         return booking;
     }

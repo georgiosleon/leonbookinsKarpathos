@@ -37,7 +37,8 @@ public record BookingRequest(
       String voucher,
       String taxRefNumber,
       String invoiceNumber,
-      String extraInfo) {
+      String extraInfo,
+      String platformReservationId) {
 
     private static final DateTimeFormatter DATE_FORMAT =
           DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
@@ -81,6 +82,7 @@ public record BookingRequest(
         booking.setTaxRefNumber(taxRefNumber);
         booking.setInvoiceNumber(invoiceNumber);
         booking.setExtraInfo(extraInfo);
+        booking.setPlatformReservationId(platformReservationId);
         return booking;
     }
 

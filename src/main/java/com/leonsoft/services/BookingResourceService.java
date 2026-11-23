@@ -1,8 +1,10 @@
 package com.leonsoft.services;
 
 import com.leonsoft.api.BookingResourceRequest;
+import com.leonsoft.api.BookingResourceUpdateRequest;
 import com.leonsoft.models.BookingResource;
 import com.leonsoft.repositories.BookingResourceRepository;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -32,6 +34,25 @@ public class BookingResourceService {
         return resourceRepository.save(request.toResource(UUID.randomUUID().toString()));
     }
 
+    public BookingResource update(String id, BookingResourceUpdateRequest request) {
+        BookingResource resource = resourceRepository.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Resource not found."));
+        String name = request.name().trim();
+        if (name.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Resource name is required.");
+        }
+        if (resourceRepository.existsByTypeAndNameIgnoreCaseAndIdNot(resource.getType(), name, id)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A resource with this name already exists.");
+        }
+        resource.setName(name);
+        resource.setRentalTaxPerNight(request.rentalTaxPerNight() == null ? BigDecimal.ZERO : request.rentalTaxPerNight());
+        resource.setActive(Boolean.TRUE.equals(request.active()));
+        resource.setRegistrationNumber(trimToNull(request.registrationNumber()));
+        resource.setPropertyAddress(trimToNull(request.propertyAddress()));
+        resource.setTaxCategory(trimToNull(request.taxCategory()));
+        return resourceRepository.save(resource);
+    }
+
     public BookingResource requireActive(String id) {
         BookingResource resource = resourceRepository.findById(id)
               .filter(BookingResource::isActive)
@@ -40,8 +61,20 @@ public class BookingResourceService {
         return resource;
     }
 
+    public BookingResource requireExisting(String id) {
+        return resourceRepository.findById(id)
+              .orElseThrow(() -> new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST, "The selected room or vehicle is not available."));
+    }
+
     public Map<String, String> namesById() {
         return resourceRepository.findAllByOrderByTypeAscNameAsc().stream()
               .collect(Collectors.toMap(BookingResource::getId, BookingResource::getName));
+    }
+
+    private static String trimToNull(String value) {
+        if (value == null) return null;
+        String trimmed = value.trim();
+        return trimmed.isEmpty() ? null : trimmed;
     }
 }

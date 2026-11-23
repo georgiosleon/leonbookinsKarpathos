@@ -136,12 +136,27 @@ export function HelpButton() {
 
                 <section>
                   <h3>{t('Roles and access')}</h3>
-                  <ul>
-                    <li>{t('ADMIN: manages users, rooms/cars, and admin operations; can view reports; cannot create, edit, or delete bookings.')}</li>
-                    <li>{t('OPERATOR: can view, create, edit, and delete any booking and view reports; cannot manage users or admin operations.')}</li>
-                    <li>{t('GUEST: can view all bookings read-only; cannot create/edit/delete bookings, view reports, or access admin operations.')}</li>
-                    <li>{t('The system prevents removing, deactivating, or deleting the last active ADMIN and the last active OPERATOR account.')}</li>
-                  </ul>
+                  <div className="report-table-wrap" role="region" aria-label={t('Roles and access')}>
+                    <table className="report-table">
+                      <thead>
+                        <tr>
+                          <th>{t('Capability')}</th>
+                          <th>ADMIN</th>
+                          <th>OPERATOR</th>
+                          <th>GUEST</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr><td>{t('View all bookings')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td></tr>
+                        <tr><td>{t('Create/edit/delete bookings')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('No')}</td></tr>
+                        <tr><td>{t('View reports / export')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('No')}</td></tr>
+                        <tr><td>{t('Manage rooms & cars')}</td><td>{t('Yes')}</td><td>{t('No')}</td><td>{t('No')}</td></tr>
+                        <tr><td>{t('Manage users')}</td><td>{t('Yes')}</td><td>{t('No')}</td><td>{t('No')}</td></tr>
+                        <tr><td>{t('Export diagnostics')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td></tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  <p>{t('The system prevents removing, deactivating, or deleting the last active ADMIN and the last active OPERATOR account.')}</p>
                 </section>
 
                 <section>

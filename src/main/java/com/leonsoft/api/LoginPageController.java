@@ -32,6 +32,7 @@ public class LoginPageController {
                       font: 16px/1.5 system-ui, sans-serif; }
                     main { width: min(100%%, 420px); padding: 28px; border: 1px solid #d5deea;
                       border-radius: 14px; background: white; box-shadow: 0 8px 30px #17203318; }
+                    .welcome { margin: 0 0 12px; text-align: center; font-size: 1.75rem; font-weight: 800; letter-spacing: 0.04em; color: #1769aa; }
                     h1 { margin: 0 0 8px; font-size: 1.5rem; }
                     p { color: #53627a; }
                     .signed-in { color: #53627a; }
@@ -46,6 +47,7 @@ public class LoginPageController {
                 </head>
                 <body>
                   <main>
+                    <p class="welcome" data-message="welcome">WELCOME</p>
                     <p data-message="brand">Karpathos booking planner</p>
                     <p id="signed-in" class="signed-in" hidden data-user="%s">
                       <span data-message="signedIn">Signed in as</span> <span id="signed-in-name">%s</span>
@@ -76,27 +78,27 @@ public class LoginPageController {
                   </main>
                   <script>
                     const copy = {
-                      en: { brand: 'Karpathos booking planner', title: 'Sign in',
+                      en: { welcome: 'WELCOME', brand: 'Karpathos booking planner', title: 'Sign in',
                         invalid: 'Invalid username or password.', signedOut: 'You have signed out.',
                         username: 'Username', password: 'Password', language: 'Language', submit: 'Sign in',
                         signedIn: 'Signed in as' },
-                      el: { brand: 'Σύστημα κρατήσεων Καρπάθου', title: 'Σύνδεση',
+                      el: { welcome: 'ΚΑΛΩΣ ΗΡΘΑΤΕ', brand: 'Σύστημα κρατήσεων Καρπάθου', title: 'Σύνδεση',
                         invalid: 'Λανθασμένο όνομα χρήστη ή κωδικός πρόσβασης.', signedOut: 'Έχετε αποσυνδεθεί.',
                         username: 'Όνομα χρήστη', password: 'Κωδικός πρόσβασης', language: 'Γλώσσα', submit: 'Σύνδεση',
                         signedIn: 'Συνδεδεμένος ως' },
-                      de: { brand: 'Karpathos Buchungsplaner', title: 'Anmelden',
+                      de: { welcome: 'WILLKOMMEN', brand: 'Karpathos Buchungsplaner', title: 'Anmelden',
                         invalid: 'Ungültiger Benutzername oder ungültiges Passwort.', signedOut: 'Sie wurden abgemeldet.',
                         username: 'Benutzername', password: 'Passwort', language: 'Sprache', submit: 'Anmelden',
                         signedIn: 'Angemeldet als' },
-                      nl: { brand: 'Boekingsplanner Karpathos', title: 'Aanmelden',
+                      nl: { welcome: 'WELKOM', brand: 'Boekingsplanner Karpathos', title: 'Aanmelden',
                         invalid: 'Ongeldige gebruikersnaam of wachtwoord.', signedOut: 'U bent afgemeld.',
                         username: 'Gebruikersnaam', password: 'Wachtwoord', language: 'Taal', submit: 'Aanmelden',
                         signedIn: 'Aangemeld als' },
-                      da: { brand: 'Bookingplanlægger for Karpathos', title: 'Log ind',
+                      da: { welcome: 'VELKOMMEN', brand: 'Bookingplanlægger for Karpathos', title: 'Log ind',
                         invalid: 'Ugyldigt brugernavn eller adgangskode.', signedOut: 'Du er logget ud.',
                         username: 'Brugernavn', password: 'Adgangskode', language: 'Sprog', submit: 'Log ind',
                         signedIn: 'Logget ind som' },
-                      fr: { brand: 'Gestion des réservations de Karpathos', title: 'Connexion',
+                      fr: { welcome: 'BIENVENUE', brand: 'Gestion des réservations de Karpathos', title: 'Connexion',
                         invalid: 'Nom d’utilisateur ou mot de passe invalide.', signedOut: 'Vous êtes déconnecté.',
                         username: 'Nom d’utilisateur', password: 'Mot de passe', language: 'Langue', submit: 'Se connecter',
                         signedIn: 'Connecté en tant que' }

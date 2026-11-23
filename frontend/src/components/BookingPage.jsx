@@ -62,6 +62,7 @@ function emptyForm() {
     charge: '',
     commission: '',
     received: '',
+    rentalTax: '',
     status: 'active',
     identification: '',
     afm: '',
@@ -70,6 +71,7 @@ function emptyForm() {
     voucher: '',
     taxRefNumber: '',
     invoiceNumber: '',
+    platformReservationId: '',
     extraInfo: '',
   };
 }
@@ -106,8 +108,9 @@ export function BookingPage() {
   const { language, locale, t } = useLanguage();
   const { currentUser } = useCurrentUser();
   const isAdmin = currentUser?.role === 'ADMIN';
-  const canManageBookings = currentUser?.role === 'OPERATOR';
-  const canSeeReports = isAdmin || canManageBookings;
+  const isOperator = currentUser?.role === 'OPERATOR';
+  const canManageBookings = isAdmin || isOperator;
+  const canSeeReports = isAdmin || isOperator;
   const [clock, setClock] = useState(() => formatClock(new Date(), locale));
 
   function showError(message) {
@@ -268,7 +271,7 @@ export function BookingPage() {
     }
   }
 
-  const balance = calculateBalance(form.charge, form.received, form.commission);
+  const balance = calculateBalance(form.charge, form.received, form.commission, form.rentalTax);
   const mode = useMemo(() => ({
     ...baseMode,
     resources: resourcesForMode(resources, baseMode),

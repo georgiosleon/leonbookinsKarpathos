@@ -40,13 +40,17 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
               .append("<th>").append(label(locale, "arrival")).append("</th>")
               .append("<th>").append(label(locale, "departure")).append("</th>")
               .append("<th>").append(label(locale, "room")).append("</th>")
+              .append("<th>").append(label(locale, "registrationNumber")).append("</th>")
               .append("<th>").append(label(locale, "name")).append("</th>")
               .append("<th>").append(label(locale, "agency")).append("</th>")
+              .append("<th>").append(label(locale, "platformReservationId")).append("</th>")
               .append("<th>").append(label(locale, "guests")).append("</th>")
               .append("<th>").append(label(locale, "nights")).append("</th>")
+              .append("<th>").append(label(locale, "rentalTaxPerNight")).append("</th>")
               .append("<th>").append(label(locale, "total")).append("</th>")
               .append("<th>").append(label(locale, "commission")).append("</th>")
               .append("<th>").append(label(locale, "received")).append("</th>")
+              .append("<th>").append(label(locale, "rentalTax")).append("</th>")
               .append("<th>").append(label(locale, "balance")).append("</th>")
               .append("<th>").append(label(locale, "country")).append("</th>")
               .append("<th>").append(label(locale, "id")).append("</th>")
@@ -79,6 +83,7 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
             totals.setTotCharge(totals.getTotCharge() + n(booking.charge()));
             totals.setTotCommission(totals.getTotCommission() + n(booking.commission()));
             totals.setTotReceived(totals.getTotReceived() + n(booking.received()));
+            totals.setTotRentalTax(totals.getTotRentalTax() + n(booking.rentalTax()));
             totals.setTotGuests(totals.getTotGuests() + n(booking.numOfGuests()));
             totals.setTotNights(totals.getTotNights() + n(booking.numOfNights()));
 
@@ -93,15 +98,19 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
 
                   .append("<td>").append(htmlEscape(booking.resourceName()))
                   .append("</td>")
+                  .append("<td>").append(htmlEscape(booking.resourceRegistrationNumber())).append("</td>")
                   .append("<td>").append(htmlEscape(booking.name())).append("</td>")
                   .append("<td>").append(htmlEscape(booking.agency())).append("</td>")
+                  .append("<td>").append(htmlEscape(booking.platformReservationId())).append("</td>")
 
                   .append("<td>").append(n(booking.numOfGuests())).append("</td>")
                   .append("<td>").append(n(booking.numOfNights())).append("</td>")
+                  .append("<td>").append(booking.numOfNights() != null && booking.numOfNights() > 0 ? n(booking.rentalTax()) / booking.numOfNights() : 0.0).append("</td>")
 
                   .append("<td>").append(n(booking.charge())).append("</td>")
                   .append("<td>").append(n(booking.commission())).append("</td>")
                   .append("<td>").append(n(booking.received())).append("</td>")
+                  .append("<td>").append(n(booking.rentalTax())).append("</td>")
                   .append("<td>").append(n(booking.balance())).append("</td>")
 
                   .append("<td>").append(htmlEscape(booking.country())).append("</td>")
@@ -135,6 +144,7 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
               .append("<th>").append(label(locale, "totalCharge")).append("</th>")
               .append("<th>").append(label(locale, "totalCommission")).append("</th>")
               .append("<th>").append(label(locale, "totalReceived")).append("</th>")
+              .append("<th>").append(label(locale, "totalRentalTax")).append("</th>")
               .append("<th>").append(label(locale, "totalBalance")).append("</th>")
               .append(" </tr>");
 
@@ -145,6 +155,7 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
                   .append("<td>").append(numberFormat.format(totals.getTotCharge())).append("</td>")
                   .append("<td>").append(numberFormat.format(totals.getTotCommission())).append("</td>")
                   .append("<td>").append(numberFormat.format(totals.getTotReceived())).append("</td>")
+                  .append("<td>").append(numberFormat.format(totals.getTotRentalTax())).append("</td>")
                   .append("<td>").append(numberFormat.format(totals.getTotBalance())).append("</td>")
               .append(" </tr>");
         report.append("  </table>")

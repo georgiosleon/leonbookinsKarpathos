@@ -107,6 +107,37 @@ export function ReportsPage() {
     [filteredBookings, mode],
   );
 
+  function exportCsv() {
+    const resourceById = new Map(mode.resources.map((r) => [r.id, r]));
+    const headers = [
+      'Status','Arrival','Departure','Resource','Registration number','Tax category','Name','Agency','Guests','Nights',
+      'Rate/night','Charge','Received','Rental tax','Balance','Platform reservation ID','Country','Email','Tel','Invoice number','Tax ref number','Notes'
+    ];
+    const escape = (value) => {
+      const text = value == null ? '' : String(value);
+      return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;
+    };
+    const rows = filteredBookings.map((b) => {
+      const r = resourceById.get(b.resourceId);
+      const nights = Number(b.numOfNights) || 0;
+      const rentalTax = Number(b.rentalTax) || 0;
+      const rate = nights > 0 ? rentalTax / nights : 0;
+      return [
+        b.status, b.startDate, b.endDate, b.resourceName ?? b.resourceId, r?.registrationNumber ?? '', r?.taxCategory ?? '',
+        b.name, b.agency, b.numOfGuests ?? 0, nights, rate.toFixed(2), b.charge ?? 0, b.received ?? 0, rentalTax.toFixed(2), b.balance ?? 0,
+        b.platformReservationId ?? '', b.country ?? '', b.email ?? '', b.tel ?? '', b.invoiceNumber ?? '', b.taxRefNumber ?? '', b.extraInfo ?? ''
+      ].map(escape).join(',');
+    });
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `bookings-${mode.id}-${range.startDate}-${range.endDate}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   function updateRange(field, value) {
     setRange((current) => ({ ...current, [field]: value }));
   }
@@ -211,6 +242,9 @@ export function ReportsPage() {
             <button type="button" className="button button-muted" onClick={showDetailedReport} disabled={!reportQueryIsValid}>
               {t('Detailed report')}
             </button>
+            <button type="button" className="button button-muted" onClick={exportCsv} disabled={!reportQueryIsValid}>
+              {t('Export CSV')}
+            </button>
             {pdfUrl && (
               <a className="button button-primary" href={pdfUrl}>
                 {t('Export PDF')}
@@ -251,7 +285,8 @@ export function ReportsPage() {
             <SummaryCard label={t('Nights')} value={summary.nights} detail={t('Active and paid bookings')} />
             <SummaryCard label={t('Charge')} value={formatMoney(summary.charge, locale)} detail={t('Active and paid bookings')} />
             <SummaryCard label={t('Received')} value={formatMoney(summary.received, locale)} detail={t('Active and paid bookings')} />
-            <SummaryCard label={t('Balance')} value={formatMoney(summary.balance, locale)} detail={t('Charge less received and commission')} />
+            <SummaryCard label={t('Rental tax (€)')} value={formatMoney(summary.rentalTax, locale)} detail={t('Active and paid bookings')} />
+            <SummaryCard label={t('Balance')} value={formatMoney(summary.balance, locale)} detail={t('Charge less received, commission, and rental tax')} />
           </section>
 
           <section className="panel" aria-labelledby="resource-report-heading">
@@ -271,6 +306,7 @@ export function ReportsPage() {
                     <th>{t('Nights')}</th>
                     <th>{t('Charge')}</th>
                     <th>{t('Received')}</th>
+                    <th>{t('Rental tax (€)')}</th>
                     <th>{t('Balance')}</th>
                   </tr>
                 </thead>
@@ -283,6 +319,7 @@ export function ReportsPage() {
                       <td>{resource.nights}</td>
                       <td>{formatMoney(resource.charge, locale)}</td>
                       <td>{formatMoney(resource.received, locale)}</td>
+                      <td>{formatMoney(resource.rentalTax, locale)}</td>
                       <td>{formatMoney(resource.balance, locale)}</td>
                     </tr>
                   ))}
@@ -308,12 +345,16 @@ export function ReportsPage() {
                     <th>{t('Arrival')}</th>
                     <th>{t('Departure')}</th>
                     <th>{t(mode.resourceLabel)}</th>
+                    <th>{t('Registration number')}</th>
                     <th>{t('Name')}</th>
                     <th>{t('Agency')}</th>
+                    <th>{t('Platform reservation ID')}</th>
                     <th>{t('Guests')}</th>
                     <th>{t('Nights')}</th>
+                    <th>{t('Rental tax per night (€)')}</th>
                     <th>{t('Charge')}</th>
                     <th>{t('Received')}</th>
+                    <th>{t('Rental tax (€)')}</th>
                     <th>{t('Balance')}</th>
                   </tr>
                 </thead>
@@ -324,18 +365,22 @@ export function ReportsPage() {
                       <td>{formatBookingDate(booking.startDate, locale)}</td>
                       <td>{formatBookingDate(booking.endDate, locale)}</td>
                       <td>{booking.resourceName ?? booking.resourceId}</td>
+                      <td>{(mode.resources.find((r) => r.id === booking.resourceId)?.registrationNumber) || '—'}</td>
                       <td>{booking.name}</td>
                       <td>{t(mode.agencies.find((agency) => agency.id === booking.agency)?.text ?? booking.agency)}</td>
+                      <td>{booking.platformReservationId || '—'}</td>
                       <td>{booking.numOfGuests ?? 0}</td>
                       <td>{booking.numOfNights ?? 0}</td>
+                      <td>{formatMoney((Number(booking.numOfNights) || 0) > 0 ? (Number(booking.rentalTax) || 0) / (Number(booking.numOfNights) || 1) : 0, locale)}</td>
                       <td>{formatMoney(Number(booking.charge) || 0, locale)}</td>
                       <td>{formatMoney(Number(booking.received) || 0, locale)}</td>
+                      <td>{formatMoney(Number(booking.rentalTax) || 0, locale)}</td>
                       <td>{formatMoney(Number(booking.balance) || 0, locale)}</td>
                     </tr>
                   ))}
                   {filteredBookings.length === 0 && (
                     <tr>
-                      <td colSpan="11" className="report-empty-row">{t('No bookings start in this period.')}</td>
+                      <td colSpan="15" className="report-empty-row">{t('No bookings start in this period.')}</td>
                     </tr>
                   )}
                 </tbody>

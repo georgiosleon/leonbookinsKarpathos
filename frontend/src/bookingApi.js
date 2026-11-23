@@ -77,6 +77,16 @@ export async function createResource(resource) {
   return response.json();
 }
 
+export async function updateResource(id, resource) {
+  const csrf = await csrfHeaders();
+  const response = await request(`/api/v1/resources/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...csrf },
+    body: JSON.stringify(resource),
+  });
+  return response.json();
+}
+
 export async function saveBooking(booking) {
   const csrf = await csrfHeaders();
   const response = await request('/api/v1/booking/save', {

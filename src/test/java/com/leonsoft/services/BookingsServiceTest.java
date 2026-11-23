@@ -70,7 +70,7 @@ class BookingsServiceTest {
         Booking booking = booking("20/06/2026", "23/06/2026");
         booking.setNumOfNights(99);
         booking.setBalance(new java.math.BigDecimal("999.0"));
-        when(resourceService.requireActive("APT2"))
+        when(resourceService.requireExisting("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
 
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> {
@@ -122,7 +122,7 @@ class BookingsServiceTest {
 
         Booking update = booking("20/06/2026", "22/06/2026");
         update.setId("booking-1");
-        when(resourceService.requireActive("APT2"))
+        when(resourceService.requireExisting("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
 
         Booking result = bookingsService.update(update);
@@ -200,7 +200,7 @@ class BookingsServiceTest {
     @Test
     void rejectsOverlappingRoomBookingWhenRoomFlagIsEnabled() {
         Booking existing = savedBooking("existing", "2026-06-20", "2026-06-23", "active");
-        when(resourceService.requireActive("APT2"))
+        when(resourceService.requireExisting("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
         when(bookingRepository.findByResourceIdAndStatusIn("APT2", BookingStatus.BOOKABLE))
               .thenReturn(List.of(existing));
@@ -217,7 +217,7 @@ class BookingsServiceTest {
     void roomFlagCanAllowOverlapsWithoutDisablingVehicleProtection() {
         bookingsService = new BookingsService(
               bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository));
-        when(resourceService.requireActive("APT2"))
+        when(resourceService.requireExisting("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -230,7 +230,7 @@ class BookingsServiceTest {
               bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository));
         Booking existingVehicleBooking = savedBooking("vehicle-existing", "2026-06-20", "2026-06-23", "paid");
         existingVehicleBooking.setResourceId("CAR1");
-        when(resourceService.requireActive("CAR1"))
+        when(resourceService.requireExisting("CAR1"))
               .thenReturn(new BookingResource("CAR1", "cars", "Car 1"));
         when(bookingRepository.findByResourceIdAndStatusIn("CAR1", BookingStatus.BOOKABLE))
               .thenReturn(List.of(existingVehicleBooking));
@@ -244,7 +244,7 @@ class BookingsServiceTest {
 
     @Test
     void cancelledBookingsDoNotBlockAvailability() {
-        when(resourceService.requireActive("APT2"))
+        when(resourceService.requireExisting("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -307,7 +307,7 @@ class BookingsServiceTest {
         Booking existing = savedBooking("booking-1", "2026-06-20", "2026-06-23", "active");
         existing.setUser(new User());
         when(bookingRepository.findById("booking-1")).thenReturn(Optional.of(existing));
-        when(resourceService.requireActive("APT2"))
+        when(resourceService.requireExisting("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
@@ -321,18 +321,20 @@ class BookingsServiceTest {
     }
 
     @Test
-    void adminCannotUpdateBookings() {
+    void adminCanUpdateBookings() {
         Booking existing = savedBooking("booking-1", "2026-06-20", "2026-06-23", "active");
         when(bookingRepository.findById("booking-1")).thenReturn(Optional.of(existing));
+        when(resourceService.requireExisting("APT2"))
+              .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
         Booking update = booking("21/06/2026", "23/06/2026");
         update.setId("booking-1");
 
-        ResponseStatusException exception = assertThrows(
-              ResponseStatusException.class, () -> bookingsService.update(update));
+        Booking result = bookingsService.update(update);
 
-        assertEquals(HttpStatus.FORBIDDEN, exception.getStatusCode());
-        verify(bookingRepository, never()).save(any(Booking.class));
+        assertEquals(java.time.LocalDate.parse("2026-06-21"), result.getStartDate());
+        verify(bookingRepository).save(any(Booking.class));
     }
 
     @Test

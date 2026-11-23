@@ -99,11 +99,16 @@ defaults are rejected in production.
 
 Role matrix:
 
-| Role | Bookings | Reports/export | Users | Resources/admin ops |
-|---|---|---:|---:|---:|
-| `ADMIN` | View all, read-only | Yes | Manage | Yes |
-| `OPERATOR` | View/create/edit/delete any | Yes | No | No |
-| `GUEST` | View all, read-only | No | No | No |
+| Capability | ADMIN | OPERATOR | GUEST |
+|---|:---:|:---:|:---:|
+| View all bookings | Yes | Yes | Yes |
+| Create/edit/delete bookings | Yes | Yes | No |
+| View reports / detailed report / export PDF | Yes | Yes | No |
+| View rooms/cars resources | Yes | Yes | Yes |
+| Create/edit/manage rooms & cars | Yes | No | No |
+| Manage users | Yes | No | No |
+| View app version/info | Yes | Yes | Yes |
+| Export diagnostics | Yes | Yes | Yes |
 
 The system prevents removing, deactivating, or deleting the last active admin or
 operator account. Do not commit real secrets. LAN/internet exposure requires

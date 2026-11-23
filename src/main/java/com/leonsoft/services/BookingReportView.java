@@ -23,12 +23,16 @@ public record BookingReportView(
         java.math.BigDecimal charge,
         java.math.BigDecimal commission,
         java.math.BigDecimal received,
+        java.math.BigDecimal rentalTax,
         java.math.BigDecimal balance,
         String tel,
         String status,
-        String extraInfo) {
+        String extraInfo,
+        String platformReservationId,
+        String resourceRegistrationNumber,
+        String resourceTaxCategory) {
 
-    public static BookingReportView from(Booking booking, String resourceName) {
+    public static BookingReportView from(Booking booking, String resourceName, String resourceRegistrationNumber, String resourceTaxCategory) {
         String resolvedName = resourceName == null || resourceName.isBlank()
                 ? booking.getResourceId()
                 : resourceName;
@@ -52,9 +56,13 @@ public record BookingReportView(
                 booking.getCharge(),
                 booking.getCommission(),
                 booking.getReceived(),
+                booking.getRentalTax(),
                 booking.getBalance(),
                 booking.getTel(),
                 booking.getStatus() == null ? null : booking.getStatus().getValue(),
-                booking.getExtraInfo());
+                booking.getExtraInfo(),
+                booking.getPlatformReservationId(),
+                resourceRegistrationNumber,
+                resourceTaxCategory);
     }
 }

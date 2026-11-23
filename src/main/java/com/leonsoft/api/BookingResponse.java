@@ -13,6 +13,7 @@ public record BookingResponse(
         java.math.BigDecimal charge,
         java.math.BigDecimal received,
         java.math.BigDecimal commission,
+        java.math.BigDecimal rentalTax,
         java.math.BigDecimal balance,
         String name,
         String agency,
@@ -28,6 +29,7 @@ public record BookingResponse(
         String afm,
         String tel,
         String extraInfo,
+        String platformReservationId,
         String status,
         LocalDateTime requestDateTime) {
 
@@ -45,6 +47,7 @@ public record BookingResponse(
                 booking.getCharge(),
                 booking.getReceived(),
                 booking.getCommission(),
+                booking.getRentalTax(),
                 booking.getBalance(),
                 booking.getName(),
                 booking.getAgency(),
@@ -60,6 +63,7 @@ public record BookingResponse(
                 booking.getAfm(),
                 booking.getTel(),
                 booking.getExtraInfo(),
+                booking.getPlatformReservationId(),
                 booking.getStatus() == null ? null : booking.getStatus().getValue(),
                 booking.getRequestDateTime());
     }

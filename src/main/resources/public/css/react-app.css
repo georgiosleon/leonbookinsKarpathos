@@ -193,6 +193,18 @@ textarea {
   white-space: nowrap;
 }
 
+.form-section {
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e3e8f1;
+}
+
+.form-section:last-of-type {
+  margin-bottom: 0;
+  padding-bottom: 0;
+  border-bottom: 0;
+}
+
 .form-grid,
 .details-grid {
   display: grid;
@@ -747,6 +759,10 @@ textarea {
 
 [data-theme="dark"] .button-primary:hover:not(:disabled) {
   background: #2585d1;
+}
+
+[data-theme="dark"] .form-section {
+  border-bottom-color: #3a4558;
 }
 
 [data-theme="dark"] .form-note {

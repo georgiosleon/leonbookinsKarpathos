@@ -9,4 +9,6 @@ public interface BookingResourceRepository extends CrudRepository<BookingResourc
     List<BookingResource> findAllByOrderByTypeAscNameAsc();
 
     boolean existsByTypeAndNameIgnoreCase(String type, String name);
+
+    boolean existsByTypeAndNameIgnoreCaseAndIdNot(String type, String name, String id);
 }

@@ -42,10 +42,10 @@ public class BookingsService {
         this.currentUserProvider = currentUserProvider;
     }
 
-    /** Operators can create/update/delete any booking; admins and guests cannot. */
+    /** Admins and operators can create/update/delete any booking; guests cannot. */
     private boolean canModifyBooking(Booking booking) {
         User currentUser = currentUserProvider.getCurrentUser().orElse(null);
-        return currentUser != null && currentUser.isOperator();
+        return currentUser != null && (currentUser.isAdmin() || currentUser.isOperator());
     }
 
     @Transactional
@@ -88,7 +88,17 @@ public class BookingsService {
 
     @Transactional
     private Booking saveWithNormalizedValues(Booking booking) {
-        BookingResource resource = resourceService.requireActive(booking.getResourceId());
+        BookingResource resource = resourceService.requireExisting(booking.getResourceId());
+        if (!resource.isActive()) {
+            boolean sameExistingResource = booking.getId() != null
+                    && bookingRepository.findById(booking.getId())
+                        .map(Booking::getResourceId)
+                        .filter(booking.getResourceId()::equals)
+                        .isPresent();
+            if (!sameExistingResource) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "The selected room or vehicle is not available.");
+            }
+        }
         LocalDate stDate = booking.getStartDate();
         LocalDate edDate = booking.getEndDate();
         if (stDate == null || edDate == null) {
@@ -112,8 +122,11 @@ public class BookingsService {
         booking.setCharge(BookingsUtils.normalizeMoney(booking.getCharge()));
         booking.setCommission(BookingsUtils.normalizeMoney(booking.getCommission()));
         booking.setReceived(BookingsUtils.normalizeMoney(booking.getReceived()));
+        java.math.BigDecimal rentalTax = BookingsUtils.normalizeMoney(resource.getRentalTaxPerNight())
+                .multiply(java.math.BigDecimal.valueOf(booking.getNumOfNights()));
+        booking.setRentalTax(BookingsUtils.normalizeMoney(rentalTax));
         booking.setBalance(BookingsUtils.calculateBalance(
-                booking.getCharge(), booking.getReceived(), booking.getCommission()));
+                booking.getCharge(), booking.getReceived(), booking.getCommission(), booking.getRentalTax()));
 
         booking = bookingRepository.save(booking);
         booking.setResourceName(resource.getName());
