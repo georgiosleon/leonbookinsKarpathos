@@ -5,8 +5,8 @@ import java.util.Objects;
 
 public record BookingReportView(
         String id,
-        String room,
-        String roomName,
+        String resourceId,
+        String resourceName,
         java.time.LocalDate startDate,
         java.time.LocalDate endDate,
         String name,
@@ -30,11 +30,11 @@ public record BookingReportView(
 
     public static BookingReportView from(Booking booking, String resourceName) {
         String resolvedName = resourceName == null || resourceName.isBlank()
-                ? booking.getRoom()
+                ? booking.getResourceId()
                 : resourceName;
         return new BookingReportView(
                 booking.getId(),
-                booking.getRoom(),
+                booking.getResourceId(),
                 resolvedName,
                 booking.getStartDate(),
                 booking.getEndDate(),

@@ -92,8 +92,8 @@ export function BookingForm({
           <span>{t(mode.resourceLabel)} *</span>
           <select
             required
-            value={form.room}
-            onChange={(event) => update('room', event.target.value)}
+            value={form.resourceId}
+            onChange={(event) => update('resourceId', event.target.value)}
           >
             <option value="">{t('Select')}</option>
             {mode.resources.filter(({ active = true }) => active).map(({ id, text }) => (

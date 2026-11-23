@@ -112,7 +112,7 @@ class BookingsRestControllerTest {
               .andExpect(jsonPath("$[0].id").value("booking-1"))
               .andExpect(jsonPath("$[0].startDate").value("20/06/2026"))
               .andExpect(jsonPath("$[0].endDate").value("23/06/2026"))
-              .andExpect(jsonPath("$[0].roomName").value("APT 2"))
+              .andExpect(jsonPath("$[0].resourceName").value("APT 2"))
               .andExpect(jsonPath("$[0].status").value("active"));
     }
 
@@ -138,7 +138,7 @@ class BookingsRestControllerTest {
               .andExpect(jsonPath("$.id").value("booking-1"))
               .andExpect(jsonPath("$.startDate").value("20/06/2026"))
               .andExpect(jsonPath("$.endDate").value("23/06/2026"))
-              .andExpect(jsonPath("$.roomName").value("APT 2"));
+              .andExpect(jsonPath("$.resourceName").value("APT 2"));
     }
 
     private static Booking booking(String startDate, String endDate) {
@@ -146,8 +146,8 @@ class BookingsRestControllerTest {
         booking.setId("booking-1");
         booking.setName("Ada");
         booking.setAgency("agency");
-        booking.setRoom("room-1");
-        booking.setRoomName("APT 2");
+        booking.setResourceId("room-1");
+        booking.setResourceName("APT 2");
         booking.setStartDate(java.time.LocalDate.parse(startDate));
         booking.setEndDate(java.time.LocalDate.parse(endDate));
         booking.setNumOfGuests(2);

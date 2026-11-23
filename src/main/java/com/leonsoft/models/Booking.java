@@ -53,11 +53,11 @@ public class Booking {
     @Column(name = "agency")
     private String agency;
 
-    @Column(name = "room")
-    private String room;
+    @Column(name = "resource_id")
+    private String resourceId;
 
     @Transient
-    private String roomName;
+    private String resourceName;
 
     @Column(name = "num_of_guests")
     private Integer numOfGuests;

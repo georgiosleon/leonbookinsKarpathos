@@ -54,13 +54,13 @@ test('calculates nights and balance', () => {
 
 test('availability conflicts only for overlapping bookable bookings in the same resource', () => {
   const existing = [{
-    room: 'APT2',
+    resourceId: 'APT2',
     startDate: '10/07/2026',
     endDate: '13/07/2026',
     status: 'active',
   }];
   const candidate = {
-    room: 'APT2',
+    resourceId: 'APT2',
     startDate: '12/07/2026',
     endDate: '14/07/2026',
     status: 'paid',
@@ -68,7 +68,7 @@ test('availability conflicts only for overlapping bookable bookings in the same 
 
   assert.equal(hasAvailabilityConflict(candidate, existing), true);
   assert.equal(hasAvailabilityConflict({ ...candidate, startDate: '13/07/2026' }, existing), false);
-  assert.equal(hasAvailabilityConflict({ ...candidate, room: 'APT5' }, existing), false);
+  assert.equal(hasAvailabilityConflict({ ...candidate, resourceId: 'APT5' }, existing), false);
   assert.equal(hasAvailabilityConflict({ ...candidate, status: 'cancelled' }, existing), false);
   assert.equal(hasAvailabilityConflict(candidate, [{ ...existing[0], id: 'existing' }], 'existing'), false);
 });
@@ -79,7 +79,7 @@ test('maps API records to form fields and back to the existing create payload sh
     name: 'Alex',
     numOfGuests: 2,
     agency: 'walkin',
-    room: 'APT2',
+    resourceId: 'APT2',
     startDate: '08/03/2026',
     endDate: '11/03/2026',
     numOfNights: 3,
@@ -104,7 +104,7 @@ test('maps API records to form fields and back to the existing create payload sh
 test('creates safe timeline labels and maps managed resources to a mode', () => {
   const item = toTimelineItem({
     id: 'booking-1',
-    room: 'APT2',
+    resourceId: 'APT2',
     name: '<img src=x>',
     startDate: '08/03/2026',
     endDate: '11/03/2026',
@@ -141,7 +141,7 @@ test('keeps same-guest cancelled bookings as separate stacked timeline items', (
     {
       id: 'cancelled-1',
       name: 'Alex',
-      room: 'APT2',
+      resourceId: 'APT2',
       startDate: '08/03/2026',
       endDate: '11/03/2026',
       status: 'cancelled',
@@ -149,7 +149,7 @@ test('keeps same-guest cancelled bookings as separate stacked timeline items', (
     {
       id: 'cancelled-2',
       name: 'Alex',
-      room: 'APT2',
+      resourceId: 'APT2',
       startDate: '08/03/2026',
       endDate: '11/03/2026',
       status: 'cancelled',
@@ -168,7 +168,7 @@ test('keeps same-guest cancelled bookings as separate stacked timeline items', (
 test('marks cancelled timeline items for their separate visual treatment', () => {
   const item = toTimelineItem({
     id: 'cancelled-1',
-    room: 'APT2',
+    resourceId: 'APT2',
     name: 'Alex',
     startDate: '08/03/2026',
     endDate: '11/03/2026',
@@ -250,10 +250,10 @@ test('creates a standalone report document with theme-specific colors', () => {
 
 test('filters report records by selected mode and inclusive arrival-date range', () => {
   const bookings = [
-    { id: 'inside', room: 'APT2', startDate: '10/07/2026', status: 'active' },
-    { id: 'before', room: 'APT2', startDate: '30/06/2026', status: 'active' },
+    { id: 'inside', resourceId: 'APT2', startDate: '10/07/2026', status: 'active' },
+    { id: 'before', resourceId: 'APT2', startDate: '30/06/2026', status: 'active' },
     { id: 'other-mode', room: 'CAR1', startDate: '10/07/2026', status: 'active' },
-    { id: 'cancelled', room: 'APT2', startDate: '10/07/2026', status: 'cancelled' },
+    { id: 'cancelled', resourceId: 'APT2', startDate: '10/07/2026', status: 'cancelled' },
   ];
 
   assert.deepEqual(
@@ -271,7 +271,7 @@ test('summarizes active financials by resource and counts cancellations separate
   const summary = summarizeBookings([
     {
       id: 'active',
-      room: 'APT2',
+      resourceId: 'APT2',
       status: 'active',
       numOfGuests: 2,
       numOfNights: 3,
@@ -281,7 +281,7 @@ test('summarizes active financials by resource and counts cancellations separate
     },
     {
       id: 'paid',
-      room: 'APT2',
+      resourceId: 'APT2',
       status: 'paid',
       numOfGuests: 1,
       numOfNights: 1,
@@ -291,7 +291,7 @@ test('summarizes active financials by resource and counts cancellations separate
     },
     {
       id: 'cancelled',
-      room: 'APT2',
+      resourceId: 'APT2',
       status: 'cancelled',
       numOfGuests: 4,
       numOfNights: 5,

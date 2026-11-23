@@ -120,7 +120,7 @@ public class BookingsPDFExporter {
         for (BookingResource resource : resources) {
             List<BookingReportView> rows = bookings.stream()
                   .filter(this::isBookable)
-                  .filter(booking -> resource.getId().equals(booking.room()))
+                  .filter(booking -> resource.getId().equals(booking.resourceId()))
                   .toList();
             addCell(table, resource.getName(), reportFont(8), Element.ALIGN_LEFT);
             addCell(table, String.valueOf(rows.size()), reportFont(8), Element.ALIGN_RIGHT);
@@ -161,7 +161,7 @@ public class BookingsPDFExporter {
                 addCell(table, status(booking.status()), font, Element.ALIGN_LEFT);
                 addCell(table, formatBookingDate(booking.startDate()), font, Element.ALIGN_LEFT);
                 addCell(table, formatBookingDate(booking.endDate()), font, Element.ALIGN_LEFT);
-                addCell(table, booking.roomName(), font, Element.ALIGN_LEFT);
+                addCell(table, booking.resourceName(), font, Element.ALIGN_LEFT);
                 addCell(table, booking.name(), font, Element.ALIGN_LEFT);
                 addCell(table, agency(booking.agency()), font, Element.ALIGN_LEFT);
                 addCell(table, String.valueOf(Objects.requireNonNullElse(booking.numOfGuests(), 0)),

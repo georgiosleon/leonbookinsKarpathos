@@ -47,7 +47,7 @@ class BookingResponseTest {
         assertNull(response.endDate());
         assertEquals("booking-1", response.id());
         assertEquals("Ada", response.name());
-        assertEquals("APT 2", response.roomName());
+        assertEquals("APT 2", response.resourceName());
         assertEquals("active", response.status());
         assertEquals(requestDateTime, response.requestDateTime());
     }
@@ -57,8 +57,8 @@ class BookingResponseTest {
         booking.setId("booking-1");
         booking.setName("Ada");
         booking.setAgency("Agency");
-        booking.setRoom("room-1");
-        booking.setRoomName("APT 2");
+        booking.setResourceId("room-1");
+        booking.setResourceName("APT 2");
         booking.setNumOfGuests(2);
         booking.setNumOfNights(3);
         booking.setCharge(new java.math.BigDecimal("100.0"));

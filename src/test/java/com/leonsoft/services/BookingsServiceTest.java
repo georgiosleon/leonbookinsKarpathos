@@ -89,7 +89,7 @@ class BookingsServiceTest {
         assertEquals(java.time.LocalDate.parse("2026-06-23"), result.getEndDate());
         assertEquals(3, result.getNumOfNights());
         assertEquals(new java.math.BigDecimal("70.00"), result.getBalance());
-        assertEquals("APT 2", result.getRoomName());
+        assertEquals("APT 2", result.getResourceName());
     }
 
     @Test
@@ -128,7 +128,7 @@ class BookingsServiceTest {
         Booking result = bookingsService.update(update);
 
         assertEquals(createdAt, result.getRequestDateTime());
-        assertEquals("APT 2", result.getRoomName());
+        assertEquals("APT 2", result.getResourceName());
         verify(bookingRepository).save(update);
     }
 
@@ -202,7 +202,7 @@ class BookingsServiceTest {
         Booking existing = savedBooking("existing", "2026-06-20", "2026-06-23", "active");
         when(resourceService.requireActive("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
-        when(bookingRepository.findByRoomAndStatusIn("APT2", BookingStatus.BOOKABLE))
+        when(bookingRepository.findByResourceIdAndStatusIn("APT2", BookingStatus.BOOKABLE))
               .thenReturn(List.of(existing));
 
         ResponseStatusException exception = assertThrows(
@@ -224,19 +224,19 @@ class BookingsServiceTest {
         Booking roomBooking = booking("22/06/2026", "24/06/2026", "active");
         assertNotNull(bookingsService.create(roomBooking).getId());
         verify(bookingRepository, never())
-              .findByRoomAndStatusIn("APT2", BookingStatus.BOOKABLE);
+              .findByResourceIdAndStatusIn("APT2", BookingStatus.BOOKABLE);
 
         bookingsService = new BookingsService(
               bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository));
         Booking existingVehicleBooking = savedBooking("vehicle-existing", "2026-06-20", "2026-06-23", "paid");
-        existingVehicleBooking.setRoom("CAR1");
+        existingVehicleBooking.setResourceId("CAR1");
         when(resourceService.requireActive("CAR1"))
               .thenReturn(new BookingResource("CAR1", "cars", "Car 1"));
-        when(bookingRepository.findByRoomAndStatusIn("CAR1", BookingStatus.BOOKABLE))
+        when(bookingRepository.findByResourceIdAndStatusIn("CAR1", BookingStatus.BOOKABLE))
               .thenReturn(List.of(existingVehicleBooking));
 
         Booking vehicleBooking = booking("22/06/2026", "24/06/2026", "active");
-        vehicleBooking.setRoom("CAR1");
+        vehicleBooking.setResourceId("CAR1");
         ResponseStatusException exception = assertThrows(
               ResponseStatusException.class, () -> bookingsService.create(vehicleBooking));
         assertEquals(HttpStatus.CONFLICT, exception.getStatusCode());
@@ -251,7 +251,7 @@ class BookingsServiceTest {
         Booking cancelled = booking("22/06/2026", "24/06/2026", "cancelled");
         assertNotNull(bookingsService.create(cancelled).getId());
         verify(bookingRepository, never())
-              .findByRoomAndStatusIn("APT2", BookingStatus.BOOKABLE);
+              .findByResourceIdAndStatusIn("APT2", BookingStatus.BOOKABLE);
     }
 
     @Test
@@ -368,7 +368,7 @@ class BookingsServiceTest {
         booking.setCharge(new java.math.BigDecimal("100.0"));
         booking.setCommission(new java.math.BigDecimal("10.0"));
         booking.setReceived(new java.math.BigDecimal("20.0"));
-        booking.setRoom("APT2");
+        booking.setResourceId("APT2");
         booking.setStatus(status == null ? null : com.leonsoft.models.BookingStatus.from(status));
         return booking;
     }
@@ -378,7 +378,7 @@ class BookingsServiceTest {
         booking.setId(id);
         booking.setStartDate(com.leonsoft.services.BookingsUtils.parseStoredDate(startDate));
         booking.setEndDate(com.leonsoft.services.BookingsUtils.parseStoredDate(endDate));
-        booking.setRoom("APT2");
+        booking.setResourceId("APT2");
         booking.setStatus(status == null ? null : com.leonsoft.models.BookingStatus.from(status));
         return booking;
     }

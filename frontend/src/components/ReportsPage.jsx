@@ -323,7 +323,7 @@ export function ReportsPage() {
                       <td>{t(booking.status)}</td>
                       <td>{formatBookingDate(booking.startDate, locale)}</td>
                       <td>{formatBookingDate(booking.endDate, locale)}</td>
-                      <td>{booking.roomName ?? booking.room}</td>
+                      <td>{booking.resourceName ?? booking.resourceId}</td>
                       <td>{booking.name}</td>
                       <td>{t(mode.agencies.find((agency) => agency.id === booking.agency)?.text ?? booking.agency)}</td>
                       <td>{booking.numOfGuests ?? 0}</td>

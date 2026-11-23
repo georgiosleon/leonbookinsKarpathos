@@ -20,7 +20,7 @@ public record BookingRequest(
       @NotBlank String name,
       @NotNull @Positive Integer numOfGuests,
       @NotBlank String agency,
-      @NotBlank String room,
+      @NotBlank @com.fasterxml.jackson.annotation.JsonAlias("room") String resourceId,
       String country,
       @NotBlank String startDate,
       @NotBlank String endDate,
@@ -63,7 +63,7 @@ public record BookingRequest(
         booking.setName(name);
         booking.setNumOfGuests(numOfGuests);
         booking.setAgency(agency);
-        booking.setRoom(room);
+        booking.setResourceId(resourceId);
         booking.setCountry(country);
         booking.setStartDate(startDate == null ? null : com.leonsoft.services.BookingsUtils.parseEuroDate(startDate));
         booking.setEndDate(endDate == null ? null : com.leonsoft.services.BookingsUtils.parseEuroDate(endDate));

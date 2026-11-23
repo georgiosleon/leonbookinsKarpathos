@@ -17,7 +17,7 @@ public class BookingOverlapChecker {
     }
 
     public boolean hasOverlap(Booking candidate, LocalDate startDate, LocalDate endDate) {
-        return bookingRepository.findByRoomAndStatusIn(candidate.getRoom(), BookingStatus.BOOKABLE)
+        return bookingRepository.findByResourceIdAndStatusIn(candidate.getResourceId(), BookingStatus.BOOKABLE)
                 .stream()
                 .filter(existing -> !Objects.equals(existing.getId(), candidate.getId()))
                 .anyMatch(existing -> existing.getStartDate().isBefore(endDate)

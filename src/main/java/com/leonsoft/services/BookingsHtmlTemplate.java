@@ -91,7 +91,7 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
                   .append("<td>").append(dateFormatter.format(stDt)).append("</td>")
                   .append("<td>").append(dateFormatter.format(edDt)).append("</td>")
 
-                  .append("<td>").append(htmlEscape(booking.roomName()))
+                  .append("<td>").append(htmlEscape(booking.resourceName()))
                   .append("</td>")
                   .append("<td>").append(htmlEscape(booking.name())).append("</td>")
                   .append("<td>").append(htmlEscape(booking.agency())).append("</td>")

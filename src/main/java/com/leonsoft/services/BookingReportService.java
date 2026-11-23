@@ -73,13 +73,13 @@ public class BookingReportService {
 
         Map<String, String> namesById = resourceService.namesById();
         List<BookingReportView> bookings = allBookings.stream()
-                .filter(booking -> resourcesById.containsKey(booking.getRoom()))
+                .filter(booking -> resourcesById.containsKey(booking.getResourceId()))
                 .sorted(Comparator
                         .comparing(Booking::getStartDate)
                         .thenComparing(
                                 booking -> Objects.toString(booking.getName(), ""),
                                 Collator.getInstance(locale)))
-                .map(booking -> BookingReportView.from(booking, namesById.get(booking.getRoom())))
+                .map(booking -> BookingReportView.from(booking, namesById.get(booking.getResourceId())))
                 .toList();
 
         response.setContentType("application/pdf");
@@ -103,7 +103,7 @@ public class BookingReportService {
                     LocalDate bookingEnd = booking.getEndDate();
                     return !bookingStart.isBefore(stDate) && !bookingEnd.isAfter(edDate);
                 })
-                .map(booking -> BookingReportView.from(booking, namesById.get(booking.getRoom())))
+                .map(booking -> BookingReportView.from(booking, namesById.get(booking.getResourceId())))
                 .toList();
 
         return htmlReportRenderer.render(fromDateEuroFmt, toDateEuroFmt, all, locale);

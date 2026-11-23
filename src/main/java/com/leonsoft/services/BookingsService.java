@@ -88,7 +88,7 @@ public class BookingsService {
 
     @Transactional
     private Booking saveWithNormalizedValues(Booking booking) {
-        BookingResource resource = resourceService.requireActive(booking.getRoom());
+        BookingResource resource = resourceService.requireActive(booking.getResourceId());
         LocalDate stDate = booking.getStartDate();
         LocalDate edDate = booking.getEndDate();
         if (stDate == null || edDate == null) {
@@ -116,7 +116,7 @@ public class BookingsService {
                 booking.getCharge(), booking.getReceived(), booking.getCommission()));
 
         booking = bookingRepository.save(booking);
-        booking.setRoomName(resource.getName());
+        booking.setResourceName(resource.getName());
         return booking;
     }
 

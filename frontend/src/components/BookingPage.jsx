@@ -57,7 +57,7 @@ function emptyForm() {
     name: '',
     numOfGuests: '',
     agency: '',
-    room: '',
+    resourceId: '',
     country: '',
     startDate: today,
     endDate: today,
@@ -173,7 +173,7 @@ export function BookingPage() {
     setNotice('');
 
     const payload = toBookingPayload(form);
-    if (!payload.name || !payload.room || !payload.agency || !payload.numOfGuests) {
+    if (!payload.name || !payload.resourceId || !payload.agency || !payload.numOfGuests) {
       showError(t('Complete the required name, guest, agency, and resource fields.'));
       return;
     }

@@ -49,7 +49,7 @@ export function hasAvailabilityConflict(candidate, bookings, ignoredBookingId = 
 
   return bookings.some((booking) => {
     if (booking.id === ignoredBookingId) return false;
-    if (booking.room !== candidate.room || !['active', 'paid'].includes(booking.status)) {
+    if (booking.resourceId !== candidate.resourceId || !['active', 'paid'].includes(booking.status)) {
       return false;
     }
 
@@ -64,7 +64,7 @@ export function toBookingPayload(form) {
     name: form.name.trim(),
     numOfGuests: Number(form.numOfGuests),
     agency: form.agency,
-    room: form.room,
+    resourceId: form.resourceId,
     country: form.country.trim(),
     startDate: isoToEuropeanDate(form.startDate),
     endDate: isoToEuropeanDate(form.endDate),
@@ -90,7 +90,7 @@ export function bookingToForm(booking) {
     name: booking.name ?? '',
     numOfGuests: booking.numOfGuests == null ? '' : String(booking.numOfGuests),
     agency: booking.agency ?? '',
-    room: booking.room ?? '',
+    resourceId: booking.resourceId ?? '',
     country: booking.country ?? '',
     startDate: europeanToIsoDate(booking.startDate),
     endDate: europeanToIsoDate(booking.endDate),
@@ -120,7 +120,7 @@ export function toTimelineItem(booking, mode) {
   return {
     id: booking.id,
     type: 'range',
-    group: booking.room,
+    group: booking.resourceId,
     start: localMidday(europeanToIsoDate(booking.startDate)),
     end: localMidday(europeanToIsoDate(booking.endDate)),
     content: `${mode.timelinePrefix}${nights} ${mode.timelineGuestLabel}${guestCount} ${safeName}`,

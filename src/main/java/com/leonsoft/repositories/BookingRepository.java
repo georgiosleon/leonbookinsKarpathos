@@ -13,7 +13,7 @@ public interface BookingRepository extends CrudRepository<Booking, String> {
 
     List<Booking> findByStartDateBetweenOrderByStartDateDesc(String startDate, String endDate);
 
-    List<Booking> findByRoomAndStatusIn(String room, Collection<BookingStatus> statuses);
+    List<Booking> findByResourceIdAndStatusIn(String room, Collection<BookingStatus> statuses);
 
     List<Booking> findByUserIdOrderByStartDateAsc(Integer userId);
 

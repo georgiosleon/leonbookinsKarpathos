@@ -119,7 +119,7 @@ class BookingsReportPdfServiceTest {
         booking.setStartDate(java.time.LocalDate.parse("2026-06-12"));
         booking.setEndDate(java.time.LocalDate.parse("2026-06-15"));
         booking.setStatus(com.leonsoft.models.BookingStatus.ACTIVE);
-        booking.setRoom(resourceId);
+        booking.setResourceId(resourceId);
         booking.setName(name);
         booking.setAgency("abnb");
         booking.setNumOfGuests(2);

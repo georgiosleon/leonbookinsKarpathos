@@ -17,7 +17,7 @@ class BookingsHtmlTemplateTest {
         booking.setStartDate(java.time.LocalDate.parse("2026-06-20"));
         booking.setEndDate(java.time.LocalDate.parse("2026-06-22"));
         booking.setStatus(com.leonsoft.models.BookingStatus.CANCELLED);
-        booking.setRoom("<svg onload='alert(1)'>");
+        booking.setResourceId("<svg onload='alert(1)'>");
         booking.setName("<img src=x onerror=alert(1)> & guest");
         booking.setAgency("\" onmouseover=\"alert(1)");
         booking.setCharge(new java.math.BigDecimal("100.0"));
@@ -28,7 +28,7 @@ class BookingsHtmlTemplateTest {
         booking.setNumOfNights(2);
         booking.setExtraInfo("<script>alert(1)</script>");
 
-        String report = new BookingsHtmlTemplate().render("20/06/2026", "30/06/2026", List.of(BookingReportView.from(booking, booking.getRoom())), Locale.ENGLISH);
+        String report = new BookingsHtmlTemplate().render("20/06/2026", "30/06/2026", List.of(BookingReportView.from(booking, booking.getResourceId())), Locale.ENGLISH);
 
         assertTrue(report.contains("&lt;svg onload=&#39;alert(1)&#39;&gt;"));
         assertTrue(report.contains("&lt;img src=x onerror=alert(1)&gt; &amp; guest"));
@@ -53,7 +53,7 @@ class BookingsHtmlTemplateTest {
         booking.setNumOfNights(2);
 
         String report = new BookingsHtmlTemplate().render(
-              "20/06/2026", "30/06/2026", List.of(BookingReportView.from(booking, booking.getRoom())), Locale.forLanguageTag("el-GR"));
+              "20/06/2026", "30/06/2026", List.of(BookingReportView.from(booking, booking.getResourceId())), Locale.forLanguageTag("el-GR"));
 
         assertTrue(report.contains("<th>Κατάσταση</th>"));
         assertTrue(report.contains(">Ακυρωμένη</td>"));

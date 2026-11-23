@@ -16,8 +16,8 @@ public record BookingResponse(
         java.math.BigDecimal balance,
         String name,
         String agency,
-        String room,
-        String roomName,
+        String resourceId,
+        String resourceName,
         Integer numOfGuests,
         String country,
         String voucher,
@@ -32,11 +32,11 @@ public record BookingResponse(
         LocalDateTime requestDateTime) {
 
     public static BookingResponse from(Booking booking) {
-        return from(booking, booking.getRoomName());
+        return from(booking, booking.getResourceName());
     }
 
-    public static BookingResponse from(Booking booking, String roomName) {
-        String resolvedRoomName = roomName == null || roomName.isBlank() ? booking.getRoom() : roomName;
+    public static BookingResponse from(Booking booking, String resourceName) {
+        String resolvedResourceName = resourceName == null || resourceName.isBlank() ? booking.getResourceId() : resourceName;
         return new BookingResponse(
                 booking.getId(),
                 formatDate(booking.getStartDate()),
@@ -48,8 +48,8 @@ public record BookingResponse(
                 booking.getBalance(),
                 booking.getName(),
                 booking.getAgency(),
-                booking.getRoom(),
-                resolvedRoomName,
+                booking.getResourceId(),
+                resolvedResourceName,
                 booking.getNumOfGuests(),
                 booking.getCountry(),
                 booking.getVoucher(),

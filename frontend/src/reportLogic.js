@@ -10,7 +10,7 @@ export function selectBookingsForReport(bookings, mode, startDate, endDate) {
   return bookings
     .filter((booking) => {
       const arrival = europeanToIsoDate(booking.startDate);
-      return arrival && resourceIds.has(booking.room) && arrival >= start && arrival <= end;
+      return arrival && resourceIds.has(booking.resourceId) && arrival >= start && arrival <= end;
     })
     .sort((left, right) => (
       europeanToIsoDate(left.startDate).localeCompare(europeanToIsoDate(right.startDate)) ||
@@ -23,7 +23,7 @@ export function summarizeBookings(bookings, mode) {
   const cancelledBookings = bookings.filter((booking) => booking.status === 'cancelled');
 
   const resources = mode.resources.map(({ id, text }) => {
-    const resourceBookings = bookableBookings.filter((booking) => booking.room === id);
+    const resourceBookings = bookableBookings.filter((booking) => booking.resourceId === id);
     return {
       id,
       name: text,

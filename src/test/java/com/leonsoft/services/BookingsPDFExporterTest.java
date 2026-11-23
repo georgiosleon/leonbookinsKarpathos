@@ -21,8 +21,8 @@ class BookingsPDFExporterTest {
         booking.setStartDate(java.time.LocalDate.parse("2026-11-20"));
         booking.setEndDate(java.time.LocalDate.parse("2026-11-29"));
         booking.setStatus(com.leonsoft.models.BookingStatus.CANCELLED);
-        booking.setRoom("APT2");
-        booking.setRoomName("Δωμάτιο");
+        booking.setResourceId("APT2");
+        booking.setResourceName("Δωμάτιο");
         booking.setName("Κράτηση");
         booking.setNumOfGuests(2);
         booking.setNumOfNights(9);
@@ -64,8 +64,8 @@ class BookingsPDFExporterTest {
             booking.setStartDate(java.time.LocalDate.parse("2026-06-20"));
             booking.setEndDate(java.time.LocalDate.parse("2026-06-22"));
             booking.setStatus(index == 0 ? com.leonsoft.models.BookingStatus.CANCELLED : com.leonsoft.models.BookingStatus.ACTIVE);
-            booking.setRoom("APT2");
-            booking.setRoomName("APT 2");
+            booking.setResourceId("APT2");
+            booking.setResourceName("APT 2");
             booking.setName("Guest " + index);
             booking.setAgency("abnb");
             booking.setNumOfGuests(2);
