@@ -5,17 +5,15 @@ import {
   fetchBookings,
   fetchResources,
   bookingPdfUrl,
+  isAuthRedirectError,
   logout,
 } from '../bookingApi.js';
 import { selectBookingsForReport, summarizeBookings } from '../reportLogic.js';
-import { ThemeToggle } from './ThemeToggle.jsx';
 import { useTheme } from '../useTheme.js';
 import { reportDocument } from '../reportDocument.js';
 import { formatMoney, useLanguage } from '../i18n.jsx';
-import { LanguageSelector } from './LanguageSelector.jsx';
 import { FeedbackDialog } from './FeedbackDialog.jsx';
-import { HelpButton } from './HelpButton.jsx';
-import { AppSupportActions } from './AppSupportActions.jsx';
+import { AppHeader } from './AppHeader.jsx';
 import { useCurrentUser } from '../useCurrentUser.js';
 
 function currentMonthRange() {
@@ -82,7 +80,9 @@ export function ReportsPage() {
         }
       })
       .catch((requestError) => {
-        if (active) showError(t('Could not load booking data: {error}', { error: requestError.message }));
+        if (active && !isAuthRedirectError(requestError)) {
+          showError(t('Could not load booking data: {error}', { error: requestError.message }));
+        }
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -152,7 +152,9 @@ export function ReportsPage() {
     try {
       setReportHtml(await fetchBookingReport(range.startDate, range.endDate, language));
     } catch (requestError) {
-      showError(t('Could not load detailed report: {error}', { error: requestError.message }));
+      if (!isAuthRedirectError(requestError)) {
+        showError(t('Could not load detailed report: {error}', { error: requestError.message }));
+      }
     }
   }
 
@@ -181,12 +183,16 @@ export function ReportsPage() {
   if (!canAccessReports) {
     return (
       <main className="app-shell">
-        <header className="app-header">
-          <div>
-            <p className="eyebrow">{t('Karpathos booking planner')}</p>
-            <h1>{t('Booking reports')}</h1>
-          </div>
-        </header>
+        <AppHeader
+          title={t('Booking reports')}
+          currentPage="reports"
+          modeId={mode.id}
+          isAdmin={isAdmin}
+          canAccessReports={false}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          onLogout={handleLogout}
+        />
         <p className="feedback feedback-error" role="alert">{t('You do not have permission to perform this action.')}</p>
       </main>
     );
@@ -194,43 +200,16 @@ export function ReportsPage() {
 
   return (
     <main className="app-shell">
-      <header className="app-header">
-        <div>
-          <p className="eyebrow">{t('Karpathos booking planner')}</p>
-          <h1>{t('Booking reports')}</h1>
-        </div>
-        <div className="header-meta">
-          <nav aria-label={t('Main navigation')}>
-            <a href={`/?type=${mode.id}`}>{t('Bookings')}</a>
-            <a className="nav-icon-link" href={`/?type=${mode.id}&page=reports`} aria-current="page">
-              <svg
-                className="nav-icon"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                aria-hidden="true"
-              >
-                <path d="M4 19.5h16" />
-                <path d="M7 16V10" />
-                <path d="M12 16V5" />
-                <path d="M17 16v-4" />
-              </svg>
-              <span>{t('Reports')}</span>
-            </a>
-            {isAdmin && <a href="/?page=resources">{t('Manage rooms and cars')}</a>}
-            {isAdmin && <a href="/?page=users">{t('Manage users')}</a>}
-          </nav>
-          <span>{t(mode.title)}</span>
-          <HelpButton />
-          <LanguageSelector />
-          <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          <AppSupportActions />
-          <button type="button" className="button button-muted" onClick={handleLogout}>{t('Sign out')}</button>
-        </div>
-      </header>
+      <AppHeader
+        title={t('Booking reports')}
+        currentPage="reports"
+        modeId={mode.id}
+        isAdmin={isAdmin}
+        canAccessReports={canAccessReports}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onLogout={handleLogout}
+      />
 
       <section className="panel" aria-labelledby="report-filters-heading">
         <div className="panel-heading">

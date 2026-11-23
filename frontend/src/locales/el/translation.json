@@ -113,7 +113,6 @@
   "Sign out": "Αποσύνδεση",
   "Version {version}": "Έκδοση {version}",
   "Version unavailable": "Η έκδοση δεν είναι διαθέσιμη",
-  "Export diagnostics": "Εξαγωγή διαγνωστικών",
   "Booking details": "Στοιχεία κράτησης",
   "Enter a new booking or select one on the timeline to review it.": "Καταχωρίστε νέα κράτηση ή επιλέξτε μία από το χρονοδιάγραμμα.",
   "Balance: {amount}": "Υπόλοιπο: {amount}",
@@ -278,5 +277,12 @@
   "View all bookings": "Προβολή όλων των κρατήσεων",
   "Create/edit/delete bookings": "Δημιουργία/επεξεργασία/διαγραφή κρατήσεων",
   "View reports / export": "Προβολή αναφορών / εξαγωγή",
-  "Manage rooms & cars": "Διαχείριση δωματίων & αυτοκινήτων"
+  "Manage rooms & cars": "Διαχείριση δωματίων & αυτοκινήτων",
+  "Support": "Υποστήριξη",
+  "Save mode": "Λειτουργία αποθήκευσης",
+  "Diagnostic information for troubleshooting.": "Διαγνωστικές πληροφορίες για αντιμετώπιση προβλημάτων.",
+  "Loading...": "Φόρτωση...",
+  "Could not load support information.": "Δεν ήταν δυνατή η φόρτωση των πληροφοριών υποστήριξης.",
+  "Update mode": "Λειτουργία ενημέρωσης",
+  "Remove & add mode": "Λειτουργία αφαίρεσης & προσθήκης"
 }

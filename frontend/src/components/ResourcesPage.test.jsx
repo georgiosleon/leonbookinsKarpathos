@@ -12,6 +12,7 @@ vi.mock('../bookingApi.js', () => ({
   fetchResources: vi.fn().mockResolvedValue([]),
   createResource: vi.fn(),
   logout: vi.fn(),
+  isAuthRedirectError: (error) => error?.name === 'AuthRedirectError',
 }));
 
 vi.mock('../i18n.jsx', () => ({

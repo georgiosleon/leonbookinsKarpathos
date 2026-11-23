@@ -113,7 +113,6 @@
   "Sign out": "Sign out",
   "Version {version}": "Version {version}",
   "Version unavailable": "Version unavailable",
-  "Export diagnostics": "Export diagnostics",
   "Booking details": "Booking details",
   "Enter a new booking or select one on the timeline to review it.": "Enter a new booking or select one on the timeline to review it.",
   "Balance: {amount}": "Balance: {amount}",
@@ -278,5 +277,12 @@
   "View all bookings": "View all bookings",
   "Create/edit/delete bookings": "Create/edit/delete bookings",
   "View reports / export": "View reports / export",
-  "Manage rooms & cars": "Manage rooms & cars"
+  "Manage rooms & cars": "Manage rooms & cars",
+  "Support": "Support",
+  "Save mode": "Save mode",
+  "Diagnostic information for troubleshooting.": "Diagnostic information for troubleshooting.",
+  "Loading...": "Loading...",
+  "Could not load support information.": "Could not load support information.",
+  "Update mode": "Update mode",
+  "Remove & add mode": "Remove & add mode"
 }

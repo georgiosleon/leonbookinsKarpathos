@@ -18,6 +18,7 @@ vi.mock('../../usersApi.js', () => ({
 
 vi.mock('../../bookingApi.js', () => ({
   logout: (...args) => logout(...args),
+  isAuthRedirectError: (error) => error?.name === 'AuthRedirectError',
 }));
 
 vi.mock('../../i18n.jsx', () => ({

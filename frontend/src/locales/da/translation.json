@@ -69,7 +69,6 @@
   "Sign out": "Log ud",
   "Version {version}": "Version {version}",
   "Version unavailable": "Version ikke tilgængelig",
-  "Export diagnostics": "Eksportér diagnosticering",
   "Booking details": "Bookingoplysninger",
   "Enter a new booking or select one on the timeline to review it.": "Indtast en ny booking, eller vælg en på tidslinjen for at se den.",
   "Balance: {amount}": "Saldo: {amount}",
@@ -278,5 +277,12 @@
   "View all bookings": "Se alle bookinger",
   "Create/edit/delete bookings": "Opret/rediger/slet bookinger",
   "View reports / export": "Se rapporter / eksport",
-  "Manage rooms & cars": "Administrer værelser & biler"
+  "Manage rooms & cars": "Administrer værelser & biler",
+  "Support": "Support",
+  "Save mode": "Gemmetilstand",
+  "Diagnostic information for troubleshooting.": "Diagnostiske oplysninger til fejlfinding.",
+  "Loading...": "Indlæser...",
+  "Could not load support information.": "Kunne ikke indlæse supportoplysninger.",
+  "Update mode": "Opdateringstilstand",
+  "Remove & add mode": "Tilstand fjern & tilføj"
 }

@@ -1,12 +1,41 @@
 import { useEffect, useRef, useState } from 'react';
 import { useLanguage } from '../i18n.jsx';
 
+const HELP_SECTIONS = ['installation', 'operations', 'support'];
+
 export function HelpButton() {
   const [open, setOpen] = useState(false);
   const [section, setSection] = useState('installation');
+  const [diagnostics, setDiagnostics] = useState('');
+  const [diagnosticsLoading, setDiagnosticsLoading] = useState(false);
+  const [diagnosticsError, setDiagnosticsError] = useState('');
   const dialogRef = useRef(null);
   const closeButtonRef = useRef(null);
   const { t } = useLanguage();
+
+  useEffect(() => {
+    if (!open || section !== 'support' || diagnostics) return undefined;
+    let active = true;
+    setDiagnosticsLoading(true);
+    setDiagnosticsError('');
+    fetch('/api/v1/diagnostics')
+      .then((response) => {
+        if (!response.ok) throw new Error(`Request failed (${response.status}).`);
+        return response.text();
+      })
+      .then((text) => {
+        if (active) setDiagnostics(text);
+      })
+      .catch(() => {
+        if (active) setDiagnosticsError(t('Could not load support information.'));
+      })
+      .finally(() => {
+        if (active) setDiagnosticsLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, [open, section, diagnostics, t]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -53,9 +82,13 @@ export function HelpButton() {
     macos: 'SERVER_ADDRESS=0.0.0.0 ./LeonBookings.app/Contents/MacOS/LeonBookings',
   };
 
-  function handleTabKeyDown(event, nextSection) {
+  function handleTabKeyDown(event, currentSection) {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
+    const currentIndex = HELP_SECTIONS.indexOf(currentSection);
+    const delta = event.key === 'ArrowRight' ? 1 : -1;
+    const nextIndex = (currentIndex + delta + HELP_SECTIONS.length) % HELP_SECTIONS.length;
+    const nextSection = HELP_SECTIONS[nextIndex];
     setSection(nextSection);
     document.getElementById(`help-${nextSection}-tab`)?.focus();
   }
@@ -98,7 +131,7 @@ export function HelpButton() {
                 aria-selected={section === 'installation'}
                 aria-controls="help-installation"
                 onClick={() => setSection('installation')}
-                onKeyDown={(event) => handleTabKeyDown(event, 'operations')}
+                onKeyDown={(event) => handleTabKeyDown(event, 'installation')}
               >
                 {t('Installation')}
               </button>
@@ -110,9 +143,21 @@ export function HelpButton() {
                 aria-selected={section === 'operations'}
                 aria-controls="help-operations"
                 onClick={() => setSection('operations')}
-                onKeyDown={(event) => handleTabKeyDown(event, 'installation')}
+                onKeyDown={(event) => handleTabKeyDown(event, 'operations')}
               >
                 {t('Operations')}
+              </button>
+              <button
+                id="help-support-tab"
+                type="button"
+                role="tab"
+                tabIndex={section === 'support' ? 0 : -1}
+                aria-selected={section === 'support'}
+                aria-controls="help-support"
+                onClick={() => setSection('support')}
+                onKeyDown={(event) => handleTabKeyDown(event, 'support')}
+              >
+                {t('Support')}
               </button>
             </nav>
 
@@ -152,7 +197,7 @@ export function HelpButton() {
                         <tr><td>{t('View reports / export')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('No')}</td></tr>
                         <tr><td>{t('Manage rooms & cars')}</td><td>{t('Yes')}</td><td>{t('No')}</td><td>{t('No')}</td></tr>
                         <tr><td>{t('Manage users')}</td><td>{t('Yes')}</td><td>{t('No')}</td><td>{t('No')}</td></tr>
-                        <tr><td>{t('Export diagnostics')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td></tr>
+                        <tr><td>{t('Support')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td></tr>
                       </tbody>
                     </table>
                   </div>
@@ -248,6 +293,23 @@ export function HelpButton() {
                   <h4>{t('macOS portable app')}</h4>
                   <pre><code>{restoreCommands.macos}</code></pre>
                   <p>{t('Replace your-backup.sqlite3.enc with the actual backup filename. For Linux or a custom database location, see the backup and restore instructions in the project README.')}</p>
+                </section>
+              </div>
+
+              <div
+                id="help-support"
+                role="tabpanel"
+                aria-labelledby="help-support-tab"
+                hidden={section !== 'support'}
+              >
+                <section>
+                  <h3>{t('Support')}</h3>
+                  <p>{t('Diagnostic information for troubleshooting.')}</p>
+                  {diagnosticsLoading ? <p role="status">{t('Loading...')}</p> : null}
+                  {diagnosticsError ? <p className="feedback feedback-error" role="alert">{diagnosticsError}</p> : null}
+                  {!diagnosticsLoading && !diagnosticsError && diagnostics ? (
+                    <pre><code>{diagnostics}</code></pre>
+                  ) : null}
                 </section>
               </div>
             </div>

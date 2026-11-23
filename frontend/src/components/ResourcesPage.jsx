@@ -1,12 +1,9 @@
 import { useEffect, useState } from 'react';
-import { createResource, fetchResources, logout, updateResource } from '../bookingApi.js';
-import { LanguageSelector } from './LanguageSelector.jsx';
+import { createResource, fetchResources, isAuthRedirectError, logout, updateResource } from '../bookingApi.js';
 import { useLanguage } from '../i18n.jsx';
-import { ThemeToggle } from './ThemeToggle.jsx';
 import { useTheme } from '../useTheme.js';
 import { FeedbackDialog } from './FeedbackDialog.jsx';
-import { HelpButton } from './HelpButton.jsx';
-import { AppSupportActions } from './AppSupportActions.jsx';
+import { AppHeader } from './AppHeader.jsx';
 import { useCurrentUser } from '../useCurrentUser.js';
 
 export function ResourcesPage() {
@@ -52,7 +49,9 @@ export function ResourcesPage() {
         if (active) setResources(data);
       })
       .catch((requestError) => {
-        if (active) showError(t('Could not load resources: {error}', { error: requestError.message }));
+        if (active && !isAuthRedirectError(requestError)) {
+          showError(t('Could not load resources: {error}', { error: requestError.message }));
+        }
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -158,12 +157,15 @@ export function ResourcesPage() {
   if (!isAdmin) {
     return (
       <main className="app-shell">
-        <header className="app-header">
-          <div>
-            <p className="eyebrow">{t('Karpathos booking planner')}</p>
-            <h1>{t('Manage rooms and cars')}</h1>
-          </div>
-        </header>
+        <AppHeader
+          title={t('Manage rooms and cars')}
+          currentPage="resources"
+          isAdmin={false}
+          canAccessReports={false}
+          theme={theme}
+          onToggleTheme={toggleTheme}
+          onLogout={handleLogout}
+        />
         <p className="feedback feedback-error" role="alert">{t('You do not have permission to perform this action.')}</p>
       </main>
     );
@@ -171,25 +173,15 @@ export function ResourcesPage() {
 
   return (
     <main className="app-shell">
-      <header className="app-header">
-        <div>
-          <p className="eyebrow">{t('Karpathos booking planner')}</p>
-          <h1>{t('Manage rooms and cars')}</h1>
-        </div>
-        <div className="header-meta">
-          <nav aria-label={t('Main navigation')}>
-            <a href="/?type=rooms">{t('Rooms')}</a>
-            <a href="/?type=cars">{t('Cars & bikes')}</a>
-            <a href="/?type=rooms&page=reports">{t('Reports')}</a>
-            <a href="/?page=resources" aria-current="page">{t('Manage rooms and cars')}</a>
-          </nav>
-          <HelpButton />
-          <LanguageSelector />
-          <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          <AppSupportActions />
-          <button type="button" className="button button-muted" onClick={handleLogout}>{t('Sign out')}</button>
-        </div>
-      </header>
+      <AppHeader
+        title={t('Manage rooms and cars')}
+        currentPage="resources"
+        isAdmin={isAdmin}
+        canAccessReports={isAdmin}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onLogout={handleLogout}
+      />
 
       <section className="panel" aria-labelledby="resources-heading">
         <div className="panel-heading">

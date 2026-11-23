@@ -23,6 +23,7 @@ export function BookingForm({
   onReset,
   selectedBooking,
   saveMode,
+  onSaveModeChange,
   busy,
   canManage = true,
 }) {
@@ -128,6 +129,20 @@ export function BookingForm({
                 ))}
               </select>
             </label>
+            {canManage && onSaveModeChange ? (
+              <div className="field">
+                <span>{t('Save mode')}</span>
+                <button
+                  type="button"
+                  className="button button-muted save-mode-toggle"
+                  aria-pressed={saveMode === 'edit'}
+                  onClick={onSaveModeChange}
+                >
+                  <span aria-hidden="true">{saveMode === 'edit' ? '✏️' : '📝'}</span>
+                  <span>{saveMode === 'edit' ? t('Update mode') : t('Remove & add mode')}</span>
+                </button>
+              </div>
+            ) : null}
           </div>
         </section>
 

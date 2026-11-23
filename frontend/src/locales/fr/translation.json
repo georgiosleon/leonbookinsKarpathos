@@ -69,7 +69,6 @@
   "Sign out": "Se déconnecter",
   "Version {version}": "Version {version}",
   "Version unavailable": "Version indisponible",
-  "Export diagnostics": "Exporter les diagnostics",
   "Booking details": "Détails de la réservation",
   "Enter a new booking or select one on the timeline to review it.": "Saisissez une réservation ou sélectionnez-en une dans le calendrier pour consulter ses détails.",
   "Balance: {amount}": "Solde : {amount}",
@@ -278,5 +277,12 @@
   "View all bookings": "Voir toutes les réservations",
   "Create/edit/delete bookings": "Créer/modifier/supprimer des réservations",
   "View reports / export": "Voir rapports / exporter",
-  "Manage rooms & cars": "Gérer chambres & véhicules"
+  "Manage rooms & cars": "Gérer chambres & véhicules",
+  "Support": "Assistance",
+  "Save mode": "Mode d’enregistrement",
+  "Diagnostic information for troubleshooting.": "Informations de diagnostic pour le dépannage.",
+  "Loading...": "Chargement...",
+  "Could not load support information.": "Impossible de charger les informations d’assistance.",
+  "Update mode": "Mode mise à jour",
+  "Remove & add mode": "Mode supprimer & ajouter"
 }

@@ -16,6 +16,7 @@ import {
   fetchAvailabilitySettings,
   fetchBookings,
   fetchResources,
+  isAuthRedirectError,
   saveBooking,
   updateBooking,
 } from '../bookingApi.js';
@@ -23,12 +24,9 @@ import { fetchMe } from '../usersApi.js';
 import { BookingForm } from './BookingForm.jsx';
 import { BookingTimeline } from './BookingTimeline.jsx';
 import { FeedbackDialog } from './FeedbackDialog.jsx';
-import { HelpButton } from './HelpButton.jsx';
-import { ThemeToggle } from './ThemeToggle.jsx';
+import { AppHeader } from './AppHeader.jsx';
 import { useTheme } from '../useTheme.js';
 import { formatMoney, useLanguage } from '../i18n.jsx';
-import { LanguageSelector } from './LanguageSelector.jsx';
-import { AppSupportActions } from './AppSupportActions.jsx';
 import { useCurrentUser } from '../useCurrentUser.js';
 
 function todayAsIsoDate() {
@@ -81,9 +79,7 @@ function getMode() {
   return bookingModes[requestedMode] ?? bookingModes.rooms;
 }
 
-function formatClock(date, locale) {
-  return date.toLocaleTimeString(locale, { hour: 'numeric', minute: '2-digit', second: '2-digit' });
-}
+
 
 export function BookingPage() {
   const baseMode = useMemo(getMode, []);
@@ -111,7 +107,7 @@ export function BookingPage() {
   const isOperator = currentUser?.role === 'OPERATOR';
   const canManageBookings = isAdmin || isOperator;
   const canSeeReports = isAdmin || isOperator;
-  const [clock, setClock] = useState(() => formatClock(new Date(), locale));
+
 
   function showError(message) {
     setError(message);
@@ -129,7 +125,9 @@ export function BookingPage() {
         }
       })
       .catch((requestError) => {
-        if (active) showError(t('Could not load bookings: {error}', { error: requestError.message }));
+        if (active && !isAuthRedirectError(requestError)) {
+          showError(t('Could not load bookings: {error}', { error: requestError.message }));
+        }
       });
 
     return () => {
@@ -154,9 +152,7 @@ export function BookingPage() {
 
   useEffect(() => {
     document.documentElement.lang = language;
-    const timerId = window.setInterval(() => setClock(formatClock(new Date(), locale)), 1000);
-    return () => window.clearInterval(timerId);
-  }, [language, locale]);
+  }, [language]);
 
   function resetForm() {
     setForm(emptyForm());
@@ -256,8 +252,8 @@ export function BookingPage() {
     cancelledTimelineRef.current?.shiftDays(action);
   }
 
-  function handleSaveModeChange(event) {
-    const nextMode = event.target.checked ? 'edit' : 'create';
+  function handleSaveModeChange() {
+    const nextMode = saveMode === 'edit' ? 'create' : 'edit';
     setSaveMode(storeBookingSaveMode(nextMode));
     setNotice('');
   }
@@ -279,61 +275,17 @@ export function BookingPage() {
 
   return (
     <main className="app-shell">
-      <header className="app-header">
-        <div>
-          <p className="eyebrow">{t('Karpathos booking planner')}</p>
-          <h1>{t(mode.title)}</h1>
-        </div>
-        {me && (
-          <p className="signed-in-label">
-            {t('Signed in as {username}', { username: `${me.username} (${me.role})` })}
-          </p>
-        )}
-        <div className="header-meta">
-          <nav aria-label={t('Booking type')}>
-            <a href="/?type=rooms" aria-current={mode.id === 'rooms' ? 'page' : undefined}>{t('Rooms')}</a>
-            <a href="/?type=cars" aria-current={mode.id === 'cars' ? 'page' : undefined}>{t('Cars & bikes')}</a>
-            {canSeeReports && (
-              <a className="nav-icon-link" href={`/?type=${mode.id}&page=reports`}>
-                <svg
-                  className="nav-icon"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.8"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden="true"
-                >
-                  <path d="M4 19.5h16" />
-                  <path d="M7 16V10" />
-                  <path d="M12 16V5" />
-                  <path d="M17 16v-4" />
-                </svg>
-                <span>{t('Reports')}</span>
-              </a>
-            )}
-            {isAdmin && <a href="/?page=resources">{t('Manage rooms and cars')}</a>}
-            {isAdmin && <a href="/?page=users">{t('Manage users')}</a>}
-          </nav>
-          <HelpButton />
-          <LanguageSelector />
-          <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          <AppSupportActions />
-          {canManageBookings && (
-            <label className="save-mode-toggle">
-              <input
-                type="checkbox"
-                checked={saveMode === 'edit'}
-                onChange={handleSaveModeChange}
-              />
-              <span>{t('Edit selected booking')} <small>{t('(testing)')}</small></span>
-            </label>
-          )}
-          <button type="button" className="button button-muted" onClick={handleLogout}>{t('Sign out')}</button>
-          <time>{clock}</time>
-        </div>
-      </header>
+      <AppHeader
+        title={t(mode.title)}
+        currentPage={mode.id}
+        modeId={mode.id}
+        isAdmin={isAdmin}
+        canAccessReports={canSeeReports}
+        signedInLabel={me ? t('Signed in as {username}', { username: `${me.username} (${me.role})` }) : ''}
+        theme={theme}
+        onToggleTheme={toggleTheme}
+        onLogout={handleLogout}
+      />
 
       <section className="panel" aria-labelledby="booking-form-heading">
         <div className="panel-heading">
@@ -373,6 +325,7 @@ export function BookingPage() {
             onReset={resetForm}
             selectedBooking={selectedBooking}
             saveMode={saveMode}
+            onSaveModeChange={handleSaveModeChange}
             busy={busy}
             canManage={canManageBookings}
           />
