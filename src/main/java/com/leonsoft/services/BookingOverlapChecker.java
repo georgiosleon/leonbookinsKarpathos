@@ -24,7 +24,7 @@ public class BookingOverlapChecker {
                         && startDate.toString().compareTo(existing.getEndDate()) < 0);
     }
 
-    public boolean isBookable(String status) {
+    public boolean isBookable(BookingStatus status) {
         return BookingStatus.isBookable(status);
     }
 }

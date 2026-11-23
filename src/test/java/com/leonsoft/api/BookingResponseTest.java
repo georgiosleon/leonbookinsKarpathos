@@ -65,7 +65,7 @@ class BookingResponseTest {
         booking.setReceived(20.0);
         booking.setCommission(10.0);
         booking.setBalance(70.0);
-        booking.setStatus("active");
+        booking.setStatus(com.leonsoft.models.BookingStatus.ACTIVE);
         return booking;
     }
 }

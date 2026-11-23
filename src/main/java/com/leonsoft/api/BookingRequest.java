@@ -72,7 +72,7 @@ public record BookingRequest(
         booking.setCommission(toDouble(commission));
         booking.setReceived(toDouble(received));
         booking.setBalance(toDouble(balance));
-        booking.setStatus(status);
+        booking.setStatus(com.leonsoft.models.BookingStatus.from(status));
         booking.setIdentification(identification);
         booking.setAfm(afm);
         booking.setEmail(email);

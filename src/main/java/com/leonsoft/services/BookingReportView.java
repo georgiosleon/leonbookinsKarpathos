@@ -54,7 +54,7 @@ public record BookingReportView(
                 booking.getReceived(),
                 booking.getBalance(),
                 booking.getTel(),
-                booking.getStatus(),
+                booking.getStatus() == null ? null : booking.getStatus().getValue(),
                 booking.getExtraInfo());
     }
 }

@@ -85,8 +85,8 @@ public class Booking {
     @Column(name = "extra_info")
     private String extraInfo;
 
-    @Column(name = "status")
-    private String status;
+    @Column(name = "status", nullable = false)
+    private BookingStatus status;
 
 
     @Column(name = "request_DateTime")

@@ -60,7 +60,7 @@ public record BookingResponse(
                 booking.getAfm(),
                 booking.getTel(),
                 booking.getExtraInfo(),
-                booking.getStatus(),
+                booking.getStatus() == null ? null : booking.getStatus().getValue(),
                 booking.getRequestDateTime());
     }
 

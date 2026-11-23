@@ -16,7 +16,7 @@ class BookingsHtmlTemplateTest {
         booking.setId("booking-1");
         booking.setStartDate("2026-06-20");
         booking.setEndDate("2026-06-22");
-        booking.setStatus("cancelled");
+        booking.setStatus(com.leonsoft.models.BookingStatus.CANCELLED);
         booking.setRoom("<svg onload='alert(1)'>");
         booking.setName("<img src=x onerror=alert(1)> & guest");
         booking.setAgency("\" onmouseover=\"alert(1)");
@@ -44,7 +44,7 @@ class BookingsHtmlTemplateTest {
         Booking booking = new Booking();
         booking.setStartDate("2026-06-20");
         booking.setEndDate("2026-06-22");
-        booking.setStatus("cancelled");
+        booking.setStatus(com.leonsoft.models.BookingStatus.CANCELLED);
         booking.setCharge(1234.5);
         booking.setCommission(0.0);
         booking.setReceived(0.0);

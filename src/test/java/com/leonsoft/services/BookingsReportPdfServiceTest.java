@@ -118,7 +118,7 @@ class BookingsReportPdfServiceTest {
         booking.setId(name);
         booking.setStartDate("2026-06-12");
         booking.setEndDate("2026-06-15");
-        booking.setStatus("active");
+        booking.setStatus(com.leonsoft.models.BookingStatus.ACTIVE);
         booking.setRoom(resourceId);
         booking.setName(name);
         booking.setAgency("abnb");

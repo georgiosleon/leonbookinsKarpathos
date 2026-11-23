@@ -10,6 +10,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import com.leonsoft.models.Booking;
+import com.leonsoft.models.BookingStatus;
 import com.leonsoft.models.BookingResource;
 import com.leonsoft.models.User;
 import com.leonsoft.repositories.BookingRepository;
@@ -201,7 +202,7 @@ class BookingsServiceTest {
         Booking existing = savedBooking("existing", "2026-06-20", "2026-06-23", "active");
         when(resourceService.requireActive("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
-        when(bookingRepository.findByRoomAndStatusIn("APT2", List.of("active", "paid")))
+        when(bookingRepository.findByRoomAndStatusIn("APT2", BookingStatus.BOOKABLE))
               .thenReturn(List.of(existing));
 
         ResponseStatusException exception = assertThrows(
@@ -223,7 +224,7 @@ class BookingsServiceTest {
         Booking roomBooking = booking("22/06/2026", "24/06/2026", "active");
         assertNotNull(bookingsService.create(roomBooking).getId());
         verify(bookingRepository, never())
-              .findByRoomAndStatusIn("APT2", List.of("active", "paid"));
+              .findByRoomAndStatusIn("APT2", BookingStatus.BOOKABLE);
 
         bookingsService = new BookingsService(
               bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository));
@@ -231,7 +232,7 @@ class BookingsServiceTest {
         existingVehicleBooking.setRoom("CAR1");
         when(resourceService.requireActive("CAR1"))
               .thenReturn(new BookingResource("CAR1", "cars", "Car 1"));
-        when(bookingRepository.findByRoomAndStatusIn("CAR1", List.of("active", "paid")))
+        when(bookingRepository.findByRoomAndStatusIn("CAR1", BookingStatus.BOOKABLE))
               .thenReturn(List.of(existingVehicleBooking));
 
         Booking vehicleBooking = booking("22/06/2026", "24/06/2026", "active");
@@ -250,7 +251,7 @@ class BookingsServiceTest {
         Booking cancelled = booking("22/06/2026", "24/06/2026", "cancelled");
         assertNotNull(bookingsService.create(cancelled).getId());
         verify(bookingRepository, never())
-              .findByRoomAndStatusIn("APT2", List.of("active", "paid"));
+              .findByRoomAndStatusIn("APT2", BookingStatus.BOOKABLE);
     }
 
     @Test
@@ -368,7 +369,7 @@ class BookingsServiceTest {
         booking.setCommission(10.0);
         booking.setReceived(20.0);
         booking.setRoom("APT2");
-        booking.setStatus(status);
+        booking.setStatus(status == null ? null : com.leonsoft.models.BookingStatus.from(status));
         return booking;
     }
 
@@ -378,7 +379,7 @@ class BookingsServiceTest {
         booking.setStartDate(startDate);
         booking.setEndDate(endDate);
         booking.setRoom("APT2");
-        booking.setStatus(status);
+        booking.setStatus(status == null ? null : com.leonsoft.models.BookingStatus.from(status));
         return booking;
     }
 }

@@ -20,7 +20,7 @@ class BookingsPDFExporterTest {
         Booking booking = new Booking();
         booking.setStartDate("2026-11-20");
         booking.setEndDate("2026-11-29");
-        booking.setStatus("cancelled");
+        booking.setStatus(com.leonsoft.models.BookingStatus.CANCELLED);
         booking.setRoom("APT2");
         booking.setRoomName("Δωμάτιο");
         booking.setName("Κράτηση");
@@ -63,7 +63,7 @@ class BookingsPDFExporterTest {
             booking.setId("booking-" + index);
             booking.setStartDate("2026-06-20");
             booking.setEndDate("2026-06-22");
-            booking.setStatus(index == 0 ? "cancelled" : "active");
+            booking.setStatus(index == 0 ? com.leonsoft.models.BookingStatus.CANCELLED : com.leonsoft.models.BookingStatus.ACTIVE);
             booking.setRoom("APT2");
             booking.setRoomName("APT 2");
             booking.setName("Guest " + index);

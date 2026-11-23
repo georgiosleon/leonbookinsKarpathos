@@ -152,7 +152,7 @@ class BookingsRestControllerTest {
         booking.setEndDate(endDate);
         booking.setNumOfGuests(2);
         booking.setNumOfNights(3);
-        booking.setStatus("active");
+        booking.setStatus(com.leonsoft.models.BookingStatus.ACTIVE);
         booking.setRequestDateTime(LocalDateTime.of(2026, 6, 1, 12, 0));
         return booking;
     }

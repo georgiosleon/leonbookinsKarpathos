@@ -1,22 +1,67 @@
 package com.leonsoft.models;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
+import java.util.Arrays;
 import java.util.List;
 
-public final class BookingStatus {
+public enum BookingStatus {
+    ACTIVE("active"),
+    PAID("paid"),
+    CANCELLED("cancelled");
 
-    public static final String ACTIVE = "active";
-    public static final String PAID = "paid";
-    public static final String CANCELLED = "cancelled";
-    public static final List<String> BOOKABLE = List.of(ACTIVE, PAID);
+    public static final List<BookingStatus> BOOKABLE = List.of(ACTIVE, PAID);
 
-    private BookingStatus() {
+    private final String value;
+
+    BookingStatus(String value) {
+        this.value = value;
+    }
+
+    @JsonValue
+    public String getValue() {
+        return value;
+    }
+
+    @JsonCreator
+    public static BookingStatus from(String value) {
+        if (value == null) {
+            return null;
+        }
+        String normalized = value.trim().toLowerCase();
+        return Arrays.stream(values())
+                .filter(status -> status.value.equals(normalized))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Unknown booking status: " + value));
+    }
+
+    public static boolean isBookable(BookingStatus status) {
+        return status == ACTIVE || status == PAID;
     }
 
     public static boolean isBookable(String status) {
-        return ACTIVE.equals(status) || PAID.equals(status);
+        if (status == null) {
+            return false;
+        }
+        try {
+            return isBookable(from(status));
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
+    }
+
+    public static boolean isCancelled(BookingStatus status) {
+        return status == CANCELLED;
     }
 
     public static boolean isCancelled(String status) {
-        return CANCELLED.equals(status);
+        if (status == null) {
+            return false;
+        }
+        try {
+            return isCancelled(from(status));
+        } catch (IllegalArgumentException ex) {
+            return false;
+        }
     }
 }
