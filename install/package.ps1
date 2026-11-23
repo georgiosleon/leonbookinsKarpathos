@@ -64,7 +64,7 @@ if (-not $Version) {
 }
 
 # Keep the runtime small but retain bin/java.exe: the launcher starts Spring Boot with it.
-$RuntimeModules = "java.base,java.desktop,java.instrument,java.logging,java.management,java.naming,java.security.jgss,java.sql,java.xml,jdk.crypto.ec,jdk.unsupported"
+$RuntimeModules = "java.base,java.compiler,java.desktop,java.instrument,java.logging,java.management,java.naming,java.security.jgss,java.sql,java.xml,jdk.crypto.ec,jdk.unsupported"
 $JlinkOptions = "--strip-debug --no-man-pages --no-header-files --compress=2"
 
 Push-Location $Root

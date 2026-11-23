@@ -221,7 +221,7 @@ if [[ -z "$VERSION" ]]; then
 fi
 
 # Keep the runtime small but retain bin/java: the launcher uses it to start Spring Boot.
-RUNTIME_MODULES="java.base,java.desktop,java.instrument,java.logging,java.management,java.naming,java.security.jgss,java.sql,java.xml,jdk.crypto.ec,jdk.unsupported"
+RUNTIME_MODULES="java.base,java.compiler,java.desktop,java.instrument,java.logging,java.management,java.naming,java.security.jgss,java.sql,java.xml,jdk.crypto.ec,jdk.unsupported"
 JLINK_OPTIONS="--strip-debug --no-man-pages --no-header-files --compress=2"
 
 cd "$ROOT"
