@@ -89,8 +89,8 @@ public class BookingsService {
     @Transactional
     private Booking saveWithNormalizedValues(Booking booking) {
         BookingResource resource = resourceService.requireActive(booking.getRoom());
-        LocalDate stDate = LocalDate.parse(booking.getStartDate(), BookingsUtils.formatterEURO);
-        LocalDate edDate = LocalDate.parse(booking.getEndDate(), BookingsUtils.formatterEURO);
+        LocalDate stDate = BookingsUtils.parseEuroDate(booking.getStartDate());
+        LocalDate edDate = BookingsUtils.parseEuroDate(booking.getEndDate());
 
         if (edDate.isAfter(stDate)
                 && overlapChecker.isBookable(booking.getStatus())
@@ -106,10 +106,11 @@ public class BookingsService {
         booking.setEndDate(edDate.format(DateTimeFormatter.ISO_DATE));
 
         booking.setNumOfNights(Math.toIntExact(ChronoUnit.DAYS.between(stDate, edDate)));
-        booking.setCharge(booking.getCharge() == null ? 0 : booking.getCharge());
-        booking.setCommission(booking.getCommission() == null ? 0.0 : booking.getCommission());
-        booking.setReceived(booking.getReceived() == null ? 0.0 : booking.getReceived());
-        booking.setBalance(booking.getCharge() - booking.getReceived() - booking.getCommission());
+        booking.setCharge(BookingsUtils.normalizeMoney(booking.getCharge()));
+        booking.setCommission(BookingsUtils.normalizeMoney(booking.getCommission()));
+        booking.setReceived(BookingsUtils.normalizeMoney(booking.getReceived()));
+        booking.setBalance(BookingsUtils.calculateBalance(
+                booking.getCharge(), booking.getReceived(), booking.getCommission()));
 
         booking = bookingRepository.save(booking);
         booking.setRoomName(resource.getName());
