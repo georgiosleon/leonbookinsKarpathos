@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
 
+@FunctionalInterface
 public interface BookingPdfReportRenderer {
     void export(
             List<BookingReportView> bookings,

@@ -4,4 +4,15 @@
   <Match>
     <Source name="~.*generated.*"/>
   </Match>
+
+  <!-- Spring-managed dependency injection stores mutable collaborators by design. -->
+  <Match>
+    <Bug pattern="EI_EXPOSE_REP2"/>
+  </Match>
+
+  <!-- Login page uses a Java text block as a formatted HTML template. -->
+  <Match>
+    <Class name="com.leonsoft.api.LoginPageController"/>
+    <Bug pattern="VA_FORMAT_STRING_USES_NEWLINE"/>
+  </Match>
 </FindBugsFilter>

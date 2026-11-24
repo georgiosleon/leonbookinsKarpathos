@@ -61,7 +61,7 @@ public class LicenseEnforcementFilter extends OncePerRequestFilter {
                 return true;
             }
         }
-        if (path.equals("/api/v1/csrf") || path.equals("/api/v1/users/me") || path.equals("/api/v1/license/status")) {
+        if ("/api/v1/csrf".equals(path) || "/api/v1/users/me".equals(path) || "/api/v1/license/status".equals(path)) {
             return true;
         }
         for (String prefix : LICENSE_API_PREFIXES) {
@@ -70,7 +70,7 @@ public class LicenseEnforcementFilter extends OncePerRequestFilter {
             }
         }
         // Allow SPA entry pages; frontend decides what to show based on role/license status.
-        if (path.equals("/") || path.equals("/index.html") || path.equals("/rooms.html") || path.equals("/cars.html")) {
+        if (path.equals("/") || "/index.html".equals(path) || "/rooms.html".equals(path) || "/cars.html".equals(path)) {
             return true;
         }
         return false;

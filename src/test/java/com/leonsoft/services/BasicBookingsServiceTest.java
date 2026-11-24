@@ -9,8 +9,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-import com.leonsoft.models.Booking;
-import com.leonsoft.models.User;
 import com.leonsoft.repositories.BookingRepository;
 import com.leonsoft.repositories.UserRepository;
 

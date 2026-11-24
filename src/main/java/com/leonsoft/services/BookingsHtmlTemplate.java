@@ -7,7 +7,6 @@ import java.time.format.DateTimeFormatter;
 import java.text.NumberFormat;
 import java.util.List;
 import java.util.Locale;
-import java.util.Objects;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -183,10 +182,6 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
     }
 
 
-
-    private static double n(Double value) {
-        return value == null ? 0.0 : value;
-    }
 
     private static double n(java.math.BigDecimal value) {
         return value == null ? 0.0 : value.doubleValue();

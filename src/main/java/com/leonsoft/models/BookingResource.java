@@ -28,7 +28,7 @@ public class BookingResource {
     private String name;
 
     @Column(name = "active", nullable = false)
-    private boolean active = true;
+    private boolean active;
 
     @Convert(converter = MoneyCentsConverter.class)
     @Column(name = "rental_tax_per_night", columnDefinition = "integer")

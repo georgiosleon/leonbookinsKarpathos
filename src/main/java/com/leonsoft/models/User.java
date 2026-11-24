@@ -20,6 +20,7 @@ import lombok.ToString;
 @NoArgsConstructor
 @ToString(exclude = "passwordHash")
 public class User implements UserDetails {
+    private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

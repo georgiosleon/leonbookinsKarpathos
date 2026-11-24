@@ -6,7 +6,6 @@ import com.leonsoft.models.BookingStatus;
 import com.leonsoft.models.User;
 import com.leonsoft.repositories.BookingRepository;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.UUID;
@@ -43,7 +42,7 @@ public class BookingsService {
     }
 
     /** Admins and operators can create/update/delete any booking; guests cannot. */
-    private boolean canModifyBooking(Booking booking) {
+    private boolean canModifyBooking() {
         User currentUser = currentUserProvider.getCurrentUser().orElse(null);
         return currentUser != null && (currentUser.isAdmin() || currentUser.isOperator());
     }
@@ -54,7 +53,9 @@ public class BookingsService {
         User currentUser = currentUserProvider.getCurrentUser().orElse(null);
         String generatedId = UUID.randomUUID().toString();
 
-        log.debug("Creating booking by user: {}", currentUser != null ? currentUser.getUsername() : "unknown");
+        if (log.isDebugEnabled()) {
+            log.debug("Creating booking by user: {}", currentUser != null ? currentUser.getUsername() : "unknown");
+        }
         booking.setId(generatedId);
 
         // Assign current user as the booking owner if authenticated.
@@ -64,7 +65,9 @@ public class BookingsService {
 
         Booking saved = saveWithNormalizedValues(booking);
 
-        log.debug("Booking created with ID: {}", saved.getId());
+        if (log.isDebugEnabled()) {
+            log.debug("Booking created with ID: {}", saved.getId());
+        }
         return saved;
     }
 
@@ -77,11 +80,13 @@ public class BookingsService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found.");
         }
 
-        if (!canModifyBooking(existing)) {
+        if (!canModifyBooking()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to update this booking.");
         }
 
-        log.debug("Updating booking");
+        if (log.isDebugEnabled()) {
+            log.debug("Updating booking");
+        }
         booking.setRequestDateTime(existing.getRequestDateTime());
         return saveWithNormalizedValues(booking);
     }
@@ -138,7 +143,7 @@ public class BookingsService {
         Booking booking = bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found."));
 
-        if (!canModifyBooking(booking)) {
+        if (!canModifyBooking()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this booking.");
         }
 
@@ -154,7 +159,7 @@ public class BookingsService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Only cancelled bookings can be deleted.");
         }
 
-        if (!canModifyBooking(booking)) {
+        if (!canModifyBooking()) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, "You do not have permission to delete this booking.");
         }
 

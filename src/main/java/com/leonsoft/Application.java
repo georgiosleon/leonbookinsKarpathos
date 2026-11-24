@@ -11,11 +11,11 @@ import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfigura
 
 public class Application {
 
-	public static void main(String[] args) {
-		if (args.length > 0 && "db".equals(args[0])) {
-			System.exit(DatabaseCli.run(java.util.Arrays.copyOfRange(args, 1, args.length)));
-		}
-		SpringApplication.run(Application.class, args);
-	}
+    public static void main(String[] args) {
+        if (args.length > 0 && "db".equals(args[0])) {
+            System.exit(DatabaseCli.run(java.util.Arrays.copyOfRange(args, 1, args.length)));
+        }
+        SpringApplication.run(Application.class, args);
+    }
 
 }

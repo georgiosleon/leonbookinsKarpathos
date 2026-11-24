@@ -12,10 +12,8 @@ import com.leonsoft.services.licensing.LicensePayload;
 import com.leonsoft.services.licensing.LicenseVerifier;
 import java.time.LocalDateTime;
 import java.util.UUID;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class LicenseService {

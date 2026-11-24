@@ -1,11 +1,9 @@
 package com.leonsoft.api;
 
-import com.leonsoft.models.Booking;
 import com.leonsoft.services.BookingReportService;
 import com.leonsoft.services.BookingResourceService;
 import com.leonsoft.services.BookingsService;
 import com.leonsoft.services.ReportMessages;
-import java.util.Map;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import java.io.IOException;
@@ -28,6 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/v1/booking")
 public class BookingsRestController {
+    private static final String ADMIN_OR_OPERATOR = "hasAnyRole('ADMIN', 'OPERATOR')";
 
     private static final Logger log = LoggerFactory.getLogger(BookingsRestController.class);
 
@@ -42,7 +41,7 @@ public class BookingsRestController {
     }
 
     @GetMapping("/export/pdf")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
+    @PreAuthorize(ADMIN_OR_OPERATOR)
     public void exportToPDF(
             HttpServletResponse response,
             @RequestParam(name = "fromDate") String fromDateEuroFmt,
@@ -59,7 +58,7 @@ public class BookingsRestController {
     }
 
     @GetMapping(value = "/report", produces = MediaType.TEXT_PLAIN_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
+    @PreAuthorize(ADMIN_OR_OPERATOR)
     String report(
             @RequestParam(name = "fromDate") String fromDateEuroFmt,
             @RequestParam(name = "toDate") String toDateEuroFmt,
@@ -71,20 +70,20 @@ public class BookingsRestController {
     }
 
     @PostMapping(value = "/save", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
+    @PreAuthorize(ADMIN_OR_OPERATOR)
     BookingResponse create(@Valid @RequestBody BookingRequest request) {
         return BookingResponse.from(bookingsService.create(request.toBooking()));
     }
 
     @PutMapping(value = "/update", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
+    @PreAuthorize(ADMIN_OR_OPERATOR)
     BookingResponse update(@Valid @RequestBody BookingRequest request) {
         return BookingResponse.from(bookingsService.update(request.toBooking()));
     }
 
 
     @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
+    @PreAuthorize(ADMIN_OR_OPERATOR)
     Boolean deleteObject(@Valid @RequestBody BookingDeleteRequest request) {
         log.debug(" Delete    {}", request.id());
         bookingsService.deleteObject(request.id());
@@ -92,7 +91,7 @@ public class BookingsRestController {
     }
 
     @PostMapping(value = "/del")
-    @PreAuthorize("hasAnyRole('ADMIN', 'OPERATOR')")
+    @PreAuthorize(ADMIN_OR_OPERATOR)
     void delCancelledBooking(@RequestParam(name = "bid") String bookingId) {
         log.debug(" Delete  a cancelled   {}", bookingId);
         bookingsService.delCancelledBooking(bookingId);

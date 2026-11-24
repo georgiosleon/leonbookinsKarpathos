@@ -106,7 +106,7 @@ public final class DatabaseCli {
         }
         validateDatabase(database);
 
-        Path parent = output.getParent();
+        Path parent = requireParent(output);
         Files.createDirectories(parent);
         Path temporary = Files.createTempFile(parent, "." + output.getFileName() + ".", ".sqlite3");
         try {
@@ -132,7 +132,7 @@ public final class DatabaseCli {
         }
         validateDatabase(database);
 
-        Path parent = output.getParent();
+        Path parent = requireParent(output);
         Files.createDirectories(parent);
         Path temporaryDatabase = null;
         Path temporaryEncrypted = null;
@@ -167,7 +167,7 @@ public final class DatabaseCli {
         if (database.equals(input)) {
             throw new IllegalArgumentException("Restore source must be different from the live database");
         }
-        Path parent = database.getParent();
+        Path parent = requireParent(database);
         Files.createDirectories(parent);
         Path temporaryDatabase = Files.createTempFile(parent, ".booking-restore-", ".sqlite3");
         try {
@@ -202,9 +202,10 @@ public final class DatabaseCli {
                             + String.join(", ", sidecars.stream().map(Path::toString).toList()));
         }
 
-        Files.createDirectories(database.getParent());
+        Path parent = requireParent(database);
+        Files.createDirectories(parent);
         Path temporary = Files.createTempFile(
-                database.getParent(), "." + database.getFileName() + ".restore-", ".sqlite3");
+                parent, "." + database.getFileName() + ".restore-", ".sqlite3");
         Path preRestoreBackup = null;
         try {
             copyDatabase(input, temporary);
@@ -340,6 +341,14 @@ public final class DatabaseCli {
 
     private static boolean isHelp(String value) {
         return "-h".equals(value) || "--help".equals(value) || "help".equals(value);
+    }
+
+    private static Path requireParent(Path path) {
+        Path parent = path.toAbsolutePath().normalize().getParent();
+        if (parent == null) {
+            throw new IllegalArgumentException("Path must have a parent directory: " + path);
+        }
+        return parent;
     }
 
     private static void printUsage() {

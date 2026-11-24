@@ -1,7 +1,6 @@
 package com.leonsoft.services.licensing;
 
 import tools.jackson.databind.ObjectMapper;
-import java.nio.charset.StandardCharsets;
 import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
@@ -13,7 +12,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 
 @Component
-public class LicenseVerifier {
+public final class LicenseVerifier {
 
     static final String PRODUCT = "leonbookinsKarpathos";
     // Dev/public verification key (Ed25519, X.509). Replace for production deployments.
@@ -56,8 +55,8 @@ public class LicenseVerifier {
             signature.initVerify(publicKey);
             signature.update(payloadBytes);
             valid = signature.verify(signatureBytes);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "License key could not be verified.");
+        } catch (java.security.GeneralSecurityException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "License key could not be verified.", e);
         }
         if (!valid) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "License key signature is invalid.");
@@ -66,8 +65,8 @@ public class LicenseVerifier {
         LicensePayload payload;
         try {
             payload = objectMapper.readValue(payloadBytes, LicensePayload.class);
-        } catch (Exception e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "License key payload is invalid.");
+        } catch (tools.jackson.core.JacksonException e) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "License key payload is invalid.", e);
         }
 
         if (!PRODUCT.equals(payload.product())) {
