@@ -128,7 +128,8 @@ activate by pasting an Ed25519-signed key (`base64url(payload).base64url(signatu
 through `POST /api/v1/license/activate`. `LicenseEnforcementFilter` blocks normal
 API use until activated, while allowing login/static/SPA shell, CSRF, current-user,
 license status, and admin license/customer endpoints. Activation takes effect
-immediately with no restart.
+immediately with no restart. For production, configure `APP_LICENSE_PUBLIC_KEY`
+(base64 X.509 Ed25519 public key); the dev key is used only as fallback.
 
 ## Persistence and reports
 

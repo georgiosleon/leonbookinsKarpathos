@@ -50,6 +50,15 @@ class LicenseVerifierTest {
         assertThrows(ResponseStatusException.class, () -> verifier.verify("not-a-key", INSTALL_ID));
     }
 
+    @Test
+    void rejectsLicenseSignedWithDifferentKey() throws Exception {
+        java.security.KeyPairGenerator kpg = java.security.KeyPairGenerator.getInstance("Ed25519");
+        String otherPublic = Base64.getEncoder().encodeToString(kpg.generateKeyPair().getPublic().getEncoded());
+        LicenseVerifier otherVerifier = new LicenseVerifier(new ObjectMapper(), otherPublic);
+        String key = sign(payload(INSTALL_ID, "Acme", "+30", "a@b.com"));
+        assertThrows(ResponseStatusException.class, () -> otherVerifier.verify(key, INSTALL_ID));
+    }
+
     private static String payload(String installId, String name, String phone, String email) {
         return "{"
                 + "\"product\":\"leonbookinsKarpathos\","

@@ -105,6 +105,9 @@ public class LicenseService {
         license.setStatus("ACTIVE");
         licenseRepository.save(license);
         activatedCache = true;
+        org.slf4j.LoggerFactory.getLogger(LicenseService.class)
+                .info("License activated for installId={}, customerId={}, activatedBy={}",
+                        installId, customer.getId(), activatedBy);
 
         return getStatus();
     }

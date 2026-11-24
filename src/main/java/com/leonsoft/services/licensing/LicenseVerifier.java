@@ -15,21 +15,21 @@ import org.springframework.web.server.ResponseStatusException;
 public final class LicenseVerifier {
 
     static final String PRODUCT = "leonbookinsKarpathos";
-    // Dev/public verification key (Ed25519, X.509). Replace for production deployments.
-    static final String PUBLIC_KEY_B64 = "MCowBQYDK2VwAyEAURg0//L5zeM9lZxbFnMuCM6Emvx2BPjzXKKbnO2x31k=";
+    // Dev/public verification key (Ed25519, X.509). Override with app.license.public-key for production.
+    static final String DEFAULT_PUBLIC_KEY_B64 = "MCowBQYDK2VwAyEAURg0//L5zeM9lZxbFnMuCM6Emvx2BPjzXKKbnO2x31k=";
 
     private final ObjectMapper objectMapper;
     private final PublicKey publicKey;
 
     @Autowired
-    public LicenseVerifier(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
-        this.publicKey = loadPublicKey(PUBLIC_KEY_B64);
-    }
-
-    LicenseVerifier(ObjectMapper objectMapper, String publicKeyB64) {
+    public LicenseVerifier(ObjectMapper objectMapper,
+                           @org.springframework.beans.factory.annotation.Value("${app.license.public-key:" + DEFAULT_PUBLIC_KEY_B64 + "}") String publicKeyB64) {
         this.objectMapper = objectMapper;
         this.publicKey = loadPublicKey(publicKeyB64);
+    }
+
+    LicenseVerifier(ObjectMapper objectMapper) {
+        this(objectMapper, DEFAULT_PUBLIC_KEY_B64);
     }
 
     public LicensePayload verify(String signedLicense, String expectedInstallId) {

@@ -13,6 +13,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 @Service
 public class CustomerService {
+    private static final org.slf4j.Logger log = org.slf4j.LoggerFactory.getLogger(CustomerService.class);
 
     private final CustomerRepository customerRepository;
     private final AppLicenseRepository appLicenseRepository;
@@ -43,7 +44,9 @@ public class CustomerService {
         LocalDateTime now = LocalDateTime.now();
         customer.setCreatedAt(now);
         customer.setUpdatedAt(now);
-        return customerRepository.save(customer);
+        Customer saved = customerRepository.save(customer);
+        log.info("Customer created id={}, name={}", saved.getId(), saved.getName());
+        return saved;
     }
 
     @Transactional
@@ -51,7 +54,9 @@ public class CustomerService {
         Customer customer = getById(id);
         apply(customer, request);
         customer.setUpdatedAt(LocalDateTime.now());
-        return customerRepository.save(customer);
+        Customer saved = customerRepository.save(customer);
+        log.info("Customer updated id={}, name={}", saved.getId(), saved.getName());
+        return saved;
     }
 
     @Transactional
@@ -64,6 +69,7 @@ public class CustomerService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete the customer linked to the active license.");
         }
         customerRepository.delete(customer);
+        log.info("Customer deleted id={}, name={}", customer.getId(), customer.getName());
     }
 
     @Transactional

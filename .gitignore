@@ -42,3 +42,6 @@ build/
 
 ### VS Code ###
 .vscode/
+
+# Dev-only license signing key (do not use in production; keep local only)
+tools/dev-license-private.pkcs8.b64

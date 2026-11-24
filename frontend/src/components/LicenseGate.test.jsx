@@ -65,4 +65,41 @@ describe('LicenseGate', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Activate' }));
     expect(await screen.findByRole('alert')).toHaveTextContent('Bad key');
   });
+
+  it('shows load failure', async () => {
+    api.fetchLicenseStatus.mockRejectedValue(new Error('boom'));
+    render(<LicenseGate currentUser={{ username: 'admin', role: 'ADMIN' }} onActivated={vi.fn()} />);
+    expect(await screen.findByRole('alert')).toHaveTextContent('boom');
+  });
+
+  it('lets admin update and delete customer', async () => {
+    api.fetchLicenseStatus.mockResolvedValue({ activated: false, installId: 'inst-1', customer: null });
+    api.fetchCustomers
+      .mockResolvedValueOnce([{ id: 7, name: 'Old', telephone: '', email: '' }])
+      .mockResolvedValueOnce([{ id: 7, name: 'New', telephone: '', email: '' }])
+      .mockResolvedValue([]);
+    api.updateCustomer.mockResolvedValue({ id: 7, name: 'New' });
+    api.deleteCustomer.mockResolvedValue();
+
+    render(<LicenseGate currentUser={{ username: 'admin', role: 'ADMIN' }} onActivated={vi.fn()} />);
+    const name = await screen.findByLabelText('Name');
+    await userEvent.clear(name);
+    await userEvent.type(name, 'New');
+    await userEvent.click(screen.getByRole('button', { name: 'Update customer' }));
+    await waitFor(() => expect(api.updateCustomer).toHaveBeenCalledWith(7, { name: 'New', telephone: '', email: '' }));
+
+    await screen.findByRole('button', { name: 'Delete customer' });
+    await userEvent.click(screen.getByRole('button', { name: 'Delete customer' }));
+    await waitFor(() => expect(api.deleteCustomer).toHaveBeenCalledWith(7));
+  });
+
+  it('shows activated status after successful activation', async () => {
+    api.fetchLicenseStatus.mockResolvedValue({ activated: false, installId: 'inst-1', customer: null });
+    api.activateLicense.mockResolvedValue({ activated: true, installId: 'inst-1', customer: { name: 'Acme' } });
+    render(<LicenseGate currentUser={{ username: 'admin', role: 'ADMIN' }} onActivated={vi.fn()} />);
+    await screen.findByLabelText('License key');
+    await userEvent.type(screen.getByLabelText('License key'), 'signed-key');
+    await userEvent.click(screen.getByRole('button', { name: 'Activate' }));
+    expect(await screen.findByText('Activated for Acme')).toBeInTheDocument();
+  });
 });

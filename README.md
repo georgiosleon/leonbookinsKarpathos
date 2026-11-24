@@ -272,13 +272,16 @@ screen and blocks normal use until activated.
 - **Access**: only ADMIN can activate/manage licensing; OPERATOR/GUEST see a blocked message until activated.
 - **APIs**: `GET /api/v1/license/status` (authenticated), `POST /api/v1/license/activate` (ADMIN, CSRF), `/api/v1/customers` (ADMIN CRUD).
 
-Generate a dev/test license key with the included tool:
+Generate a dev/test license key with the included tool (dev-only):
 
 ```sh
+# If needed, unlock the dev-only private key (encrypted file is committed; plain key is gitignored)
+./tools/unlock-dev-license-key.sh
+
 java --source 25 tools/LicenseSigner.java tools/dev-license-private.pkcs8.b64 <installId> "Customer Name" "+30..." "customer@example.com"
 ```
 
-Replace the embedded dev public key/private key pair for production deployments.
+**Production:** set `APP_LICENSE_PUBLIC_KEY` (or `app.license.public-key`) to your production Ed25519 X.509 public key (base64). Keep the matching private key outside the repository. Do not use the committed `tools/dev-license-*.b64` dev keypair for real customer deployments.
 
 ## API versioning
 
