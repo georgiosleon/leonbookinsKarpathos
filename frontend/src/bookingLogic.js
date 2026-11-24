@@ -37,11 +37,17 @@ export function nightsBetween(startDate, endDate) {
   return Number.isInteger(days) ? days : 0;
 }
 
-export function calculateBalance(charge, received, commission, rentalTax = 0) {
+// Display-only estimates. The backend is authoritative and recalculates these
+// values from the selected resource when a booking is saved.
+export function estimateRentalTax(startDate, endDate, resource) {
+  return Math.max(0, nightsBetween(startDate, endDate)) * (Number(resource?.rentalTaxPerNight) || 0);
+}
+
+export function estimateBalance(charge, received, commission, rentalTax = 0) {
   return (Number(charge) || 0) - (Number(received) || 0) - (Number(commission) || 0) - (Number(rentalTax) || 0);
 }
 
-export function calculateRentalSubTotal(charge, rentalTax = 0) {
+export function estimateRentalSubTotal(charge, rentalTax = 0) {
   return (Number(charge) || 0) - (Number(rentalTax) || 0);
 }
 
@@ -72,11 +78,9 @@ export function toBookingPayload(form) {
     country: form.country.trim(),
     startDate: isoToEuropeanDate(form.startDate),
     endDate: isoToEuropeanDate(form.endDate),
-    numOfNights: nightsBetween(form.startDate, form.endDate),
     charge: form.charge === '' ? null : Number(form.charge),
     commission: form.commission === '' ? null : Number(form.commission),
     received: form.received === '' ? null : Number(form.received),
-    balance: calculateBalance(form.charge, form.received, form.commission, form.rentalTax),
     status: form.status,
     identification: form.identification.trim(),
     afm: form.afm.trim(),
@@ -85,6 +89,7 @@ export function toBookingPayload(form) {
     voucher: form.voucher.trim(),
     taxRefNumber: form.taxRefNumber.trim(),
     invoiceNumber: form.invoiceNumber.trim(),
+    platformReservationId: (form.platformReservationId ?? '').trim(),
     extraInfo: form.extraInfo.trim(),
   };
 }
@@ -101,7 +106,6 @@ export function bookingToForm(booking) {
     charge: booking.charge == null ? '' : String(booking.charge),
     commission: booking.commission == null ? '' : String(booking.commission),
     received: booking.received == null ? '' : String(booking.received),
-    rentalTax: booking.rentalTax == null ? '' : String(booking.rentalTax),
     status: booking.status ?? 'active',
     identification: booking.identification ?? '',
     afm: booking.afm ?? '',

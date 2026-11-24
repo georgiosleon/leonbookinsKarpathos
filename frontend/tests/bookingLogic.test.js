@@ -14,7 +14,8 @@ import {
 } from '../src/bookingConfig.js';
 import {
   bookingToForm,
-  calculateBalance,
+  estimateBalance,
+  estimateRentalTax,
   europeanToIsoDate,
   hasAvailabilityConflict,
   isoToEuropeanDate,
@@ -46,10 +47,12 @@ test('converts and validates the API date format', () => {
   assert.equal(europeanToIsoDate('8/3/2026'), '');
 });
 
-test('calculates nights and balance', () => {
+test('calculates display-only night, tax, and balance estimates', () => {
   assert.equal(nightsBetween('2026-03-08', '2026-03-11'), 3);
   assert.equal(nightsBetween('2026-03-11', '2026-03-08'), -3);
-  assert.equal(calculateBalance('100.50', '20', '5.25', '2.00'), 73.25);
+  assert.equal(estimateRentalTax('2026-03-08', '2026-03-11', { rentalTaxPerNight: 12.5 }), 37.5);
+  assert.equal(estimateRentalTax('2026-03-11', '2026-03-08', { rentalTaxPerNight: 12.5 }), 0);
+  assert.equal(estimateBalance('100.50', '20', '5.25', '2.00'), 73.25);
 });
 
 test('availability conflicts only for overlapping bookable bookings in the same resource', () => {
@@ -73,7 +76,7 @@ test('availability conflicts only for overlapping bookable bookings in the same 
   assert.equal(hasAvailabilityConflict(candidate, [{ ...existing[0], id: 'existing' }], 'existing'), false);
 });
 
-test('maps API records to form fields and back to the existing create payload shape', () => {
+test('maps API records to form fields and back to a backend-authoritative create payload', () => {
   const booking = {
     id: 'existing-id',
     name: 'Alex',
@@ -87,6 +90,7 @@ test('maps API records to form fields and back to the existing create payload sh
     received: 20,
     commission: 5,
     balance: 75,
+    platformReservationId: 'PLAT-123',
     status: 'active',
   };
   const form = bookingToForm(booking);
@@ -96,8 +100,10 @@ test('maps API records to form fields and back to the existing create payload sh
   const payload = toBookingPayload(form);
   assert.equal(payload.startDate, '08/03/2026');
   assert.equal(payload.endDate, '11/03/2026');
-  assert.equal(payload.numOfNights, 3);
-  assert.equal(payload.balance, 75);
+  assert.equal(payload.platformReservationId, 'PLAT-123');
+  assert.equal(Object.hasOwn(payload, 'numOfNights'), false);
+  assert.equal(Object.hasOwn(payload, 'balance'), false);
+  assert.equal(Object.hasOwn(payload, 'rentalTax'), false);
   assert.equal(Object.hasOwn(payload, 'id'), false);
 });
 

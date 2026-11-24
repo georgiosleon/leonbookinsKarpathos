@@ -6,9 +6,11 @@ import {
 } from '../appConfig.js';
 import {
   bookingToForm,
-  calculateBalance,
-  calculateRentalSubTotal,
+  estimateBalance,
+  estimateRentalSubTotal,
+  estimateRentalTax,
   hasAvailabilityConflict,
+  nightsBetween,
   toBookingPayload,
 } from '../bookingLogic.js';
 import {
@@ -61,7 +63,6 @@ function emptyForm() {
     charge: '',
     commission: '',
     received: '',
-    rentalTax: '',
     status: 'active',
     identification: '',
     afm: '',
@@ -174,7 +175,7 @@ export function BookingPage() {
       showError(t('Complete the required name, guest, agency, and resource fields.'));
       return;
     }
-    if (!payload.startDate || !payload.endDate || payload.numOfNights <= 0) {
+    if (!payload.startDate || !payload.endDate || nightsBetween(form.startDate, form.endDate) <= 0) {
       showError(t('The end date must be after the start date.'));
       return;
     }
@@ -268,12 +269,14 @@ export function BookingPage() {
     }
   }
 
-  const balance = calculateBalance(form.charge, form.received, form.commission, form.rentalTax);
-  const rentalSubTotal = calculateRentalSubTotal(form.charge, form.rentalTax);
   const mode = useMemo(() => ({
     ...baseMode,
     resources: resourcesForMode(resources, baseMode),
   }), [baseMode, resources]);
+  const selectedResource = mode.resources.find((resource) => resource.id === form.resourceId);
+  const rentalTaxEstimate = estimateRentalTax(form.startDate, form.endDate, selectedResource);
+  const balance = estimateBalance(form.charge, form.received, form.commission, rentalTaxEstimate);
+  const rentalSubTotal = estimateRentalSubTotal(form.charge, rentalTaxEstimate);
 
   return (
     <main className="app-shell">
@@ -302,7 +305,7 @@ export function BookingPage() {
             </p>
           </div>
           <div className="booking-form-heading-actions">
-            <strong className="balance-summary">{t('Rental subtotal: {amount}', { amount: formatMoney(rentalSubTotal, locale) })} · {t('Balance: {amount}', { amount: formatMoney(balance, locale) })}</strong>
+            <strong className="balance-summary">{t('Estimated rental subtotal: {amount}', { amount: formatMoney(rentalSubTotal, locale) })} · {t('Estimated balance: {amount}', { amount: formatMoney(balance, locale) })}</strong>
             <button
               type="button"
               className="button button-muted"
