@@ -65,11 +65,12 @@ docker compose up --build -d
 ```
 
 Open [http://localhost:8080](http://localhost:8080) and sign in with the
-credentials from `.env`. The SQLite database is stored in the persistent
-`booking-data` Docker volume and survives container upgrades and restarts. The
-published port is bound to this computer only by default. Docker starts with a
-new database; it does not automatically import a repository-local
-`bookings.db`.
+credentials from `.env`. On a fresh installation, an `ADMIN` user must activate
+the application with a signed license key before normal use. The SQLite database
+is stored in the persistent `booking-data` Docker volume and survives container
+upgrades and restarts. The published port is bound to this computer only by
+default. Docker starts with a new database; it does not automatically import a
+repository-local `bookings.db`.
 
 To stop the application, run `docker compose down`. This keeps the database.
 To permanently remove the database too, run `docker compose down --volumes`.
@@ -257,6 +258,26 @@ The macOS ZIP matches the architecture of the build machine. These portable
 archives are not signed or notarized, so Windows SmartScreen or macOS
 Gatekeeper may show warnings. The existing Windows MSI and macOS DMG builds
 remain available.
+
+## Licensing and activation
+
+The application requires a one-time offline license activation per installation.
+On a fresh install, sign in as an `ADMIN` user: the app shows a **License activation**
+screen and blocks normal use until activated.
+
+- **Installation ID**: shown on the activation screen; provide it to the license issuer.
+- **Customer**: ADMIN can create/update the single customer record (name, telephone, email).
+- **Activation**: paste the signed license key and click **Activate**. Activation takes effect immediately (no restart).
+- **Scope**: perpetual, no expiry, bound to the installation ID stored in the local database.
+- **Access**: only ADMIN can activate/manage licensing; OPERATOR/GUEST see a blocked message until activated.
+
+Generate a dev/test license key with the included tool:
+
+```sh
+java --source 25 tools/LicenseSigner.java tools/dev-license-private.pkcs8.b64 <installId> "Customer Name" "+30..." "customer@example.com"
+```
+
+Replace the embedded dev public key/private key pair for production deployments.
 
 ## API versioning
 
@@ -482,6 +503,7 @@ Seed account passwords must be at least 12 characters. Browser sessions use CSRF
 | View rooms/cars resources | Yes | Yes | Yes |
 | Create/edit/manage rooms & cars | Yes | No | No |
 | Manage users | Yes | No | No |
+| Activate/manage license & customer | Yes | No | No |
 | View app version/info | Yes | Yes | Yes |
 | Support | Yes | Yes | Yes |
 

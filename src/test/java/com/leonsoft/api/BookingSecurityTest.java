@@ -1,5 +1,6 @@
 package com.leonsoft.api;
 
+import com.leonsoft.config.LicenseEnforcementFilter;
 import com.leonsoft.config.SecurityConfig;
 import com.leonsoft.models.Booking;
 import com.leonsoft.models.BookingResource;
@@ -9,6 +10,8 @@ import com.leonsoft.services.BookingReportService;
 import com.leonsoft.services.BookingResourceService;
 import com.leonsoft.repositories.UserRepository;
 import com.leonsoft.services.BookingsService;
+import com.leonsoft.services.CustomerService;
+import com.leonsoft.services.LicenseService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 //import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -38,9 +41,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
                 AvailabilitySettingsRestController.class,
                 ApplicationSupportController.class,
                 CsrfController.class,
-                UserRestController.class
+                UserRestController.class,
+                LicenseController.class,
+                CustomerController.class
         })
-@Import(SecurityConfig.class)
+@Import({SecurityConfig.class, LicenseEnforcementFilter.class})
 class BookingSecurityTest {
 
     @Autowired
@@ -63,6 +68,17 @@ class BookingSecurityTest {
 
     @MockitoBean
     private UserRepository userRepository;
+
+    @MockitoBean
+    private LicenseService licenseService;
+
+    @MockitoBean
+    private CustomerService customerService;
+
+    @org.junit.jupiter.api.BeforeEach
+    void setUpLicense() {
+        when(licenseService.isActivated()).thenReturn(true);
+    }
 
     @Test
     void bookingEndpointsRequireAuthentication() throws Exception {
@@ -92,10 +108,28 @@ class BookingSecurityTest {
                 .andExpect(status().isUnauthorized());
     }
 
+
+    @Test
+    void licenseGateBlocksNonLicenseApisWhenNotActivated() throws Exception {
+        when(licenseService.isActivated()).thenReturn(false);
+        when(licenseService.getStatus()).thenReturn(
+                new com.leonsoft.api.LicenseStatusResponse(false, "install-1", null, null, null));
+
+        mockMvc.perform(get("/api/v1/booking/getAll").with(user("admin").roles("ADMIN")))
+                .andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.message").value("License activation required. Please contact an administrator."));
+
+        mockMvc.perform(get("/api/v1/license/status").with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(get("/api/v1/license/status").with(user("operator").roles("OPERATOR")))
+                .andExpect(status().isOk());
+    }
+
     @Test
     void applicationSupportEndpointsAreAvailableToAuthenticatedUsers() throws Exception {
         when(applicationSupportService.appInfo())
-                .thenReturn(new ApplicationSupportService.AppInfo("1.0.0", "standalone"));
+                .thenReturn(new ApplicationSupportService.AppInfo("1.0.0", "standalone", true));
         when(applicationSupportService.diagnostics()).thenReturn("diagnostics");
 
         mockMvc.perform(get("/api/v1/app-info"))

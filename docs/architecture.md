@@ -81,7 +81,7 @@ classDiagram
     class Booking {
         <<JPA entity>>
     }
-    class BookinsHtmlTemplate
+    class BookingsHtmlTemplate
     class ReportMessages
     class SecurityConfig
     class DBConfig
@@ -95,7 +95,7 @@ classDiagram
     BookingResourceRepository --> BookingResource : persists catalog
     BookingsService --> BookingResourceService : validates assignments
     BookingResourceController --> BookingResourceService : manages catalog
-    BookingsService --> BookinsHtmlTemplate : renders HTML
+    BookingsService --> BookingsHtmlTemplate : renders HTML
     BookingsService --> ReportMessages : localizes reports
     DBConfig --> SQLite : configures datasource
     SecurityConfig ..> BookingsRestController : protects endpoints
@@ -145,6 +145,7 @@ the application's SQLite persistence.
 ## Current boundaries and growth
 
 - **Authentication and permissions:** database-backed users with roles `ADMIN`, `OPERATOR`, and `GUEST`. The system prevents removing/deactivating/deleting the last active admin or operator.
+- **Licensing:** offline one-time per-install activation. A signed Ed25519 license key is validated and stored in SQLite; `LicenseEnforcementFilter` blocks normal app use until ADMIN activates. Activation takes effect immediately.
 
   | Capability | ADMIN | OPERATOR | GUEST |
   |---|:---:|:---:|:---:|
@@ -153,6 +154,7 @@ the application's SQLite persistence.
   | Reports/export | Yes | Yes | No |
   | Manage rooms/cars | Yes | No | No |
   | Manage users | Yes | No | No |
+  | Activate/manage license & customer | Yes | No | No |
   | Support | Yes | Yes | Yes |
 - **Resources:** rooms and vehicles are persisted as managed resources; bookings store stable `resourceId` values.
 - **Database:** SQLite with Flyway migrations and `ddl-auto=validate`. `DatabaseInitializer` seeds default accounts when missing.

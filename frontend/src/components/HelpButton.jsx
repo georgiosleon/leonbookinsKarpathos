@@ -173,10 +173,15 @@ export function HelpButton() {
                   <ol>
                     <li>{t('Download the portable ZIP or installer for your operating system from the project release. macOS builds are architecture-specific.')}</li>
                     <li>{t('Extract or install the app, then start it from a terminal in the application folder. Keep the bundled runtime with the app.')}</li>
-                    <li>{t('Configure seed account credentials through environment variables before first startup (APP_ADMIN_*, APP_OPERATOR_* or legacy APP_USER_*, APP_GUEST_*). Passwords should be at least 12 characters.')}</li>
+                    <li>{t('Configure seed account credentials through environment variables before first startup (APP_ADMIN_*, APP_OPERATOR_*, APP_GUEST_*). Passwords must be at least 12 characters; the built-in default is rejected in production.')}</li>
                     <li>{t('Sign in with a configured account. The SQLite database is bookings.db in the launcher working directory unless configured otherwise.')}</li>
                   </ol>
                   <p>{t('Portable builds include Java and do not need a separate Java installation. Unsigned downloads may show Windows SmartScreen or macOS Gatekeeper warnings.')}</p>
+                </section>
+
+                <section>
+                  <h3>{t('License activation')}</h3>
+                  <p>{t('A fresh installation requires one-time ADMIN license activation before normal use. The activation screen shows the Installation ID; provide it to the license issuer, then paste the signed license key. Activation takes effect immediately.')}</p>
                 </section>
 
                 <section>
@@ -197,6 +202,7 @@ export function HelpButton() {
                         <tr><td>{t('View reports / export')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('No')}</td></tr>
                         <tr><td>{t('Manage rooms & cars')}</td><td>{t('Yes')}</td><td>{t('No')}</td><td>{t('No')}</td></tr>
                         <tr><td>{t('Manage users')}</td><td>{t('Yes')}</td><td>{t('No')}</td><td>{t('No')}</td></tr>
+                        <tr><td>{t('Activate/manage license & customer')}</td><td>{t('Yes')}</td><td>{t('No')}</td><td>{t('No')}</td></tr>
                         <tr><td>{t('Support')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td><td>{t('Yes')}</td></tr>
                       </tbody>
                     </table>
@@ -224,7 +230,7 @@ export function HelpButton() {
                   <ul>
                     <li>{t('The React frontend provides booking, reports, resources, and user-management screens. It communicates with the backend using same-origin HTTP/JSON.')}</li>
                     <li>{t('Spring Boot separates REST controllers, service/business rules, and Spring Data JPA repositories. Security is database-backed with role-based authorization and CSRF protection for browser writes.')}</li>
-                    <li>{t('SQLite stores users, bookings, and the managed room/vehicle catalog. JPA ddl-auto=update and DatabaseInitializer handle startup schema/bootstrap; use versioned migrations before future schema-altering changes.')}</li>
+                    <li>{t('SQLite stores users, bookings, the managed room/vehicle catalog, and licensing data. Flyway manages schema migrations and Hibernate validates the schema at startup; DatabaseInitializer seeds missing default accounts only.')}</li>
                     <li>{t('Active/Paid overlap checks are enforced by the backend and have separate room and vehicle settings. Cancelled bookings are retained but do not reserve availability.')}</li>
                   </ul>
                 </section>

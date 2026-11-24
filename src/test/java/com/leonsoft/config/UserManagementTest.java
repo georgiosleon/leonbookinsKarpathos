@@ -86,7 +86,7 @@ class UserManagementTest {
     @Test
     void userDetailsCarryModelAuthoritiesAndActiveFlag() {
         UserRepository userRepository = mock(UserRepository.class);
-        SecurityConfig config = new SecurityConfig(userRepository);
+        SecurityConfig config = new SecurityConfig(userRepository, mock(com.leonsoft.config.LicenseEnforcementFilter.class));
 
         User admin = new User();
         admin.setUsername("admin");
@@ -113,7 +113,7 @@ class UserManagementTest {
     @Test
     void securityUserDetailsForUnknownUserThrows() {
         UserRepository userRepository = mock(UserRepository.class);
-        SecurityConfig config = new SecurityConfig(userRepository);
+        SecurityConfig config = new SecurityConfig(userRepository, mock(com.leonsoft.config.LicenseEnforcementFilter.class));
         when(userRepository.findByUsername("nobody")).thenReturn(Optional.empty());
         assertThrows(org.springframework.security.core.userdetails.UsernameNotFoundException.class,
                 () -> config.userDetailsService().loadUserByUsername("nobody"));

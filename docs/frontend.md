@@ -26,13 +26,11 @@ backend at its configured local address.
   visible. The booking screen can collapse the full booking form without
   clearing the current form values.
 - A Help dialog is available from the booking, reports, and resource screens,
-  with Installation and Operations sections. Installation summarizes portable
-  app setup and the architecture/design documented in `docs/architecture.md`
-  and `docs/backend.md`, and explains opt-in LAN access and its security
-  limits. Operations covers booking validation and encrypted database backup
-  and restore steps, including keeping the passphrase separate from the backup
-  when sharing it through an approved support channel. The app does not email
-  or upload database backups.
+  with Installation, Operations, and Support sections. Installation summarizes
+  portable app setup, licensing/activation, architecture/design, and opt-in LAN
+  access. Operations covers booking validation and encrypted database backup and
+  restore steps. Support shows diagnostics. The app does not email or upload
+  database backups.
 - The booking form supports create and update flows. The build-time
   `VITE_BOOKING_SAVE_MODE` setting selects the default (`create` or `edit`);
   the in-session control is intended for testing and lasts only for the
@@ -47,6 +45,7 @@ backend at its configured local address.
   stored in the browser.
 - The admin resource screen (`?page=resources`) adds rooms and vehicles to the shared catalog. Active resources are selectable for new bookings; the booking stores the resource ID while API/report display uses its name.
 - The admin user-management screen (`?page=users`) lists/creates/updates/deletes database-backed users. The UI gates actions by role, but backend authorization is authoritative.
+- License activation is enforced before normal app use. The SPA fetches `/api/v1/license/status`; when unactivated, it shows a license gate. ADMIN can view the installation ID, manage the single customer record, and paste a signed license key to activate immediately. OPERATOR/GUEST see a blocked message.
 
 ## API integration
 

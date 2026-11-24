@@ -2,7 +2,10 @@ package com.leonsoft.services;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
+import com.leonsoft.api.LicenseStatusResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Properties;
@@ -30,7 +33,7 @@ class ApplicationSupportServiceTest {
         environment.setActiveProfiles("prod");
 
         String report = new ApplicationSupportService(
-              buildProperties(), environment, log.toString()).diagnostics();
+              buildProperties(), environment, log.toString(), licenseService(true)).diagnostics();
 
         assertTrue(report.contains("Version: 1.2.3"));
         assertTrue(report.contains("Deployment: desktop"));
@@ -52,7 +55,7 @@ class ApplicationSupportServiceTest {
     @Test
     void diagnosticsClearlyIndicateWhenLogCaptureIsNotConfigured() {
         String report = new ApplicationSupportService(
-              buildProperties(), new MockEnvironment(), "").diagnostics();
+              buildProperties(), new MockEnvironment(), "", licenseService(false)).diagnostics();
 
         assertTrue(report.contains("Recent logs"));
         assertTrue(report.contains("Not configured for this installation."));
@@ -62,5 +65,13 @@ class ApplicationSupportServiceTest {
         Properties properties = new Properties();
         properties.setProperty("version", "1.2.3");
         return new BuildProperties(properties);
+    }
+
+    private static LicenseService licenseService(boolean activated) {
+        LicenseService licenseService = mock(LicenseService.class);
+        when(licenseService.isActivated()).thenReturn(activated);
+        when(licenseService.getStatus()).thenReturn(
+              new LicenseStatusResponse(activated, "install-1", null, null, null));
+        return licenseService;
     }
 }

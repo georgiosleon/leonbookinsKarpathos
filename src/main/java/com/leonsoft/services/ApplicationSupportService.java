@@ -34,20 +34,25 @@ public class ApplicationSupportService {
     private final BuildProperties buildProperties;
     private final Environment environment;
     private final String logFile;
+    private final LicenseService licenseService;
 
     public ApplicationSupportService(
           BuildProperties buildProperties,
           Environment environment,
-          @Value("${app.diagnostics.log-file:}") String logFile) {
+          @Value("${app.diagnostics.log-file:}") String logFile,
+          LicenseService licenseService) {
         this.buildProperties = buildProperties;
         this.environment = environment;
         this.logFile = logFile;
+        this.licenseService = licenseService;
     }
 
     public AppInfo appInfo() {
+        var licenseStatus = licenseService.getStatus();
         return new AppInfo(
               buildProperties.getVersion(),
-              environment.getProperty("app.deployment-type", "standalone"));
+              environment.getProperty("app.deployment-type", "standalone"),
+              licenseStatus.activated());
     }
 
     public String diagnostics() {
@@ -66,6 +71,7 @@ public class ApplicationSupportService {
               .append(environment.getProperty("booking.availability.rooms.prevent-overlap", "true")).append('\n')
               .append("Vehicle overlap prevention: ")
               .append(environment.getProperty("booking.availability.cars.prevent-overlap", "true")).append('\n')
+              .append("License activated: ").append(licenseService.isActivated()).append('\n')
               .append("\nRecent logs (last ").append(MAX_LOG_LINES).append(" lines maximum):\n");
         appendLogs(report);
         return report.toString();
@@ -121,6 +127,6 @@ public class ApplicationSupportService {
         return sanitized.replaceAll("[\\p{Cntrl}&&[^\\t]]", "");
     }
 
-    public record AppInfo(String version, String deploymentType) {
+    public record AppInfo(String version, String deploymentType, boolean licenseActivated) {
     }
 }

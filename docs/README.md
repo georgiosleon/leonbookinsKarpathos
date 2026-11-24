@@ -10,7 +10,7 @@ tests as authoritative when behavior changes.
   request flow, class diagram, and guidance on Kafka and Protocol Buffers.
 - [Frontend](frontend.md): React/Vite structure, UI behavior, and API
   integration.
-- [Backend](backend.md): Spring Boot layers, API, persistence, security, and
+- [Backend](backend.md): Spring Boot layers, API, persistence, security, licensing, and
   reports.
 - [Tests](testing.md): existing test suites, what they cover, and how to run
   them.

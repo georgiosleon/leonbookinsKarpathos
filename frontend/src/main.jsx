@@ -1,8 +1,11 @@
 import React, { Suspense, lazy, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BookingPage } from './components/BookingPage.jsx';
+import { LicenseGate } from './components/LicenseGate.jsx';
+import { fetchLicenseStatus, isAuthRedirectError } from './bookingApi.js';
 import { getInitialTheme } from './theme.js';
 import { LanguageProvider } from './i18n.jsx';
+import { useCurrentUser } from './useCurrentUser.js';
 
 const ReportsPage = lazy(() => import('./components/ReportsPage.jsx').then((m) => ({ default: m.ReportsPage })));
 const ResourcesPage = lazy(() => import('./components/ResourcesPage.jsx').then((m) => ({ default: m.ResourcesPage })));
@@ -46,6 +49,24 @@ function shouldHandleClientNavigation(event) {
 
 function AppRouter() {
   const [location, setLocation] = useState(pageFromLocation);
+  const [licenseStatus, setLicenseStatus] = useState(null);
+  const [licenseLoading, setLicenseLoading] = useState(true);
+  const { currentUser, loading: userLoading } = useCurrentUser();
+
+  useEffect(() => {
+    let active = true;
+    fetchLicenseStatus()
+      .then((status) => {
+        if (active) setLicenseStatus(status);
+      })
+      .catch((error) => {
+        if (active && !isAuthRedirectError(error)) setLicenseStatus({ activated: false });
+      })
+      .finally(() => {
+        if (active) setLicenseLoading(false);
+      });
+    return () => { active = false; };
+  }, []);
 
   useEffect(() => {
     const onPopState = () => setLocation(pageFromLocation());
@@ -68,6 +89,22 @@ function AppRouter() {
     document.addEventListener('click', onClick);
     return () => document.removeEventListener('click', onClick);
   }, []);
+
+  if (licenseLoading || userLoading) {
+    return (
+      <LanguageProvider>
+        <main className="app-shell"><p className="feedback" role="status">Loading…</p></main>
+      </LanguageProvider>
+    );
+  }
+
+  if (!licenseStatus?.activated) {
+    return (
+      <LanguageProvider>
+        <LicenseGate currentUser={currentUser} onActivated={(status) => setLicenseStatus(status)} />
+      </LanguageProvider>
+    );
+  }
 
   const App = resolveApp(location.page);
 

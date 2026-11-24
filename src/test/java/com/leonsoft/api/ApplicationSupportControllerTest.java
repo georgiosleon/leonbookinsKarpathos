@@ -28,12 +28,13 @@ class ApplicationSupportControllerTest {
     @Test
     void returnsVersionAndDeploymentInformation() throws Exception {
         when(supportService.appInfo())
-              .thenReturn(new ApplicationSupportService.AppInfo("1.2.3", "desktop"));
+              .thenReturn(new ApplicationSupportService.AppInfo("1.2.3", "desktop", true));
 
         mockMvc.perform(get("/api/v1/app-info"))
               .andExpect(status().isOk())
               .andExpect(jsonPath("$.version").value("1.2.3"))
-              .andExpect(jsonPath("$.deploymentType").value("desktop"));
+              .andExpect(jsonPath("$.deploymentType").value("desktop"))
+              .andExpect(jsonPath("$.licenseActivated").value(true));
     }
 
     @Test

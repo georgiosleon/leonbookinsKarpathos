@@ -33,6 +33,7 @@ public class LoginPageController {
                     main { width: min(100%%, 420px); padding: 28px; border: 1px solid #d5deea;
                       border-radius: 14px; background: white; box-shadow: 0 8px 30px #17203318; }
                     .welcome { margin: 0 0 12px; text-align: center; font-size: 1.75rem; font-weight: 800; letter-spacing: 0.04em; color: #1769aa; }
+                    .login-image { display: block; width: 100%%; max-width: 320px; height: auto; margin: 0 auto 16px; border-radius: 12px; object-fit: cover; }
                     h1 { margin: 0 0 8px; font-size: 1.5rem; }
                     p { color: #53627a; }
                     .signed-in { color: #53627a; }
@@ -48,6 +49,7 @@ public class LoginPageController {
                 <body>
                   <main>
                     <p class="welcome" data-message="welcome">WELCOME</p>
+                    <img class="login-image" src="/images/login-image-1.jpg" alt="Karpathos" width="320" height="213" loading="eager">
                     <p data-message="brand">Karpathos booking planner</p>
                     <p id="signed-in" class="signed-in" hidden data-user="%s">
                       <span data-message="signedIn">Signed in as</span> <span id="signed-in-name">%s</span>

@@ -36,10 +36,10 @@ Direct runs using the `prod` profile bind to `127.0.0.1` by default. Set
 the application with a trusted HTTPS proxy or trusted-network firewall because
 the application does not provide TLS itself.
 
-Schema initialization is currently handled by JPA `ddl-auto=update` and
-`DatabaseInitializer` seed logic. SQL init scripts are not the primary bootstrap
-path; adopt versioned Liquibase migrations before making future schema changes
-that alter existing tables.
+Schema changes are managed by Flyway SQL migrations in
+`src/main/resources/db/migration` with `spring.jpa.hibernate.ddl-auto=validate`.
+`DatabaseInitializer` seeds default accounts only when missing. Back up existing
+customer databases before upgrading and test releases against copies of real data.
 
 ## Layers
 
@@ -64,20 +64,25 @@ for compatibility. Access is deny-by-default; endpoints below require authentica
 | Method | Route | Access | Purpose |
 |---|---|---|---|
 | `GET` | `/api/v1/booking/getAll` | ADMIN, OPERATOR, GUEST | List bookings (all authenticated roles see all bookings). |
-| `POST` | `/api/v1/booking/save` | OPERATOR | Create a booking. |
-| `PUT` | `/api/v1/booking/update` | OPERATOR | Update any booking. |
-| `POST` | `/api/v1/booking/delete` | OPERATOR | Delete a booking by ID. |
-| `POST` | `/api/v1/booking/del?bid=...` | OPERATOR | Delete a cancelled booking only (legacy route; CSRF required). |
+| `POST` | `/api/v1/booking/save` | ADMIN, OPERATOR | Create a booking. |
+| `PUT` | `/api/v1/booking/update` | ADMIN, OPERATOR | Update any booking. |
+| `POST` | `/api/v1/booking/delete` | ADMIN, OPERATOR | Delete a booking by ID. |
+| `POST` | `/api/v1/booking/del?bid=...` | ADMIN, OPERATOR | Delete a cancelled booking only (legacy route; CSRF required). |
 | `GET` | `/api/v1/booking/report` | ADMIN, OPERATOR | Generate a localized detailed report response. |
 | `GET` | `/api/v1/booking/export/pdf` | ADMIN, OPERATOR | Download filtered PDF report. |
 | `GET` | `/api/v1/settings/availability` | ADMIN, OPERATOR, GUEST | Read room/vehicle overlap rules. |
 | `GET` | `/api/v1/resources` | ADMIN, OPERATOR, GUEST | List managed rooms and vehicles. |
 | `POST` | `/api/v1/resources` | ADMIN | Add a room or vehicle. |
+| `PUT` | `/api/v1/resources/{id}` | ADMIN | Update a room or vehicle. |
 | `GET` | `/api/v1/users/me` | Authenticated | Current user identity/role for UI gating. |
 | `GET/POST` | `/api/v1/users` | ADMIN | List/create users. |
 | `GET/PUT/DELETE` | `/api/v1/users/{id}` | ADMIN | Get/update/delete user. |
-| `GET` | `/api/v1/app-info` | ADMIN | Application info. |
-| `GET` | `/api/v1/diagnostics` | ADMIN | Diagnostics download. |
+| `GET` | `/api/v1/license/status` | Authenticated | License activation status and installation ID. |
+| `POST` | `/api/v1/license/activate` | ADMIN | Activate installation with a signed license key. |
+| `GET/POST` | `/api/v1/customers` | ADMIN | List/create licensed customer records (one per installation). |
+| `PUT/DELETE` | `/api/v1/customers/{id}` | ADMIN | Update/delete customer record. |
+| `GET` | `/api/v1/app-info` | Authenticated | Application version/deployment/license info. |
+| `GET` | `/api/v1/diagnostics` | Authenticated | Diagnostics download. |
 | `GET` | `/api/v1/csrf` | Authenticated | Obtain CSRF token for browser writes. |
 
 Report requests accept `fromDate` and `toDate` in `dd/MM/yyyy` format and an
@@ -94,8 +99,7 @@ browser state-changing requests.
 
 Default seed accounts are created only when missing, using `APP_ADMIN_*`,
 `APP_OPERATOR_*`, and `APP_GUEST_*` environment
-variables. Seed passwords must be at least 12 characters; built-in `change-me-*`
-defaults are rejected in production.
+variables. Seed passwords must be at least 12 characters; built-in default password `1qaz2wsx3edc` (and legacy `change-me-*` values) is rejected in production.
 
 Role matrix:
 
@@ -107,12 +111,24 @@ Role matrix:
 | View rooms/cars resources | Yes | Yes | Yes |
 | Create/edit/manage rooms & cars | Yes | No | No |
 | Manage users | Yes | No | No |
+| Activate/manage license & customer | Yes | No | No |
 | View app version/info | Yes | Yes | Yes |
 | Support | Yes | Yes | Yes |
 
 The system prevents removing, deactivating, or deleting the last active admin or
 operator account. Do not commit real secrets. LAN/internet exposure requires
 trusted-network controls and HTTPS proxying; the app does not provide TLS.
+
+## Licensing
+
+Licensing is offline and one-time per installation. `app_installation` stores a
+generated `install_id`; `customer` stores the single licensed customer record;
+`app_license` stores the signed license key and activation metadata. Admins
+activate by pasting an Ed25519-signed key (`base64url(payload).base64url(signature)`)
+through `POST /api/v1/license/activate`. `LicenseEnforcementFilter` blocks normal
+API use until activated, while allowing login/static/SPA shell, CSRF, current-user,
+license status, and admin license/customer endpoints. Activation takes effect
+immediately with no restart.
 
 ## Persistence and reports
 
@@ -136,7 +152,7 @@ live SQLite database over a network share. Use the backup/restore CLI to move
 or exchange a database while the app is stopped.
 
 `BookingsService` coordinates booking operations and report data. Report
-rendering uses `BookinsHtmlTemplate` and `ReportMessages`; the controller
+rendering uses `BookingsHtmlTemplate` and `ReportMessages`; the controller
 exposes the detailed report text and PDF responses. Report HTML must continue
 escaping booking data before rendering. Reports support English, Greek,
 German, Dutch, Danish, and French, with English as the fallback. Report text

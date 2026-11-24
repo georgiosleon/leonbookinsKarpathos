@@ -99,6 +99,7 @@ accounts are not overwritten. Passwords are BCrypt-hashed.
 - i18n: en, el, de, nl, da, fr
 - Light/dark theme (browser preference)
 - Encrypted/unencrypted SQLite backup/restore CLI
+- Offline one-time license activation per installation (ADMIN, signed Ed25519 key, DB install ID)
 - Help / diagnostics / app-info support endpoints
 
 ## Key packages and directories
@@ -137,9 +138,12 @@ example `/api/v2`).
 | GET | `/api/v1/resources` | List rooms/cars |
 | POST | `/api/v1/resources` | Create resource |
 | GET | `/api/v1/settings/availability` | Overlap flags |
+| GET | `/api/v1/license/status` | License status/install ID |
+| POST | `/api/v1/license/activate` | Activate license (ADMIN) |
+| GET/POST/PUT/DELETE | `/api/v1/customers...` | Licensed customer CRUD (ADMIN) |
 | GET | `/api/v1/csrf` | CSRF token for writes |
-| GET | `/api/v1/app-info` | App metadata (admin) |
-| GET | `/api/v1/diagnostics` | Diagnostics download (admin) |
+| GET | `/api/v1/app-info` | App metadata |
+| GET | `/api/v1/diagnostics` | Diagnostics download |
 | GET | `/login` | Form login page |
 | POST | `/logout` | Logout |
 
@@ -205,8 +209,7 @@ unfinished swap. What remains transitional or deferred:
 - Old static HTML backups under `src/main/resources/static/bckup/` and leftover
   libs (for example `public/js/w2ui.js`) are not the active app path
 - Unversioned `/booking` and `/csrf` aliases; `/booking/del` legacy delete
-- Schema evolution is currently handled by JPA `ddl-auto=update` and startup
-  initialization, **not** Liquibase/Flyway — versioned migrations are future work
+- Schema evolution is handled by Flyway SQL migrations with Hibernate `ddl-auto=validate`.
 - User management exists (ADMIN CRUD), but user self-service/profile/password
   flows and finer-grained permissions are still limited
 - Resource **add only** (no deactivate/edit UI yet; see [resources.md](resources.md))
@@ -216,4 +219,4 @@ unfinished swap. What remains transitional or deferred:
 One Spring Boot JAR embeds a React booking SPA, talks to itself over `/api/v1`,
 stores bookings, users, and a room/car catalog in SQLite, enforces database-backed
 role authorization (`ADMIN`/`OPERATOR`/`GUEST`) with session + CSRF,
-and can be launched as Docker, Maven, or a desktop wrapper with an offline backup CLI.
+enforces offline one-time license activation per installation, and can be launched as Docker, Maven, or a desktop wrapper with an offline backup CLI.

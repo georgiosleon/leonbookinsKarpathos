@@ -28,19 +28,19 @@ public class DatabaseInitializer {
     @Value("${APP_ADMIN_USERNAME:admin}")
     private String adminUsername;
 
-    @Value("${APP_ADMIN_PASSWORD:change-me-admin-password}")
+    @Value("${APP_ADMIN_PASSWORD:1qaz2wsx3edc}")
     private String adminPassword;
 
     @Value("${APP_OPERATOR_USERNAME:user}")
     private String operatorUsername;
 
-    @Value("${APP_OPERATOR_PASSWORD:change-me-user-password}")
+    @Value("${APP_OPERATOR_PASSWORD:1qaz2wsx3edc}")
     private String operatorPassword;
 
     @Value("${APP_GUEST_USERNAME:guest}")
     private String guestUsername;
 
-    @Value("${APP_GUEST_PASSWORD:change-me-guest-password}")
+    @Value("${APP_GUEST_PASSWORD:1qaz2wsx3edc}")
     private String guestPassword;
 
     private final UserRepository userRepository;
@@ -70,7 +70,7 @@ public class DatabaseInitializer {
                     "Seed password for " + role + " account '" + username
                             + "' must be at least " + MIN_PASSWORD_LENGTH + " characters.");
         }
-        if (password.startsWith("change-me-")) {
+        if (password.startsWith("change-me-") || "1qaz2wsx3edc".equals(password)) {
             boolean prod = environment != null && Arrays.stream(environment.getActiveProfiles())
                     .anyMatch("prod"::equalsIgnoreCase);
             String message = "Using built-in default seed password for " + role + " account '" + username

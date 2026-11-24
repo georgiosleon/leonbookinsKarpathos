@@ -39,7 +39,7 @@ production build unless explicitly wired into CI.
 |---|---|
 | `src/test/java/com/leonsoft/api/BookingRequestTest.java` | Booking request validation and conversion rules. |
 | `src/test/java/com/leonsoft/api/BookingsRestControllerTest.java` | REST booking controller behavior and request/response handling. |
-| `src/test/java/com/leonsoft/api/BookingSecurityTest.java` | Authentication, authorization, CSRF, role matrix, and endpoint access behavior. |
+| `src/test/java/com/leonsoft/api/BookingSecurityTest.java` | Authentication, authorization, CSRF, role matrix, license gate, and endpoint access behavior. |
 | `src/test/java/com/leonsoft/config/DatabaseSchemaTest.java` | JPA startup/schema initialization smoke test on an empty SQLite database. |
 | `src/test/java/com/leonsoft/config/DatabaseInitializerTest.java` | Idempotent default account seeding and configurable seed credentials. |
 | `src/test/java/com/leonsoft/config/UserManagementTest.java` | User/role normalization and user-management related behavior. |
@@ -53,6 +53,7 @@ production build unless explicitly wired into CI.
 | `frontend/src/components/admin/UserManagement.test.jsx` | User management UI load/create flow and access-denied error display. |
 | `frontend/src/components/ReportsPage.test.jsx` | Reports page access-denied UX for unauthorized role. |
 | `frontend/src/components/ResourcesPage.test.jsx` | Resources page access-denied UX for non-admin role. |
+| `src/test/java/com/leonsoft/services/licensing/LicenseVerifierTest.java` | Offline Ed25519 license signature verification, install-ID binding, and tamper rejection. |
 
 These are focused automated tests; they are not a full end-to-end browser,
 accessibility, desktop-platform, or load-test suite. Installer packages should

@@ -12,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AnonymousAuthenticationFilter;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -27,9 +28,11 @@ import java.time.Instant;
 public class SecurityConfig {
 
     private final UserRepository userRepository;
+    private final LicenseEnforcementFilter licenseEnforcementFilter;
 
-    public SecurityConfig(UserRepository userRepository) {
+    public SecurityConfig(UserRepository userRepository, LicenseEnforcementFilter licenseEnforcementFilter) {
         this.userRepository = userRepository;
+        this.licenseEnforcementFilter = licenseEnforcementFilter;
     }
 
     @Bean
@@ -45,7 +48,7 @@ public class SecurityConfig {
               .authorizeHttpRequests(authorize -> authorize
                     // Public static assets and login/error pages.
                     .requestMatchers("/favicon.ico", "/error",
-                                     "/css/**", "/js/**", "/react-assets/**").permitAll()
+                                     "/css/**", "/js/**", "/react-assets/**", "/images/**").permitAll()
                     .requestMatchers("/login", "/logout").permitAll()
                     // SPA shells require authentication; form login redirects unauthenticated users.
                     .requestMatchers("/", "/index.html", "/rooms.html", "/cars.html").authenticated()
@@ -54,6 +57,10 @@ public class SecurityConfig {
                     .requestMatchers("/api/v1/users/me").authenticated()
                     // User administration is restricted to admins.
                     .requestMatchers("/api/v1/users", "/api/v1/users/**").hasRole("ADMIN")
+                    // Licensing: status visible to authenticated users, activation/admin ops restricted.
+                    .requestMatchers(HttpMethod.GET, "/api/v1/license/status").authenticated()
+                    .requestMatchers("/api/v1/license/**").hasRole("ADMIN")
+                    .requestMatchers("/api/v1/customers", "/api/v1/customers/**").hasRole("ADMIN")
                     // Read-only booking/resource/settings data for all authenticated roles.
                     .requestMatchers(HttpMethod.GET, "/api/v1/booking/getAll")
                         .hasAnyRole("ADMIN", "OPERATOR", "GUEST")
@@ -98,6 +105,7 @@ public class SecurityConfig {
               .csrf(csrf -> csrf
                     .csrfTokenRepository(csrfTokenRepository)
                     .csrfTokenRequestHandler(csrfTokenRequestHandler))
+              .addFilterAfter(licenseEnforcementFilter, AnonymousAuthenticationFilter.class)
               .exceptionHandling(exceptions -> exceptions
                     .defaultAuthenticationEntryPointFor(
                           (request, response, authException) -> writeSecurityError(response, request, HttpStatus.UNAUTHORIZED, "Authentication required."),

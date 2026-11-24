@@ -160,3 +160,51 @@ function bookingReportUrl(path, startDate, endDate, language) {
   });
   return `${path}?${query}`;
 }
+
+export async function fetchLicenseStatus() {
+  const response = await request('/api/v1/license/status');
+  return response.json();
+}
+
+export async function activateLicense(licenseKey) {
+  const csrf = await csrfHeaders();
+  const response = await request('/api/v1/license/activate', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...csrf },
+    body: JSON.stringify({ licenseKey }),
+  });
+  return response.json();
+}
+
+export async function fetchCustomers() {
+  const response = await request('/api/v1/customers');
+  return response.json();
+}
+
+export async function createCustomer(customer) {
+  const csrf = await csrfHeaders();
+  const response = await request('/api/v1/customers', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...csrf },
+    body: JSON.stringify(customer),
+  });
+  return response.json();
+}
+
+export async function updateCustomer(id, customer) {
+  const csrf = await csrfHeaders();
+  const response = await request(`/api/v1/customers/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...csrf },
+    body: JSON.stringify(customer),
+  });
+  return response.json();
+}
+
+export async function deleteCustomer(id) {
+  const csrf = await csrfHeaders();
+  await request(`/api/v1/customers/${id}`, {
+    method: 'DELETE',
+    headers: csrf,
+  });
+}
