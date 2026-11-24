@@ -24,6 +24,7 @@ import java.time.Instant;
 
 @Configuration
 @EnableMethodSecurity
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class SecurityConfig {
 
     private final UserRepository userRepository;

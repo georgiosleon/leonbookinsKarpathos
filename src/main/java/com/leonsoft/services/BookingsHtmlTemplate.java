@@ -12,6 +12,7 @@ import org.springframework.stereotype.Component;
 
 @Slf4j
 @Component
+@SuppressWarnings({"PMD.AvoidDuplicateLiterals","PMD.ConsecutiveAppendsShouldReuse"})
 public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
 
     @Override

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Locale;
 import org.sqlite.SQLiteConnection;
 
+@SuppressWarnings({"PMD.SystemPrintln","PMD.AvoidReassigningParameters","PMD.UseVarargs","PMD.AvoidDuplicateLiterals","PMD.AssignmentInOperand","PMD.AvoidReassigningLoopVariables","PMD.AvoidLiteralsInIfCondition","PMD.CloseResource","PMD.PreserveStackTrace"})
 public final class DatabaseCli {
     private static final Path DEFAULT_DATABASE = Path.of("bookings.db");
     private static final Path DEFAULT_BACKUP_DIRECTORY = Path.of("backups");

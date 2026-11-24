@@ -483,4 +483,34 @@ class BookingSecurityTest {
                 .andExpect(jsonPath("$.username").value("operator"))
                 .andExpect(jsonPath("$.role").value("OPERATOR"));
     }
+
+    @Test
+    void licenseActivationIsAdminOnly() throws Exception {
+        when(licenseService.activate(any())).thenReturn(new LicenseStatusResponse(true, "install-1", null, "2026-01-01T00:00:00", "admin"));
+
+        mockMvc.perform(post("/api/v1/license/activate").with(csrf()).with(user("operator").roles("OPERATOR"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"licenseKey\":\"key\"}"))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(post("/api/v1/license/activate").with(csrf()).with(user("admin").roles("ADMIN"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"licenseKey\":\"key\"}"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void customerEndpointsAreAdminOnly() throws Exception {
+        when(customerService.getAll()).thenReturn(List.of());
+
+        mockMvc.perform(get("/api/v1/customers").with(user("operator").roles("OPERATOR")))
+                .andExpect(status().isForbidden());
+        mockMvc.perform(get("/api/v1/customers").with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk());
+
+        mockMvc.perform(post("/api/v1/customers").with(csrf()).with(user("operator").roles("OPERATOR"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"name\":\"Acme\",\"telephone\":\"\",\"email\":\"\"}"))
+                .andExpect(status().isForbidden());
+    }
 }

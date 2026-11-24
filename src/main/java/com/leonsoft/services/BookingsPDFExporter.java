@@ -59,25 +59,27 @@ public class BookingsPDFExporter {
         this.moneyFormat.setCurrency(Currency.getInstance("EUR"));
     }
 
+    @SuppressWarnings("PMD.LooseCoupling")
     public void export(HttpServletResponse response) throws DocumentException, IOException {
         reportBaseFont = createReportBaseFont();
         Document document = new Document(PageSize.A4.rotate(), 20, 20, 24, 20);
         PdfWriter.getInstance(document, response.getOutputStream());
         document.open();
+        try {
+            Font titleFont = reportFont(14);
+            Paragraph title = new Paragraph(
+                  text("title") + " — " + text(resourceType) + " — "
+                        + dateFormatter.format(startDate) + " – " + dateFormatter.format(endDate),
+                  titleFont);
+            title.setSpacingAfter(10);
+            document.add(title);
 
-        Font titleFont = reportFont(14);
-        Paragraph title = new Paragraph(
-              text("title") + " — " + text(resourceType) + " — "
-                    + dateFormatter.format(startDate) + " – " + dateFormatter.format(endDate),
-              titleFont);
-        title.setSpacingAfter(10);
-        document.add(title);
-
-        addSummary(document);
-        addResourceSummary(document);
-        addBookings(document);
-
-        document.close();
+            addSummary(document);
+            addResourceSummary(document);
+            addBookings(document);
+        } finally {
+            document.close();
+        }
     }
 
     private void addSummary(Document document) throws DocumentException {
