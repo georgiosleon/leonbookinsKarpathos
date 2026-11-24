@@ -29,4 +29,12 @@ public class ApplicationSupportController {
               .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=leon-bookings-diagnostics.txt")
               .body(report);
     }
+
+    @GetMapping("/api/v1/support-bundle")
+    ResponseEntity<byte[]> supportBundle() {
+        return ResponseEntity.ok()
+              .contentType(MediaType.parseMediaType("application/zip"))
+              .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=leon-bookings-support-bundle.zip")
+              .body(supportService.supportBundle());
+    }
 }

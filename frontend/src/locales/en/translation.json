@@ -313,5 +313,14 @@
   "Linux portable app": "Linux portable app",
   "Roles and access": "Roles and access",
   "Sign in with your assigned account. Available actions depend on your role.": "Sign in with your assigned account. Available actions depend on your role.",
-  "Password *": "Password *"
+  "Password *": "Password *",
+  "Copy": "Copy",
+  "Installation ID copied.": "Installation ID copied.",
+  "Could not copy Installation ID.": "Could not copy Installation ID.",
+  "Licensed": "Licensed",
+  "Not licensed": "Not licensed",
+  "Download diagnostics": "Download diagnostics",
+  "Download support bundle": "Download support bundle",
+  "Replace the database path as needed. For Docker, run the same db backup command against the mounted /data/bookings.db.": "Replace the database path as needed. For Docker, run the same db backup command against the mounted /data/bookings.db.",
+  "Replace your-backup.sqlite3.enc with the actual backup filename and adjust the database path as needed.": "Replace your-backup.sqlite3.enc with the actual backup filename and adjust the database path as needed."
 }

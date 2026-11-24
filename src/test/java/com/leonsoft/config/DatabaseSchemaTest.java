@@ -33,6 +33,10 @@ class DatabaseSchemaTest {
             assertTrue(tableExists(connection, "Booking"));
             assertTrue(tableExists(connection, "booking_resources"));
             assertTrue(tableExists(connection, "users"));
+            assertTrue(tableExists(connection, "app_installation"));
+            assertTrue(tableExists(connection, "customer"));
+            assertTrue(tableExists(connection, "app_license"));
+            assertTrue(tableExists(connection, "audit_log"));
         }
     }
 

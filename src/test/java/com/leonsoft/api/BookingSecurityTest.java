@@ -11,6 +11,7 @@ import com.leonsoft.services.BookingResourceService;
 import com.leonsoft.repositories.UserRepository;
 import com.leonsoft.services.BookingsService;
 import com.leonsoft.services.CustomerService;
+import com.leonsoft.services.AuditService;
 import com.leonsoft.services.LicenseService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,6 +69,9 @@ class BookingSecurityTest {
 
     @MockitoBean
     private UserRepository userRepository;
+
+    @MockitoBean
+    private AuditService auditService;
 
     @MockitoBean
     private LicenseService licenseService;
@@ -131,6 +135,7 @@ class BookingSecurityTest {
         when(applicationSupportService.appInfo())
                 .thenReturn(new ApplicationSupportService.AppInfo("1.0.0", "standalone", true));
         when(applicationSupportService.diagnostics()).thenReturn("diagnostics");
+        when(applicationSupportService.supportBundle()).thenReturn(new byte[] {80, 75, 3, 4});
 
         mockMvc.perform(get("/api/v1/app-info"))
                 .andExpect(status().isUnauthorized());
@@ -150,6 +155,8 @@ class BookingSecurityTest {
         mockMvc.perform(get("/api/v1/diagnostics").with(user("operator").roles("OPERATOR")))
                 .andExpect(status().isOk());
         mockMvc.perform(get("/api/v1/diagnostics").with(user("guest").roles("GUEST")))
+                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/v1/support-bundle").with(user("operator").roles("OPERATOR")))
                 .andExpect(status().isOk());
     }
 

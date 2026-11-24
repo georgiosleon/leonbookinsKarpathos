@@ -3,6 +3,7 @@ package com.leonsoft.api;
 import com.leonsoft.models.Role;
 import com.leonsoft.models.User;
 import com.leonsoft.repositories.UserRepository;
+import com.leonsoft.services.AuditService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -26,10 +27,12 @@ public class UserRestController {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final AuditService auditService;
 
-    public UserRestController(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserRestController(UserRepository userRepository, PasswordEncoder passwordEncoder, AuditService auditService) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.auditService = auditService;
     }
 
     /**
@@ -79,7 +82,7 @@ public class UserRestController {
         user.setRole(request.role() == null ? Role.OPERATOR.name() : request.role());
         user.setActive(request.active() == null || request.active());
         User savedUser = userRepository.save(user);
-
+        auditService.record("CREATE", "USER", String.valueOf(savedUser.getId()), "username=" + savedUser.getUsername() + ",role=" + savedUser.getRole());
         return ResponseEntity.status(HttpStatus.CREATED).body(UserResponse.from(savedUser));
     }
 
@@ -128,6 +131,7 @@ public class UserRestController {
                 existingUser.setPasswordHash(passwordEncoder.encode(request.password()));
             }
             User updatedUser = userRepository.save(existingUser);
+            auditService.record("UPDATE", "USER", String.valueOf(updatedUser.getId()), "username=" + updatedUser.getUsername() + ",role=" + updatedUser.getRole());
             return ResponseEntity.ok(UserResponse.from(updatedUser));
         }).orElse(ResponseEntity.notFound().build());
     }
@@ -150,6 +154,7 @@ public class UserRestController {
                 return ResponseEntity.badRequest().body("Cannot delete the last active operator account.");
             }
             userRepository.delete(user);
+            auditService.record("DELETE", "USER", String.valueOf(user.getId()), "username=" + user.getUsername() + ",role=" + user.getRole());
             return ResponseEntity.ok().build();
         }).orElse(ResponseEntity.notFound().build());
     }

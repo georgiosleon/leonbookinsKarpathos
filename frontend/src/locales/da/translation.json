@@ -313,5 +313,14 @@
   "Linux portable app": "Bærbar Linux-app",
   "Roles and access": "Roller og adgang",
   "Sign in with your assigned account. Available actions depend on your role.": "Log ind med din tildelte konto. Tilgængelige handlinger afhænger af din rolle.",
-  "Password *": "Adgangskode *"
+  "Password *": "Adgangskode *",
+  "Copy": "Kopiér",
+  "Installation ID copied.": "Installations-ID kopieret.",
+  "Could not copy Installation ID.": "Kunne ikke kopiere installations-ID.",
+  "Licensed": "Licenseret",
+  "Not licensed": "Ikke licenseret",
+  "Download diagnostics": "Download diagnostik",
+  "Download support bundle": "Download supportpakke",
+  "Replace the database path as needed. For Docker, run the same db backup command against the mounted /data/bookings.db.": "Erstat database-stien efter behov. For Docker skal du køre den samme db backup-kommando mod den monterede /data/bookings.db.",
+  "Replace your-backup.sqlite3.enc with the actual backup filename and adjust the database path as needed.": "Erstat your-backup.sqlite3.enc med det faktiske backup-filnavn, og juster database-stien efter behov."
 }

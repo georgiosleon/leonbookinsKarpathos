@@ -17,10 +17,12 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
     private final AppLicenseRepository appLicenseRepository;
+    private final AuditService auditService;
 
-    public CustomerService(CustomerRepository customerRepository, AppLicenseRepository appLicenseRepository) {
+    public CustomerService(CustomerRepository customerRepository, AppLicenseRepository appLicenseRepository, AuditService auditService) {
         this.customerRepository = customerRepository;
         this.appLicenseRepository = appLicenseRepository;
+        this.auditService = auditService;
     }
 
     @Transactional(readOnly = true)
@@ -46,6 +48,7 @@ public class CustomerService {
         customer.setUpdatedAt(now);
         Customer saved = customerRepository.save(customer);
         log.info("Customer created id={}, name={}", saved.getId(), saved.getName());
+        auditService.record("CREATE", "CUSTOMER", String.valueOf(saved.getId()), "name=" + saved.getName());
         return saved;
     }
 
@@ -56,6 +59,7 @@ public class CustomerService {
         customer.setUpdatedAt(LocalDateTime.now());
         Customer saved = customerRepository.save(customer);
         log.info("Customer updated id={}, name={}", saved.getId(), saved.getName());
+        auditService.record("UPDATE", "CUSTOMER", String.valueOf(saved.getId()), "name=" + saved.getName());
         return saved;
     }
 
@@ -70,6 +74,7 @@ public class CustomerService {
         }
         customerRepository.delete(customer);
         log.info("Customer deleted id={}, name={}", customer.getId(), customer.getName());
+        auditService.record("DELETE", "CUSTOMER", String.valueOf(customer.getId()), "name=" + customer.getName());
     }
 
     @Transactional

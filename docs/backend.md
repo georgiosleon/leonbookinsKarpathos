@@ -40,6 +40,8 @@ Schema changes are managed by Flyway SQL migrations in
 `src/main/resources/db/migration` with `spring.jpa.hibernate.ddl-auto=validate`.
 `DatabaseInitializer` seeds default accounts only when missing. Back up existing
 customer databases before upgrading and test releases against copies of real data.
+Current Flyway baselines existing non-empty schemas at V1 (`baseline-version=1`);
+very old pre-V1 databases may require a manual upgrade path to V1-compatible schema before automatic migrations.
 
 ## Layers
 
@@ -130,6 +132,7 @@ API use until activated, while allowing login/static/SPA shell, CSRF, current-us
 license status, and admin license/customer endpoints. Activation takes effect
 immediately with no restart. For production, configure `APP_LICENSE_PUBLIC_KEY`
 (base64 X.509 Ed25519 public key); the dev key is used only as fallback.
+For development/testing only, `app.license.bypass=true` disables the license gate; it logs a warning and must never be enabled in production.
 
 ## Persistence and reports
 

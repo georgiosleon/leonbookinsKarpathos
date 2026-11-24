@@ -313,5 +313,14 @@
   "Linux portable app": "Draagbare Linux-app",
   "Roles and access": "Rollen en toegang",
   "Sign in with your assigned account. Available actions depend on your role.": "Meld u aan met het aan u toegewezen account. Beschikbare acties hangen af van uw rol.",
-  "Password *": "Wachtwoord *"
+  "Password *": "Wachtwoord *",
+  "Copy": "Kopiëren",
+  "Installation ID copied.": "Installatie-ID gekopieerd.",
+  "Could not copy Installation ID.": "Installatie-ID kon niet worden gekopieerd.",
+  "Licensed": "Gelicentieerd",
+  "Not licensed": "Niet gelicentieerd",
+  "Download diagnostics": "Diagnostiek downloaden",
+  "Download support bundle": "Ondersteuningspakket downloaden",
+  "Replace the database path as needed. For Docker, run the same db backup command against the mounted /data/bookings.db.": "Vervang het databasepad indien nodig. Voer voor Docker hetzelfde db backup-commando uit op de gekoppelde /data/bookings.db.",
+  "Replace your-backup.sqlite3.enc with the actual backup filename and adjust the database path as needed.": "Vervang your-backup.sqlite3.enc door de daadwerkelijke back-upbestandsnaam en pas het databasepad indien nodig aan."
 }

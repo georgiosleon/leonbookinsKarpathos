@@ -313,5 +313,14 @@
   "Linux portable app": "Φορητή εφαρμογή Linux",
   "Roles and access": "Ρόλοι και πρόσβαση",
   "Sign in with your assigned account. Available actions depend on your role.": "Συνδεθείτε με τον λογαριασμό που σας έχει ανατεθεί. Οι διαθέσιμες ενέργειες εξαρτώνται από τον ρόλο σας.",
-  "Password *": "Κωδικός *"
+  "Password *": "Κωδικός *",
+  "Copy": "Αντιγραφή",
+  "Installation ID copied.": "Το αναγνωριστικό εγκατάστασης αντιγράφηκε.",
+  "Could not copy Installation ID.": "Δεν ήταν δυνατή η αντιγραφή του αναγνωριστικού εγκατάστασης.",
+  "Licensed": "Με άδεια",
+  "Not licensed": "Χωρίς άδεια",
+  "Download diagnostics": "Λήψη διαγνωστικών",
+  "Download support bundle": "Λήψη πακέτου υποστήριξης",
+  "Replace the database path as needed. For Docker, run the same db backup command against the mounted /data/bookings.db.": "Αντικαταστήστε τη διαδρομή της βάσης δεδομένων όπως χρειάζεται. Για Docker, εκτελέστε την ίδια εντολή db backup στο προσαρτημένο /data/bookings.db.",
+  "Replace your-backup.sqlite3.enc with the actual backup filename and adjust the database path as needed.": "Αντικαταστήστε το your-backup.sqlite3.enc με το πραγματικό όνομα αρχείου αντιγράφου ασφαλείας και προσαρμόστε τη διαδρομή της βάσης δεδομένων όπως χρειάζεται."
 }

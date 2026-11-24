@@ -69,3 +69,16 @@ be checked in a browser at relevant screen sizes.
 - For changes crossing browser, HTTP, security, and database boundaries,
   consider a Spring integration test or an end-to-end browser test rather than
   relying on unit tests alone.
+
+
+## Frontend E2E smoke (Playwright)
+
+Playwright is scaffolded for optional browser smoke tests. Install browsers once:
+
+```sh
+cd frontend
+npx playwright install
+npm run test:e2e
+```
+
+Set `PLAYWRIGHT_BASE_URL` if the app is not running at `http://127.0.0.1:8080`.

@@ -82,6 +82,10 @@ export function HelpButton() {
     macos: 'SERVER_ADDRESS=0.0.0.0 ./LeonBookings.app/Contents/MacOS/LeonBookings',
   };
 
+  async function copyCommand(command) {
+    try { await navigator.clipboard.writeText(command); } catch {}
+  }
+
   function handleTabKeyDown(event, currentSection) {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
@@ -280,10 +284,21 @@ export function HelpButton() {
                     <li>{t('Store the encrypted backup and passphrase separately through a trusted channel. The passphrase cannot be recovered if lost.')}</li>
                   </ol>
                   <h4>{t('Windows portable app')}</h4>
-                  <pre><code>{backupCommands.windows}</code></pre>
+                  <div className="help-command">
+                    <pre><code>{backupCommands.windows}</code></pre>
+                    <button type="button" className="button button-muted" onClick={() => copyCommand(backupCommands.windows)}>{t('Copy')}</button>
+                  </div>
+                  <h4>{t('Linux portable app')}</h4>
+                  <div className="help-command">
+                    <pre><code>{backupCommands.linux}</code></pre>
+                    <button type="button" className="button button-muted" onClick={() => copyCommand(backupCommands.linux)}>{t('Copy')}</button>
+                  </div>
                   <h4>{t('macOS portable app')}</h4>
-                  <pre><code>{backupCommands.macos}</code></pre>
-                  <p>{t('For Linux or a custom database location, use the encrypted database backup command documented in the project README, replacing the database path as needed.')}</p>
+                  <div className="help-command">
+                    <pre><code>{backupCommands.macos}</code></pre>
+                    <button type="button" className="button button-muted" onClick={() => copyCommand(backupCommands.macos)}>{t('Copy')}</button>
+                  </div>
+                  <p>{t('Replace the database path as needed. For Docker, run the same db backup command against the mounted /data/bookings.db.')}</p>
                 </section>
 
                 <section className="help-warning">
@@ -295,10 +310,21 @@ export function HelpButton() {
                   <h3>{t('Restore an encrypted backup')}</h3>
                   <p>{t('Stop the application before restoring. Run db restore with the encrypted .sqlite3.enc file as --input. Confirm restore and enter the same passphrase. A pre-restore copy of the current database is saved.')}</p>
                   <h4>{t('Windows portable app')}</h4>
-                  <pre><code>{restoreCommands.windows}</code></pre>
+                  <div className="help-command">
+                    <pre><code>{restoreCommands.windows}</code></pre>
+                    <button type="button" className="button button-muted" onClick={() => copyCommand(restoreCommands.windows)}>{t('Copy')}</button>
+                  </div>
+                  <h4>{t('Linux portable app')}</h4>
+                  <div className="help-command">
+                    <pre><code>{restoreCommands.linux}</code></pre>
+                    <button type="button" className="button button-muted" onClick={() => copyCommand(restoreCommands.linux)}>{t('Copy')}</button>
+                  </div>
                   <h4>{t('macOS portable app')}</h4>
-                  <pre><code>{restoreCommands.macos}</code></pre>
-                  <p>{t('Replace your-backup.sqlite3.enc with the actual backup filename. For Linux or a custom database location, see the backup and restore instructions in the project README.')}</p>
+                  <div className="help-command">
+                    <pre><code>{restoreCommands.macos}</code></pre>
+                    <button type="button" className="button button-muted" onClick={() => copyCommand(restoreCommands.macos)}>{t('Copy')}</button>
+                  </div>
+                  <p>{t('Replace your-backup.sqlite3.enc with the actual backup filename and adjust the database path as needed.')}</p>
                 </section>
               </div>
 

@@ -282,6 +282,7 @@ java --source 25 tools/LicenseSigner.java tools/dev-license-private.pkcs8.b64 <i
 ```
 
 **Production:** set `APP_LICENSE_PUBLIC_KEY` (or `app.license.public-key`) to your production Ed25519 X.509 public key (base64). Keep the matching private key outside the repository. Do not use the committed `tools/dev-license-*.b64` dev keypair for real customer deployments.
+**Development/testing only:** `app.license.bypass=true` (or `APP_LICENSE_BYPASS=true`) bypasses the license gate. Never enable in production.
 
 ## API versioning
 
@@ -519,6 +520,13 @@ Export the seed account environment variables before starting Spring Boot.
 The build writes the bundled React app to the ignored
 `src/main/resources/public/react-assets/` directory. `/rooms.html` and
 `/cars.html` remain as redirects to the shared screen.
+
+## Production deployment checklist
+
+- **HTTPS/reverse proxy**: run behind a trusted HTTPS reverse proxy (nginx/Caddy/Traefik) for LAN or remote access; do not expose the app directly to the internet.
+- **Secrets**: set strong `APP_*_PASSWORD` values, configure `APP_LICENSE_PUBLIC_KEY` for production license verification, and keep signing keys outside the repo.
+- **Backups**: schedule encrypted database backups and store passphrases separately from backup files. Test restore on a copy before upgrades.
+- **Upgrades**: back up `bookings.db` before upgrading, then smoke-test login, license status, booking CRUD, and report export.
 
 ## Compliance scope (local only) and unsupported items
 

@@ -23,12 +23,13 @@ class CustomerServiceTest {
 
     @Mock private CustomerRepository customerRepository;
     @Mock private AppLicenseRepository appLicenseRepository;
+    @Mock private AuditService auditService;
 
     private CustomerService customerService;
 
     @BeforeEach
     void setUp() {
-        customerService = new CustomerService(customerRepository, appLicenseRepository);
+        customerService = new CustomerService(customerRepository, appLicenseRepository, auditService);
     }
 
     @Test

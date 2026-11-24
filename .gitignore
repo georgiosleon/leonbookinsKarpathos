@@ -45,3 +45,9 @@ build/
 
 # Dev-only license signing key (do not use in production; keep local only)
 tools/dev-license-private.pkcs8.b64
+
+# Playwright
+frontend/playwright-report/
+frontend/test-results/
+frontend/blob-report/
+frontend/playwright/.cache/

@@ -23,6 +23,8 @@ public class LicenseService {
     private final CustomerService customerService;
     private final LicenseVerifier licenseVerifier;
     private final CurrentUserProvider currentUserProvider;
+    private final AuditService auditService;
+    private final boolean bypassEnabled;
     private volatile Boolean activatedCache;
 
     public LicenseService(
@@ -30,12 +32,20 @@ public class LicenseService {
             AppLicenseRepository licenseRepository,
             CustomerService customerService,
             LicenseVerifier licenseVerifier,
-            CurrentUserProvider currentUserProvider) {
+            CurrentUserProvider currentUserProvider,
+            AuditService auditService,
+            @org.springframework.beans.factory.annotation.Value("${app.license.bypass:false}") boolean bypassEnabled) {
         this.installationRepository = installationRepository;
         this.licenseRepository = licenseRepository;
         this.customerService = customerService;
         this.licenseVerifier = licenseVerifier;
         this.currentUserProvider = currentUserProvider;
+        this.auditService = auditService;
+        this.bypassEnabled = bypassEnabled;
+        if (bypassEnabled) {
+            org.slf4j.LoggerFactory.getLogger(LicenseService.class)
+                    .warn("LICENSE BYPASS ENABLED (app.license.bypass=true). Do not use in production.");
+        }
     }
 
     @Transactional
@@ -54,6 +64,9 @@ public class LicenseService {
     @Transactional
     public LicenseStatusResponse getStatus() {
         String installId = getOrCreateInstallId();
+        if (bypassEnabled) {
+            return new LicenseStatusResponse(true, installId, null, null, "BYPASS");
+        }
         AppLicense license = licenseRepository.findById(1).orElse(null);
         boolean activated = license != null && "ACTIVE".equalsIgnoreCase(license.getStatus());
         CustomerResponse customer = activated && license.getCustomer() != null
@@ -70,6 +83,9 @@ public class LicenseService {
 
     @Transactional(readOnly = true)
     public boolean isActivated() {
+        if (bypassEnabled) {
+            return true;
+        }
         Boolean cached = activatedCache;
         if (cached != null) {
             return cached;
@@ -108,6 +124,7 @@ public class LicenseService {
         org.slf4j.LoggerFactory.getLogger(LicenseService.class)
                 .info("License activated for installId={}, customerId={}, activatedBy={}",
                         installId, customer.getId(), activatedBy);
+        auditService.record("ACTIVATE", "LICENSE", installId, "customerId=" + customer.getId());
 
         return getStatus();
     }

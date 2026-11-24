@@ -16,6 +16,8 @@ tests as authoritative when behavior changes.
   them.
 - [Resource management](resources.md): admin workflow and how resources map
   to existing booking data.
+- [i18n review checklist](i18n-review-checklist.md): keys and checks for
+  native-speaker translation review.
 - [System architecture diagram](diagrams/system-architecture.puml) and
   [booking/resource class diagram](diagrams/booking-resource-classes.puml):
   editable PlantUML sources.

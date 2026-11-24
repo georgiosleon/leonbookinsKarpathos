@@ -147,7 +147,22 @@ export function LicenseGate({ currentUser, onActivated }) {
 
         <div className="field">
           <label htmlFor="install-id">{t('Installation ID')}</label>
-          <input id="install-id" readOnly value={status?.installId || ''} />
+          <div className="toolbar">
+            <input id="install-id" readOnly value={status?.installId || ''} />
+            <button
+              type="button"
+              className="button button-muted"
+              disabled={!status?.installId}
+              onClick={async () => {
+                try {
+                  await navigator.clipboard.writeText(status.installId);
+                  setNotice(t('Installation ID copied.'));
+                } catch {
+                  setError(t('Could not copy Installation ID.'));
+                }
+              }}
+            >{t('Copy')}</button>
+          </div>
           <p className="field-hint">{t('Provide this Installation ID to generate a license key.')}</p>
         </div>
 

@@ -77,6 +77,32 @@ public class ApplicationSupportService {
         return report.toString();
     }
 
+    public byte[] supportBundle() {
+        try (var baos = new java.io.ByteArrayOutputStream();
+             var zip = new java.util.zip.ZipOutputStream(baos, StandardCharsets.UTF_8)) {
+            writeZipEntry(zip, "diagnostics.txt", diagnostics().getBytes(StandardCharsets.UTF_8));
+            AppInfo info = appInfo();
+            String json = "{\n  \"version\": \"" + escapeJson(info.version()) + "\",\n  \"deploymentType\": \"" + escapeJson(info.deploymentType()) + "\",\n  \"licenseActivated\": " + info.licenseActivated() + "\n}\n";
+            writeZipEntry(zip, "app-info.json", json.getBytes(StandardCharsets.UTF_8));
+            zip.finish();
+            return baos.toByteArray();
+        } catch (IOException e) {
+            throw new IllegalStateException("Could not create support bundle", e);
+        }
+    }
+
+    private static void writeZipEntry(java.util.zip.ZipOutputStream zip, String name, byte[] content) throws IOException {
+        java.util.zip.ZipEntry entry = new java.util.zip.ZipEntry(name);
+        zip.putNextEntry(entry);
+        zip.write(content);
+        zip.closeEntry();
+    }
+
+    private static String escapeJson(String value) {
+        if (value == null) return "";
+        return value.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
     private String activeProfiles() {
         String[] profiles = environment.getActiveProfiles();
         return profiles.length == 0 ? "default" : String.join(", ", profiles);

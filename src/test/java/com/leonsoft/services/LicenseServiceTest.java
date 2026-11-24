@@ -30,12 +30,13 @@ class LicenseServiceTest {
     @Mock private CustomerService customerService;
     @Mock private LicenseVerifier licenseVerifier;
     @Mock private CurrentUserProvider currentUserProvider;
+    @Mock private AuditService auditService;
 
     private LicenseService licenseService;
 
     @BeforeEach
     void setUp() {
-        licenseService = new LicenseService(installationRepository, licenseRepository, customerService, licenseVerifier, currentUserProvider);
+        licenseService = new LicenseService(installationRepository, licenseRepository, customerService, licenseVerifier, currentUserProvider, auditService, false);
     }
 
     @Test
@@ -87,6 +88,23 @@ class LicenseServiceTest {
         assertEquals("Acme", status.customer().name());
         verify(licenseRepository).save(argThat(l -> "ACTIVE".equals(l.getStatus()) && "admin".equals(l.getActivatedBy())));
         assertTrue(licenseService.isActivated());
+    }
+
+    @Test
+    void bypassReturnsActivatedWithoutDbLicense() {
+        LicenseService bypass = new LicenseService(installationRepository, licenseRepository, customerService, licenseVerifier, currentUserProvider, auditService, true);
+        when(installationRepository.findById(1)).thenReturn(Optional.of(install("install-1")));
+        assertTrue(bypass.isActivated());
+        LicenseStatusResponse status = bypass.getStatus();
+        assertTrue(status.activated());
+        assertEquals("BYPASS", status.activatedBy());
+    }
+
+    private static AppInstallation install(String id) {
+        AppInstallation i = new AppInstallation();
+        i.setId(1);
+        i.setInstallId(id);
+        return i;
     }
 
     private static AppLicense activatedLicense(Customer customer) {

@@ -33,7 +33,9 @@ public class LoginPageController {
                     main { width: min(100%%, 420px); padding: 28px; border: 1px solid #d5deea;
                       border-radius: 14px; background: white; box-shadow: 0 8px 30px #17203318; }
                     .welcome { margin: 0 0 12px; text-align: center; font-size: 1.75rem; font-weight: 800; letter-spacing: 0.04em; color: #1769aa; }
-                    .login-image { display: block; width: 100%%; max-width: 320px; height: auto; margin: 0 auto 16px; border-radius: 12px; object-fit: cover; }
+                    .login-image-rotator { position: relative; width: 100%%; max-width: 320px; aspect-ratio: 3 / 2; margin: 0 auto 16px; border-radius: 12px; overflow: hidden; background: #f3f4f6; }
+                    .login-image-rotator img { position: absolute; inset: 0; width: 100%%; height: 100%%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease-in-out; }
+                    .login-image-rotator img.active { opacity: 1; }
                     h1 { margin: 0 0 8px; font-size: 1.5rem; }
                     p { color: #53627a; }
                     .signed-in { color: #53627a; }
@@ -49,7 +51,10 @@ public class LoginPageController {
                 <body>
                   <main>
                     <p class="welcome" data-message="welcome">WELCOME</p>
-                    <img class="login-image" src="/images/login-image-1.jpg" alt="Karpathos" width="320" height="213" loading="eager">
+                    <div class="login-image-rotator" aria-hidden="true">
+                      <img src="/images/login-robot-greek-island.png" alt="" class="active" loading="eager">
+                      <img src="/images/login-anonymous-greek-island.jpg" alt="" loading="lazy">
+                    </div>
                     <p data-message="brand">Karpathos booking planner</p>
                     <p id="signed-in" class="signed-in" hidden data-user="%s">
                       <span data-message="signedIn">Signed in as</span> <span id="signed-in-name">%s</span>
@@ -130,6 +135,15 @@ public class LoginPageController {
                     const signedIn = document.getElementById('signed-in');
                     if (signedIn && signedIn.dataset.user) {
                       signedIn.hidden = false;
+                    }
+                    const rotatorImages = Array.from(document.querySelectorAll('.login-image-rotator img'));
+                    if (rotatorImages.length > 1) {
+                      let activeIndex = 0;
+                      setInterval(() => {
+                        rotatorImages[activeIndex].classList.remove('active');
+                        activeIndex = (activeIndex + 1) %% rotatorImages.length;
+                        rotatorImages[activeIndex].classList.add('active');
+                      }, 3000);
                     }
                   </script>
                 </body>
