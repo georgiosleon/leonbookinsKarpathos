@@ -62,6 +62,24 @@ public class LoginPageController {
                     <div class="login-image-rotator" aria-hidden="true">
                       <img src="/images/login-robot-greek-island.png" alt="" class="active" loading="eager">
                       <img src="/images/login-anonymous-greek-island.jpg" alt="" loading="lazy">
+                      <img src="/images/Zoro’s Greek Island Postcard.png" alt="" loading="lazy">
+                      <img src="/images/Retro Greek Island Robot Postcard.png" alt="" loading="lazy">
+                      <img src="/images/Greek Island Pirate Adventure.png" alt="" loading="lazy">
+                      <img src="/images/Ninja at Santorini Sunset.png" alt="" loading="lazy">
+                      <img src="/images/Retro Action Hero Overlooking a Greek Island.png" alt="" loading="lazy">
+                      <img src="/images/Retro Commando Overlooking a Greek Island.png" alt="" loading="lazy">
+                      <img src="/images/Retro Greek Island Karate Poster.png" alt="" loading="lazy">
+                      <img src="/images/Ares_ Spartan Fury at Sunset.png" alt="" loading="lazy">
+                      <img src="/images/Red-Haired Warrior Over Greek Isles.png" alt="" loading="lazy">
+                      <img src="/images/Greek Island Arcane Mage.png" alt="" loading="lazy">
+                      <img src="/images/Zeus Above the Stormy Aegean.png" alt="" loading="lazy">
+                      <img src="/images/Aphrodite by the Golden Sea.png" alt="" loading="lazy">
+                      <img src="/images/Regal Hera with Peacock and Sunset.png" alt="" loading="lazy">
+                      <img src="/images/Dark Mage Beneath the Blood Moon.png" alt="" loading="lazy">
+                      <img src="/images/Dwarven Council in Karpathos.png" alt="" loading="lazy">
+                      <img src="/images/Halo Heroes Over Karpathos.png" alt="" loading="lazy">
+                      <img src="/images/StarCraft Battle Over Karpathos.png" alt="" loading="lazy">
+                      <img src="/images/Counter-Strike 2_ Karpathos Showdown.png" alt="" loading="lazy">
                     </div>
                     <p class="brand" data-message="brand">Karpathos booking planner</p>
                     <p id="signed-in" class="signed-in" hidden data-user="%s">

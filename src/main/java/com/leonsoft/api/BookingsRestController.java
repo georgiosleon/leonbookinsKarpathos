@@ -85,7 +85,9 @@ public class BookingsRestController {
     @PostMapping(value = "/delete", consumes = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize(ADMIN_OR_OPERATOR)
     Boolean deleteObject(@Valid @RequestBody BookingDeleteRequest request) {
-        log.debug(" Delete    {}", request.id());
+        if (log.isDebugEnabled()) {
+            log.debug(" Delete    {}", request.id());
+        }
         bookingsService.deleteObject(request.id());
         return Boolean.TRUE;
     }
