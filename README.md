@@ -210,11 +210,11 @@ macOS releases need signing and notarization for a smooth first launch.
 #### Run the portable Linux archive
 
 The archive includes the application and its Java runtime. From the directory
-where you downloaded `LeonBookings-2.0.1-linux-x86_64.tar.gz`, extract and run
+where you downloaded `LeonBookings-2.0.2-linux-x86_64.tar.gz`, extract and run
 it:
 
 ```sh
-tar -xzf LeonBookings-2.0.1-linux-x86_64.tar.gz
+tar -xzf LeonBookings-2.0.2-linux-x86_64.tar.gz
 cd LeonBookings
 ./bin/LeonBookings
 ```

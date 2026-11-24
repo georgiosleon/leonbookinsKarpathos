@@ -54,7 +54,7 @@ Sources: `README.md:8-48`, `docs/application-deep-dive.md:39-55`,
 | Build | Maven wrapper 3.9.11, `frontend-maven-plugin` with Node 22.14.0 / npm 10.9.2 | `.mvn/wrapper/`, `pom.xml:171-210` |
 | Tests | JUnit/Spring Boot tests (backend), `node --test` + Vitest (frontend), Playwright smoke | `pom.xml:81-104`, `frontend/package.json:6-15` |
 
-Artifact version: `2.0.1` (`pom.xml:18`, `frontend/package.json:4`).
+Artifact version: `2.0.2` (`pom.xml:18`, `frontend/package.json:4`).
 
 ---
 
@@ -299,7 +299,7 @@ Commands run during this onboarding (2026-11-24):
 |---|---|---|
 | Toolchain | `java -version` | OpenJDK 25.0.5 (matches `pom.xml`). |
 | Backend tests | `./mvnw -q -o test` | **127 tests, 0 failures/errors/skips** (surefire reports). |
-| Package | `./mvnw -q -DskipTests package` | Built `target/leonbookinsKarpathos-2.0.1.jar` (~80 MB, includes frontend). |
+| Package | `./mvnw -q -DskipTests package` | Built `target/leonbookinsKarpathos-2.0.2.jar` (~80 MB, includes frontend). |
 | Frontend tests | `cd frontend && npm test` (Node 22.14.0 from `target/node/node`) | **1 of 18 Node tests fails** — see below. |
 | Frontend build | Maven `generate-resources` during package | React assets generated in `src/main/resources/public/react-assets/`. |
 | Runtime smoke | JAR started with throwaway DB on port 8081, dev profile, seeded env credentials | Login page 200; unauthenticated `/`, `/api/v1/license/status`, `/actuator/health` all 401; after form login, `/` 200, `/users/me` = ADMIN, license status `activated:true, activatedBy:"BYPASS"` (dev profile). |
@@ -336,7 +336,7 @@ suite passed separately in this pass (4 files, 11 tests).
 
 ### Release process as documented
 
-Semantic versions `vMAJOR.MINOR.PATCH`; current version `2.0.1` in both
+Semantic versions `vMAJOR.MINOR.PATCH`; current version `2.0.2` in both
 `pom.xml` and `frontend/package.json`. Manual publish flow in
 `install/README.md:284-293`: bump version, commit, tag `vX.Y.Z`, push tag.
 `CHANGELOG.md` follows Keep a Changelog. Desktop packages are built **locally on
@@ -483,8 +483,8 @@ cd frontend && node scripts/check-docs-smoke.js
 cd frontend && npx playwright test   # needs a running app + browsers
 
 # Offline DB CLI
-java -jar target/leonbookinsKarpathos-2.0.1.jar db backup --encrypt
-java -jar target/leonbookinsKarpathos-2.0.1.jar db restore \
+java -jar target/leonbookinsKarpathos-2.0.2.jar db backup --encrypt
+java -jar target/leonbookinsKarpathos-2.0.2.jar db restore \
   --database ./bookings.db --input ./backups/<file>.sqlite3.enc
 
 # Docker

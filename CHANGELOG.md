@@ -7,7 +7,11 @@ and this project uses semantic version tags: `vMAJOR.MINOR.PATCH`.
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-11-24
+
 ### Added
+- English and Greek end-user manuals for the booking planner UI (`docs/USER_MANUAL.md`, `docs/USER_MANUAL_EL.md`).
+- Onboarding notes covering architecture, operations, known issues, and owner decisions (`docs/ONBOARDING.md`).
 - Maven `quality` profile (JaCoCo, Checkstyle, PMD, SpotBugs, Enforcer) for opt-in verify checks.
 - CodeQL workflow for Java and JavaScript/TypeScript analysis.
 - Dependency review workflow for pull requests.
@@ -15,6 +19,8 @@ and this project uses semantic version tags: `vMAJOR.MINOR.PATCH`.
 - Branch protection for `master`/`main` and `v*` tag protection ruleset.
 
 ### Changed
+- Booking save payload now includes `platformReservationId` and omits backend-derived `numOfNights`, `balance`, and `rentalTax`; client money helpers are display-only estimates.
+- Bumped release version to `2.0.2`.
 - GitHub Actions pinned to commit SHAs (Dependabot keeps updates).
 - Desktop release workflow hardened for JDK/jmods and macOS bash compatibility.
 

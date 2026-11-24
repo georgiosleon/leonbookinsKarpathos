@@ -216,7 +216,7 @@ From the directory containing the archive, extract it, enter the app image,
 and launch it from a terminal:
 
 ```sh
-tar -xzf LeonBookings-2.0.1-linux-x86_64.tar.gz
+tar -xzf LeonBookings-2.0.2-linux-x86_64.tar.gz
 cd LeonBookings
 ./bin/LeonBookings
 ```
