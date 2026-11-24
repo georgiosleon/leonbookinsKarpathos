@@ -28,24 +28,32 @@ public class LoginPageController {
                   <style>
                     * { box-sizing: border-box; }
                     body { min-height: 100vh; margin: 0; display: grid; place-items: center;
-                      padding: 20px; background: #f3f6fb; color: #172033;
+                      padding: 24px; background: linear-gradient(180deg, #eef4fb 0%%, #f7f9fc 100%%); color: #172033;
                       font: 16px/1.5 system-ui, sans-serif; }
-                    main { width: min(100%%, 420px); padding: 28px; border: 1px solid #d5deea;
-                      border-radius: 14px; background: white; box-shadow: 0 8px 30px #17203318; }
-                    .welcome { margin: 0 0 12px; text-align: center; font-size: 1.75rem; font-weight: 800; letter-spacing: 0.04em; color: #1769aa; }
-                    .login-image-rotator { position: relative; width: 100%%; max-width: 320px; aspect-ratio: 3 / 2; margin: 0 auto 16px; border-radius: 12px; overflow: hidden; background: #f3f4f6; }
+                    main { width: min(100%%, 440px); padding: 32px; border: 1px solid #dbe4ef;
+                      border-radius: 16px; background: #fff; box-shadow: 0 12px 40px rgba(23, 32, 51, 0.08); }
+                    .welcome { margin: 0 0 10px; text-align: center; font-size: 1.8rem; font-weight: 800; letter-spacing: 0.04em; color: #1769aa; }
+                    .login-image-rotator { position: relative; width: 100%%; max-width: 320px; aspect-ratio: 3 / 2; margin: 0 auto 14px; border-radius: 14px; overflow: hidden; background: #e9eef5; box-shadow: 0 4px 16px rgba(23,32,51,0.08); }
                     .login-image-rotator img { position: absolute; inset: 0; width: 100%%; height: 100%%; object-fit: cover; opacity: 0; transition: opacity 0.8s ease-in-out; }
                     .login-image-rotator img.active { opacity: 1; }
-                    h1 { margin: 0 0 8px; font-size: 1.5rem; }
-                    p { color: #53627a; }
-                    .signed-in { color: #53627a; }
-                    label { display: block; margin-top: 16px; font-weight: 650; }
+                    .brand { margin: 0 0 20px; text-align: center; font-size: 0.95rem; color: #5f6f85; }
+                    h1 { margin: 0 0 4px; font-size: 1.5rem; }
+                    p { color: #53627a; margin: 0 0 12px; }
+                    .signed-in { color: #53627a; font-size: 0.95rem; }
+                    label { display: block; margin-top: 14px; font-weight: 650; font-size: 0.95rem; }
                     input, select, button { width: 100%%; min-height: 44px; margin-top: 6px;
-                      padding: 9px 11px; border: 1px solid #aeb9ca; border-radius: 8px;
-                      font: inherit; }
+                      padding: 10px 12px; border: 1px solid #b7c4d6; border-radius: 10px;
+                      font: inherit; background: #fff; }
+                    input:focus, select:focus { outline: 3px solid rgba(23,105,170,0.18); border-color: #1769aa; }
                     button { margin-top: 22px; border: 0; background: #1769aa; color: white;
-                      font-weight: 700; cursor: pointer; }
-                    .error { color: #9e2424; }
+                      font-weight: 700; cursor: pointer; transition: background-color .15s ease, transform .02s ease; }
+                    button:hover { background: #145c95; }
+                    button:active { transform: translateY(1px); }
+                    button:focus-visible { outline: 3px solid rgba(23,105,170,0.28); outline-offset: 2px; }
+                    .error { color: #9e2424; background: #fff5f5; border: 1px solid #f0cccc; padding: 10px 12px; border-radius: 8px; }
+                    .success { color: #1f6a3d; background: #f3fbf6; border: 1px solid #cfe8d8; padding: 10px 12px; border-radius: 8px; }
+                    @media (max-width: 480px) { main { padding: 24px; } .welcome { font-size: 1.6rem; } }
+                    @media (prefers-reduced-motion: reduce) { .login-image-rotator img, button { transition: none; } }
                   </style>
                 </head>
                 <body>
@@ -55,13 +63,13 @@ public class LoginPageController {
                       <img src="/images/login-robot-greek-island.png" alt="" class="active" loading="eager">
                       <img src="/images/login-anonymous-greek-island.jpg" alt="" loading="lazy">
                     </div>
-                    <p data-message="brand">Karpathos booking planner</p>
+                    <p class="brand" data-message="brand">Karpathos booking planner</p>
                     <p id="signed-in" class="signed-in" hidden data-user="%s">
                       <span data-message="signedIn">Signed in as</span> <span id="signed-in-name">%s</span>
                     </p>
                     <h1 data-message="title">Sign in</h1>
                     <p id="login-message" class="error" hidden data-message="invalid">Invalid username or password.</p>
-                    <p id="logout-message" hidden data-message="signedOut">You have signed out.</p>
+                    <p id="logout-message" class="success" hidden data-message="signedOut">You have signed out.</p>
                     <form method="post" action="/login">
                       <input type="hidden" name="%s" value="%s">
                       <label><span data-message="username">Username</span>
