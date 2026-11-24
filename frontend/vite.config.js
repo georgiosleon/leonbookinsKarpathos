@@ -18,6 +18,8 @@ export default defineConfig({
   },
   server: {
     proxy: {
+      '/api': 'http://localhost:8080',
+      '/images': 'http://localhost:8080',
       '/booking': 'http://localhost:8080',
       '/csrf': 'http://localhost:8080',
       '/css': 'http://localhost:8080',

@@ -4,7 +4,7 @@ import { BookingPage } from './components/BookingPage.jsx';
 import { LicenseGate } from './components/LicenseGate.jsx';
 import { fetchLicenseStatus, isAuthRedirectError } from './bookingApi.js';
 import { getInitialTheme } from './theme.js';
-import { LanguageProvider } from './i18n.jsx';
+import { LanguageProvider, useLanguage } from './i18n.jsx';
 import { useCurrentUser } from './useCurrentUser.js';
 
 const ReportsPage = lazy(() => import('./components/ReportsPage.jsx').then((m) => ({ default: m.ReportsPage })));
@@ -15,6 +15,11 @@ const rootElement = document.getElementById('root');
 
 if (!rootElement) {
   throw new Error('Booking app root element was not found.');
+}
+
+function LoadingFallback() {
+  const { t } = useLanguage();
+  return <main className="app-shell"><p className="feedback" role="status">{t('Loading...')}</p></main>;
 }
 
 function pageFromLocation() {
@@ -93,7 +98,7 @@ function AppRouter() {
   if (licenseLoading || userLoading) {
     return (
       <LanguageProvider>
-        <main className="app-shell"><p className="feedback" role="status">Loading…</p></main>
+        <LoadingFallback />
       </LanguageProvider>
     );
   }
@@ -110,7 +115,7 @@ function AppRouter() {
 
   return (
     <LanguageProvider>
-      <Suspense fallback={<main className="app-shell"><p className="feedback" role="status">Loading…</p></main>}>
+      <Suspense fallback={<LoadingFallback />}>
         <App key={location.search || 'default'} />
       </Suspense>
     </LanguageProvider>

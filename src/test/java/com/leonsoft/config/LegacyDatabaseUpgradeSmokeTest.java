@@ -59,7 +59,7 @@ class LegacyDatabaseUpgradeSmokeTest {
             assertTrue(tableExists(c, "flyway_schema_history"));
             assertTrue(tableExists(c, "audit_log"));
             assertTrue(tableExists(c, "app_license"));
-            try (var st = c.createStatement(); var rs = st.executeQuery("SELECT COUNT(*) FROM Booking")) {
+            try (var st = c.createStatement(); var rs = st.executeQuery("SELECT COUNT(*) FROM bookings")) {
                 assertTrue(rs.next());
                 assertTrue(rs.getInt(1) >= 1);
             }

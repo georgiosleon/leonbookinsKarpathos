@@ -12,8 +12,8 @@ import { formatMoney, useLanguage } from '../i18n.jsx';
 const detailFields = [
   { name: 'identification', label: 'Passport / ID' },
   { name: 'afm', label: 'Tax number (ΑΦΜ)' },
-  { name: 'email', label: 'Email', type: 'email' },
-  { name: 'tel', label: 'Telephone' },
+  { name: 'email', label: 'Email', type: 'email', autoComplete: 'email' },
+  { name: 'tel', label: 'Telephone', type: 'tel', autoComplete: 'tel' },
   { name: 'voucher', label: 'Voucher' },
   { name: 'taxRefNumber', label: 'Tax reference' },
   { name: 'invoiceNumber', label: 'Invoice number' },
@@ -61,7 +61,7 @@ export function BookingForm({
 
   return (
     <form className="booking-form" onSubmit={onSubmit}>
-      <fieldset disabled={readOnly} style={{ border: 0, padding: 0, margin: 0, minInlineSize: 0 }}>
+      <fieldset disabled={readOnly} className="reset-fieldset">
         <section className="form-section" aria-labelledby="stay-section-heading">
           <div className="panel-heading">
             <div>
@@ -184,21 +184,21 @@ export function BookingForm({
           </p>
         )}
         {showFinancials && (
-          <fieldset disabled={readOnly} style={{ border: 0, padding: 0, margin: 0, minInlineSize: 0 }}>
+          <fieldset disabled={readOnly} className="reset-fieldset">
             <div className="form-grid">
               <label className="field">
                 <span>{t('Total charged (€)')}</span>
-                <input type="number" step="0.01" value={form.charge} onChange={(event) => updateMoney('charge', event.target.value)} />
+                <input type="number" min="0" step="0.01" value={form.charge} onChange={(event) => updateMoney('charge', event.target.value)} />
               </label>
 
               <label className="field">
                 <span>{t('Commission (€)')}</span>
-                <input type="number" step="0.01" value={form.commission} onChange={(event) => updateMoney('commission', event.target.value)} />
+                <input type="number" min="0" step="0.01" value={form.commission} onChange={(event) => updateMoney('commission', event.target.value)} />
               </label>
 
               <label className="field">
                 <span>{t('Received (€)')}</span>
-                <input type="number" step="0.01" value={form.received} onChange={(event) => updateMoney('received', event.target.value)} />
+                <input type="number" min="0" step="0.01" value={form.received} onChange={(event) => updateMoney('received', event.target.value)} />
               </label>
 
               <label className="field">
@@ -231,13 +231,13 @@ export function BookingForm({
         </button>
       </div>
 
-      <fieldset disabled={readOnly} style={{ border: 0, padding: 0, margin: 0, minInlineSize: 0 }}>
+      <fieldset disabled={readOnly} className="reset-fieldset">
         {showDetails && (
           <div className="details-grid">
-            {detailFields.map(({ name, label, type = 'text' }) => (
+            {detailFields.map(({ name, label, type = 'text', autoComplete }) => (
               <label className="field" key={name}>
                 <span>{t(label)}</span>
-                <input type={type} value={form[name]} onChange={(event) => update(name, event.target.value)} />
+                <input type={type} autoComplete={autoComplete} value={form[name]} onChange={(event) => update(name, event.target.value)} />
               </label>
             ))}
             <label className="field field-notes">

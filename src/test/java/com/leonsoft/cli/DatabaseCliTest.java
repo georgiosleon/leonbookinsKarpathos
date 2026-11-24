@@ -169,9 +169,9 @@ class DatabaseCliTest {
     private static void createDatabase(Path path, String name) throws SQLException {
         try (var connection = DriverManager.getConnection("jdbc:sqlite:" + path);
              var statement = connection.createStatement()) {
-            statement.execute("CREATE TABLE Booking (id TEXT PRIMARY KEY, name TEXT)");
+            statement.execute("CREATE TABLE bookings (id TEXT PRIMARY KEY, name TEXT)");
             try (var insert = connection.prepareStatement(
-                    "INSERT INTO Booking (id, name) VALUES ('1', ?)")) {
+                    "INSERT INTO bookings (id, name) VALUES ('1', ?)")) {
                 insert.setString(1, name);
                 insert.executeUpdate();
             }
@@ -181,7 +181,7 @@ class DatabaseCliTest {
     private static String bookingName(Path path) throws SQLException {
         try (var connection = DriverManager.getConnection("jdbc:sqlite:" + path);
              var statement = connection.createStatement();
-             var result = statement.executeQuery("SELECT name FROM Booking WHERE id = '1'")) {
+             var result = statement.executeQuery("SELECT name FROM bookings WHERE id = '1'")) {
             assertTrue(result.next());
             return result.getString(1);
         }
@@ -189,7 +189,7 @@ class DatabaseCliTest {
 
     private static void updateBookingName(Path path, String name) throws SQLException {
         try (var connection = DriverManager.getConnection("jdbc:sqlite:" + path);
-             var statement = connection.prepareStatement("UPDATE Booking SET name = ? WHERE id = '1'")) {
+             var statement = connection.prepareStatement("UPDATE bookings SET name = ? WHERE id = '1'")) {
             statement.setString(1, name);
             statement.executeUpdate();
         }

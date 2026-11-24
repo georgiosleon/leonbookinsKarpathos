@@ -57,7 +57,7 @@ Profiles: `dev` (default for direct runs) vs `prod` (Docker Compose forces
 
 ### Booking
 
-Entity: `models/Booking.java` (table `Booking`).
+Entity: `models/Booking.java` (table `bookings`).
 
 - Stay: `startDate`, `endDate`, `numOfNights`
 - Money: `charge`, `received`, `commission`, `balance` (balance calculated

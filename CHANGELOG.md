@@ -7,6 +7,18 @@ and this project uses semantic version tags: `vMAJOR.MINOR.PATCH`.
 
 ## [Unreleased]
 
+### Fixed
+- Frontend loading states now use the translated `Loading...` key instead of hardcoded English text.
+- Guarded theme and save-mode storage access so blocked or stale browser storage cannot break startup.
+- Corrected the expected `rentalSubTotal` in the report unit test and preserved legitimate zero subtotals in report summaries.
+- Added `id="login-form"` to the generated login form so the Playwright smoke selector matches.
+- Added `/api` and `/images` to the Vite dev proxy for standalone frontend development.
+
+### Changed
+- Login images converted to smaller WebP assets; clean application jar reduced from ~141 MB to ~81 MB.
+- Booking form adds telephone/email autocomplete hints and non-negative money inputs.
+- Renamed the `Booking` database table to lowercase `bookings` via Flyway `V12`, with matching entity, CLI, and test updates.
+
 ## [2.0.2] - 2026-11-24
 
 ### Added

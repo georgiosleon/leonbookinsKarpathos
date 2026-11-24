@@ -60,26 +60,26 @@ public class LoginPageController {
                   <main>
                     <p class="welcome" data-message="welcome">WELCOME</p>
                     <div class="login-image-rotator" aria-hidden="true">
-                      <img src="/images/login-robot-greek-island.png" alt="" class="active" loading="eager">
-                      <img src="/images/login-anonymous-greek-island.jpg" alt="" loading="lazy">
-                      <img src="/images/Zoro’s Greek Island Postcard.png" alt="" loading="lazy">
-                      <img src="/images/Retro Greek Island Robot Postcard.png" alt="" loading="lazy">
-                      <img src="/images/Greek Island Pirate Adventure.png" alt="" loading="lazy">
-                      <img src="/images/Ninja at Santorini Sunset.png" alt="" loading="lazy">
-                      <img src="/images/Retro Action Hero Overlooking a Greek Island.png" alt="" loading="lazy">
-                      <img src="/images/Retro Commando Overlooking a Greek Island.png" alt="" loading="lazy">
-                      <img src="/images/Retro Greek Island Karate Poster.png" alt="" loading="lazy">
-                      <img src="/images/Ares_ Spartan Fury at Sunset.png" alt="" loading="lazy">
-                      <img src="/images/Red-Haired Warrior Over Greek Isles.png" alt="" loading="lazy">
-                      <img src="/images/Greek Island Arcane Mage.png" alt="" loading="lazy">
-                      <img src="/images/Zeus Above the Stormy Aegean.png" alt="" loading="lazy">
-                      <img src="/images/Aphrodite by the Golden Sea.png" alt="" loading="lazy">
-                      <img src="/images/Regal Hera with Peacock and Sunset.png" alt="" loading="lazy">
-                      <img src="/images/Dark Mage Beneath the Blood Moon.png" alt="" loading="lazy">
-                      <img src="/images/Dwarven Council in Karpathos.png" alt="" loading="lazy">
-                      <img src="/images/Halo Heroes Over Karpathos.png" alt="" loading="lazy">
-                      <img src="/images/StarCraft Battle Over Karpathos.png" alt="" loading="lazy">
-                      <img src="/images/Counter-Strike 2_ Karpathos Showdown.png" alt="" loading="lazy">
+                      <img src="/images/login-robot-greek-island.webp" alt="" class="active" loading="eager">
+                      <img src="/images/login-anonymous-greek-island.webp" alt="" loading="lazy">
+                      <img src="/images/Zoro’s Greek Island Postcard.webp" alt="" loading="lazy">
+                      <img src="/images/Retro Greek Island Robot Postcard.webp" alt="" loading="lazy">
+                      <img src="/images/Greek Island Pirate Adventure.webp" alt="" loading="lazy">
+                      <img src="/images/Ninja at Santorini Sunset.webp" alt="" loading="lazy">
+                      <img src="/images/Retro Action Hero Overlooking a Greek Island.webp" alt="" loading="lazy">
+                      <img src="/images/Retro Commando Overlooking a Greek Island.webp" alt="" loading="lazy">
+                      <img src="/images/Retro Greek Island Karate Poster.webp" alt="" loading="lazy">
+                      <img src="/images/Ares_ Spartan Fury at Sunset.webp" alt="" loading="lazy">
+                      <img src="/images/Red-Haired Warrior Over Greek Isles.webp" alt="" loading="lazy">
+                      <img src="/images/Greek Island Arcane Mage.webp" alt="" loading="lazy">
+                      <img src="/images/Zeus Above the Stormy Aegean.webp" alt="" loading="lazy">
+                      <img src="/images/Aphrodite by the Golden Sea.webp" alt="" loading="lazy">
+                      <img src="/images/Regal Hera with Peacock and Sunset.webp" alt="" loading="lazy">
+                      <img src="/images/Dark Mage Beneath the Blood Moon.webp" alt="" loading="lazy">
+                      <img src="/images/Dwarven Council in Karpathos.webp" alt="" loading="lazy">
+                      <img src="/images/Halo Heroes Over Karpathos.webp" alt="" loading="lazy">
+                      <img src="/images/StarCraft Battle Over Karpathos.webp" alt="" loading="lazy">
+                      <img src="/images/Counter-Strike 2_ Karpathos Showdown.webp" alt="" loading="lazy">
                     </div>
                     <p class="brand" data-message="brand">Karpathos booking planner</p>
                     <p id="signed-in" class="signed-in" hidden data-user="%s">
@@ -88,7 +88,7 @@ public class LoginPageController {
                     <h1 data-message="title">Sign in</h1>
                     <p id="login-message" class="error" hidden data-message="invalid">Invalid username or password.</p>
                     <p id="logout-message" class="success" hidden data-message="signedOut">You have signed out.</p>
-                    <form method="post" action="/login">
+                    <form id="login-form" method="post" action="/login">
                       <input type="hidden" name="%s" value="%s">
                       <label><span data-message="username">Username</span>
                         <input name="username" autocomplete="username" required autofocus>

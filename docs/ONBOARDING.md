@@ -351,13 +351,17 @@ tag-triggered installer workflow was removed. Branch/tag protection claims in
 These are observations from this onboarding pass, not changes:
 
 1. **CI red**: failing `rentalSubTotal` frontend unit test (see §7).
+   **Resolved in §13.**
 2. **E2E smoke likely broken**: `frontend/e2e/smoke.spec.js:6` expects
    `form#login-form`, but the generated login form at
    `src/main/java/com/leonsoft/api/LoginPageController.java:73` has no `id`.
+   **Resolved in §13.**
 3. **Vite dev proxy gaps**: `frontend/vite.config.js:19-28` proxies `/booking`,
    `/csrf`, `/css`, `/js`, `/login`, `/logout` but not `/api` or `/react-assets`,
    while all SPA calls use `/api/v1` (`frontend/src/bookingApi.js`). `npm run dev`
-   may not work as documented.
+   may not work as documented. **`/api` and `/images` resolved in §13;
+   `/react-assets` is intentionally not proxied because Vite serves those
+   chunks itself.**
 4. **License cache lifecycle**: `LicenseService.isActivated()` caches a `false`
    result too (`LicenseService.java:84-98`); a DB restore/license change outside
    the app would not invalidate it until restart.
@@ -559,7 +563,8 @@ _Owner answers are recorded in §11._
    key remain unconfirmed; no attempt was made to inspect or record secret paths.
 3. **Known CI issues — document only.** Both the failing `rentalSubTotal` unit
    test and the E2E `form#login-form` selector mismatch are known. Neither should
-   be changed as part of this onboarding pass.
+   be changed as part of this onboarding pass. (Later owner request superseded
+   this; both were fixed in §13.)
 4. **Pre-V1 databases — no longer supported.** The manual legacy-DB path should
    be dropped from the docs; the docs should state explicitly that only
    V1-baselined/current schemas are supported.
@@ -600,7 +605,8 @@ _Owner answers are recorded in §11._
 16. **Frontend dev workflow — Maven dev run only.** The supported local run is
     `./mvnw generate-resources spring-boot:run`; standalone `npm run dev` is not
     expected to reach `/api/v1` because the Vite proxy is stale. Keep the proxy
-    gap documented.
+    gap documented. (Later owner request superseded this; `/api` and `/images`
+    were added to the proxy in §13, while Maven dev run remains supported.)
 17. **Asset output — keep as-is.** Vite continuing to write gitignored,
     fixed-name chunks into `src/main/resources/public/react-assets/` is accepted;
     regenerated Maven builds are relied on for release correctness.
@@ -647,6 +653,49 @@ Implemented after the owner Q&A:
     `numOfNights`, `balance`, or `rentalTax`.
   - Covers the new estimate helpers.
 
-Verification: `npm test` still reports 17/18 passing with the pre-existing,
-known `rentalSubTotal` summary expectation failure (left untouched per owner
-instruction); `npm run test:components` passes 11/11; `npm run build` succeeds.
+Verification at the time of this change: `npm test` reported 17/18 passing with
+the pre-existing `rentalSubTotal` summary expectation failure; `npm run
+test:components` passed 11/11; `npm run build` succeeded. The failing
+expectation and the related items were later fixed in §13.
+
+---
+
+## 13. Quick-win pass (after onboarding)
+
+The owner later asked for the safe small fixes first, then the parked items,
+with a build between each step. All changes in this section are left uncommitted
+for the owner to commit and push.
+
+1. `frontend/src/main.jsx` — both loading states now use the existing translated
+   `Loading...` key instead of hardcoded English text.
+2. `frontend/src/components/admin/UserManagement.jsx` — simplified the redundant
+   password `autoComplete` ternary and set `type="email"` on the email field.
+3. `frontend/src/theme.js` and `frontend/src/appConfig.js` — storage reads and
+   writes are guarded with `try/catch`; invalid or stale stored values fall back
+   to the system theme / configured save mode instead of crashing startup.
+4. `frontend/src/components/BookingForm.jsx` — telephone uses `type="tel"` with
+   email/telephone autocomplete hints; money inputs use `min="0"`, matching the
+   backend's `@DecimalMin("0.0")`; the repeated inline fieldset reset moved to a
+   `.reset-fieldset` class in `public/css/react-app.css`.
+5. `frontend/tests/bookingLogic.test.js` — the expected resource summary now
+   includes `rentalSubTotal: 400`; a regression test confirms a reported zero
+   subtotal is preserved.
+6. `src/main/java/com/leonsoft/api/LoginPageController.java` — the generated
+   login form now has `id="login-form"`, matching the Playwright smoke test; a
+   controller test assertion locks it in.
+7. `frontend/src/reportLogic.js` — `reportedSubTotal()` only falls back to
+   `charge - tax` when the backend field is absent, not when it is legitimately
+   zero.
+8. `frontend/vite.config.js` — the dev proxy now includes `/api` and `/images`,
+   so standalone `npm run dev` can reach the backend and login assets.
+9. `src/main/resources/public/images/` — the 20 login images were converted
+   from ~67.9 MB of PNG/JPEG at 1536px to ~7.4 MB of WebP at 1280px, and the
+   login page references were updated. A clean package drops the jar from
+   141 MB to 81 MB; runtime smoke confirmed `200 image/webp` responses.
+
+Verification: frontend tests and build after every frontend step (20/20 unit
+tests, 11/11 component tests, build passing); backend tests, package, and a
+login HTTP smoke after backend steps (127 tests passing). The Playwright smoke
+test was also run successfully (1/1 passed) after installing Chromium with
+`npx playwright install chromium` and starting a temporary dev-profile app on
+port 8080.

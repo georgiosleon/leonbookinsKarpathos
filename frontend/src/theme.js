@@ -10,13 +10,28 @@ export function resolveTheme(value) {
 }
 
 export function getInitialTheme() {
-  const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
-  if (savedTheme) return resolveTheme(savedTheme);
+  let savedTheme = null;
+  try {
+    savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  } catch {
+    // Storage may be unavailable; fall back to the system preference.
+  }
+  if (savedTheme) {
+    try {
+      return resolveTheme(savedTheme);
+    } catch {
+      // Ignore stale values stored by an older version.
+    }
+  }
   return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
 }
 
 export function storeTheme(theme) {
   const resolvedTheme = resolveTheme(theme);
-  window.localStorage.setItem(THEME_STORAGE_KEY, resolvedTheme);
+  try {
+    window.localStorage.setItem(THEME_STORAGE_KEY, resolvedTheme);
+  } catch {
+    // The selected theme still applies for this session.
+  }
   return resolvedTheme;
 }

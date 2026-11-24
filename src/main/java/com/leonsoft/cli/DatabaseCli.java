@@ -237,10 +237,10 @@ public final class DatabaseCli {
             }
             try (var statement = connection.createStatement();
                  var table = statement.executeQuery(
-                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'Booking' COLLATE NOCASE")) {
+                         "SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'bookings' COLLATE NOCASE")) {
                 if (!table.next()) {
                     throw new IllegalArgumentException(
-                            database + " does not contain the application's Booking table");
+                            database + " does not contain the application's bookings table");
                 }
             }
         }

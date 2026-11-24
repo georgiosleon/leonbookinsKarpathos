@@ -159,7 +159,7 @@ export function UserManagement() {
           </label>
           <label className="field">
             <span>{t('Email')}</span>
-            <input value={form.email} onChange={updateForm('email')} />
+            <input type="email" value={form.email} onChange={updateForm('email')} />
           </label>
           <label className="field">
             <span>{t('Role')}</span>
@@ -179,7 +179,7 @@ export function UserManagement() {
               minLength={isEditing ? undefined : 8}
               value={form.password}
               onChange={updateForm('password')}
-              autoComplete={isEditing ? 'new-password' : 'new-password'}
+              autoComplete="new-password"
             />
           </label>
           <div className="form-actions">

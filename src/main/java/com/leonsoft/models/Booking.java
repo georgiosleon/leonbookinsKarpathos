@@ -12,6 +12,7 @@ import lombok.ToString;
 @ToString(exclude = "user")
 @NoArgsConstructor
 @Entity
+@Table(name = "bookings")
 public class Booking {
 
     private static final String INTEGER_COLUMN = "integer";

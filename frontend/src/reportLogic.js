@@ -33,7 +33,7 @@ export function summarizeBookings(bookings, mode) {
       charge: sum(resourceBookings, 'charge'),
       received: sum(resourceBookings, 'received'),
       rentalTax: sum(resourceBookings, 'rentalTax'),
-      rentalSubTotal: sum(resourceBookings, 'rentalSubTotal') || (sum(resourceBookings, 'charge') - sum(resourceBookings, 'rentalTax')),
+      rentalSubTotal: reportedSubTotal(resourceBookings),
       balance: sum(resourceBookings, 'balance'),
     };
   });
@@ -47,10 +47,17 @@ export function summarizeBookings(bookings, mode) {
     charge: sum(bookableBookings, 'charge'),
     received: sum(bookableBookings, 'received'),
     rentalTax: sum(bookableBookings, 'rentalTax'),
-    rentalSubTotal: sum(bookableBookings, 'rentalSubTotal') || (sum(bookableBookings, 'charge') - sum(bookableBookings, 'rentalTax')),
+    rentalSubTotal: reportedSubTotal(bookableBookings),
     balance: sum(bookableBookings, 'balance'),
     resources,
   };
+}
+
+function reportedSubTotal(bookings) {
+  if (bookings.every((booking) => booking.rentalSubTotal != null)) {
+    return sum(bookings, 'rentalSubTotal');
+  }
+  return sum(bookings, 'charge') - sum(bookings, 'rentalTax');
 }
 
 function sum(bookings, field) {

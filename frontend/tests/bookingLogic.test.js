@@ -325,6 +325,7 @@ test('summarizes active financials by resource and counts cancellations separate
     charge: 400,
     received: 200,
     rentalTax: 0,
+    rentalSubTotal: 400,
     balance: 150,
   });
 
@@ -337,4 +338,19 @@ test('summarizes active financials by resource and counts cancellations separate
     assert.equal(url.searchParams.get('lang'), 'fr');
     assert.equal(url.searchParams.get('type'), 'cars');
   });
+});
+
+test('keeps a reported zero rental subtotal instead of recomputing it', () => {
+  const summary = summarizeBookings([
+    {
+      resourceId: 'APT2',
+      status: 'active',
+      charge: 100,
+      rentalTax: 20,
+      rentalSubTotal: 0,
+    },
+  ], roomMode);
+
+  assert.equal(summary.rentalSubTotal, 0);
+  assert.equal(summary.resources[0].rentalSubTotal, 0);
 });

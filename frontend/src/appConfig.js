@@ -17,12 +17,25 @@ export const defaultBookingSaveMode = resolveBookingSaveMode(
 const SAVE_MODE_SESSION_KEY = 'booking-save-mode';
 
 export function getInitialBookingSaveMode() {
-  const savedMode = window.sessionStorage.getItem(SAVE_MODE_SESSION_KEY);
-  return resolveBookingSaveMode(savedMode || defaultBookingSaveMode);
+  let savedMode = null;
+  try {
+    savedMode = window.sessionStorage.getItem(SAVE_MODE_SESSION_KEY);
+  } catch {
+    // Storage may be unavailable; keep the configured default.
+  }
+  try {
+    return resolveBookingSaveMode(savedMode || defaultBookingSaveMode);
+  } catch {
+    return defaultBookingSaveMode;
+  }
 }
 
 export function storeBookingSaveMode(mode) {
   const saveMode = resolveBookingSaveMode(mode);
-  window.sessionStorage.setItem(SAVE_MODE_SESSION_KEY, saveMode);
+  try {
+    window.sessionStorage.setItem(SAVE_MODE_SESSION_KEY, saveMode);
+  } catch {
+    // The selected mode still applies for this session.
+  }
   return saveMode;
 }

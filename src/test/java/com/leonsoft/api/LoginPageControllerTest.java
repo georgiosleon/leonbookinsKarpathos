@@ -15,6 +15,7 @@ class LoginPageControllerTest {
 
         String page = new LoginPageController().loginPage(csrfToken);
 
+        assertTrue(page.contains("<form id=\"login-form\" method=\"post\" action=\"/login\">"));
         assertTrue(page.contains("name=\"_csrf\" value=\"token&quot;&amp;value\""));
         assertTrue(page.contains("Invalid username or password."));
         assertTrue(page.contains("Λανθασμένο όνομα χρήστη ή κωδικός πρόσβασης."));

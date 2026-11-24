@@ -30,7 +30,7 @@ class DatabaseSchemaTest {
     void initializesExpectedTables() throws Exception {
         Path database = temporaryDirectory.resolve("schema-test.db");
         try (Connection connection = DriverManager.getConnection("jdbc:sqlite:" + database.toAbsolutePath())) {
-            assertTrue(tableExists(connection, "Booking"));
+            assertTrue(tableExists(connection, "bookings"));
             assertTrue(tableExists(connection, "booking_resources"));
             assertTrue(tableExists(connection, "users"));
             assertTrue(tableExists(connection, "app_installation"));
