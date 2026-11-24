@@ -278,16 +278,11 @@ verifies its SHA-512 checksum; later runs use the local Maven cache. The `dist`
 directory is generated output and is intentionally ignored by Git; this
 folder's source, scripts, and instructions are tracked.
 
-The `Desktop installers` GitHub Actions workflow builds the Debian package,
-portable Linux archive, macOS DMG and ZIP, and Windows MSI and ZIP on matching
-hosted operating systems when run manually or when a version tag is pushed.
-Before building a tagged release, it verifies the tag matches the application version in
-`pom.xml` (for example, `pom.xml` version `1.0.1` requires tag `v1.0.1`). A
-matching tag automatically creates a GitHub Release with generated notes and
-all six packages attached. Manual workflow runs only upload workflow artifacts.
+Desktop installer GitHub Actions automation has been removed. Build installers
+locally on the matching operating system using the scripts above.
 
-To publish a release, update the project version in `pom.xml`, commit that
-change, then create and push the matching tag, for example:
+To publish a release manually, update the project version in `pom.xml`, commit
+that change, then create and push the matching tag, for example:
 
 ```sh
 git tag v1.0.1
