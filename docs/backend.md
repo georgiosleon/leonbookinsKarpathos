@@ -85,6 +85,8 @@ for compatibility. Access is deny-by-default; endpoints below require authentica
 | `PUT/DELETE` | `/api/v1/customers/{id}` | ADMIN | Update/delete customer record. |
 | `GET` | `/api/v1/app-info` | Authenticated | Application version/deployment/license info. |
 | `GET` | `/api/v1/diagnostics` | Authenticated | Diagnostics download. |
+| `GET` | `/api/v1/support-bundle` | Authenticated | Redacted support zip (diagnostics + app info). |
+| `GET` | `/actuator/health`, `/actuator/info` | ADMIN | Limited operational health/info endpoints. |
 | `GET` | `/api/v1/csrf` | Authenticated | Obtain CSRF token for browser writes. |
 
 Report requests accept `fromDate` and `toDate` in `dd/MM/yyyy` format and an

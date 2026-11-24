@@ -32,7 +32,7 @@ public class CustomErrorHandler {
         String message = "el".equals(locale.getLanguage())
               ? "Τα δεδομένα του αιτήματος δεν είναι έγκυρα."
               : "Invalid request.";
-        return build(HttpStatus.BAD_REQUEST, message, request);
+        return build(HttpStatus.BAD_REQUEST, "VALIDATION_ERROR", message, request);
     }
 
     @ExceptionHandler(ResponseStatusException.class)
@@ -54,27 +54,30 @@ public class CustomErrorHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiError> handleAccessDenied(AccessDeniedException exception, HttpServletRequest request) {
-        return build(HttpStatus.FORBIDDEN, "Access denied.", request);
+        return build(HttpStatus.FORBIDDEN, "ACCESS_DENIED", "Access denied.", request);
     }
 
     @ExceptionHandler(HttpRequestMethodNotSupportedException.class)
     public ResponseEntity<ApiError> handleMethodNotSupported(HttpRequestMethodNotSupportedException exception, HttpServletRequest request) {
-        return build(HttpStatus.METHOD_NOT_ALLOWED, "Method not allowed.", request);
+        return build(HttpStatus.METHOD_NOT_ALLOWED, "METHOD_NOT_ALLOWED", "Method not allowed.", request);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ApiError> handleNoResource(NoResourceFoundException exception, HttpServletRequest request) {
-        return build(HttpStatus.NOT_FOUND, "Not found.", request);
+        return build(HttpStatus.NOT_FOUND, "NOT_FOUND", "Not found.", request);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleUnexpected(Exception exception, HttpServletRequest request) {
-        return build(HttpStatus.INTERNAL_SERVER_ERROR, "Unexpected server error.", request);
+        return build(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_ERROR", "Unexpected server error.", request);
     }
 
     private ResponseEntity<ApiError> build(HttpStatus status, String message, HttpServletRequest request) {
+        return build(status, status.name(), message, request);
+    }
+
+    private ResponseEntity<ApiError> build(HttpStatus status, String code, String message, HttpServletRequest request) {
         String path = request == null ? "" : request.getRequestURI();
-        String code = status.name();
         return ResponseEntity.status(status)
               .body(new ApiError(Instant.now().toString(), status.value(), status.getReasonPhrase(), code, message, path));
     }

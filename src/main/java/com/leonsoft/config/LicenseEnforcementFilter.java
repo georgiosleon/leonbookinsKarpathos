@@ -92,7 +92,7 @@ public class LicenseEnforcementFilter extends OncePerRequestFilter {
                 + Instant.now()
                 + "\",\"status\":" + status.value()
                 + ",\"error\":\"" + status.getReasonPhrase()
-                + "\",\"message\":\"" + message
+                + "\",\"code\":\"LICENSE_REQUIRED\",\"message\":\"" + message
                 + "\",\"path\":\"" + path + "\"}";
         response.getWriter().write(body);
     }
