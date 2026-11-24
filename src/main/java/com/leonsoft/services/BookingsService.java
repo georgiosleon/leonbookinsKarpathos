@@ -140,7 +140,7 @@ public class BookingsService {
 
     public Boolean deleteObject(String bookingId) {
         log.debug("Delete booking {}", bookingId);
-        Booking booking = bookingRepository.findById(bookingId)
+        bookingRepository.findById(bookingId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Booking not found."));
 
         if (!canModifyBooking()) {

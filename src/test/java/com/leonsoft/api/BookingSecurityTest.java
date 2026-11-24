@@ -513,4 +513,28 @@ class BookingSecurityTest {
                         .content("{\"name\":\"Acme\",\"telephone\":\"\",\"email\":\"\"}"))
                 .andExpect(status().isForbidden());
     }
+
+    @Test
+    void imagesArePublicStaticAssets() throws Exception {
+        mockMvc.perform(get("/images/login-image-1.jpg"))
+                .andExpect(result -> {
+                    int status = result.getResponse().getStatus();
+                    if (status == 401 || status == 403) {
+                        throw new AssertionError("Expected /images/** to be public, got " + status);
+                    }
+                });
+    }
+
+    @Test
+    void activationMakesBlockedApisAvailable() throws Exception {
+        when(licenseService.isActivated()).thenReturn(false);
+        when(licenseService.getStatus()).thenReturn(new LicenseStatusResponse(false, "install-1", null, null, null));
+        mockMvc.perform(get("/api/v1/booking/getAll").with(user("admin").roles("ADMIN")))
+                .andExpect(status().isForbidden());
+
+        when(licenseService.isActivated()).thenReturn(true);
+        when(bookingsService.getAll()).thenReturn(List.of());
+        mockMvc.perform(get("/api/v1/booking/getAll").with(user("admin").roles("ADMIN")))
+                .andExpect(status().isOk());
+    }
 }

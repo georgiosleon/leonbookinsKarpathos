@@ -97,6 +97,32 @@ class DatabaseCliTest {
     }
 
     @Test
+    void encryptedBackupRejectsShortPassphrase() {
+        Path output = backupDirectory.resolve("bad.sqlite3.enc");
+        char[] shortPassphrase = "short".toCharArray();
+        try {
+            assertThrows(IllegalArgumentException.class,
+                    () -> DatabaseCli.backupDatabaseEncrypted(database, output, shortPassphrase));
+        } finally {
+            Arrays.fill(shortPassphrase, '\0');
+        }
+    }
+
+    @Test
+    void restoreEncryptedRejectsInvalidFile() throws Exception {
+        Path invalid = temporaryDirectory.resolve("not-encrypted.enc");
+        Files.writeString(invalid, "not encrypted");
+        char[] passphrase = "correct horse battery".toCharArray();
+        try {
+            assertThrows(java.io.IOException.class,
+                    () -> DatabaseCli.restoreEncryptedDatabase(database, invalid, backupDirectory, passphrase));
+            assertEquals("current", bookingName(database));
+        } finally {
+            Arrays.fill(passphrase, '\0');
+        }
+    }
+
+    @Test
     void restoreBacksUpCurrentDatabaseBeforeReplacingIt() throws Exception {
         Path backup = DatabaseCli.restoreDatabase(database, source, backupDirectory);
 

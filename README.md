@@ -270,6 +270,7 @@ screen and blocks normal use until activated.
 - **Activation**: paste the signed license key and click **Activate**. Activation takes effect immediately (no restart).
 - **Scope**: perpetual, no expiry, bound to the installation ID stored in the local database.
 - **Access**: only ADMIN can activate/manage licensing; OPERATOR/GUEST see a blocked message until activated.
+- **APIs**: `GET /api/v1/license/status` (authenticated), `POST /api/v1/license/activate` (ADMIN, CSRF), `/api/v1/customers` (ADMIN CRUD).
 
 Generate a dev/test license key with the included tool:
 
@@ -492,7 +493,7 @@ Compose stores SQLite data in a named volume and configures the app to listen
 inside the container. For remote access, configure a trusted HTTPS reverse
 proxy rather than exposing the application directly to the internet.
 
-Seed account passwords must be at least 12 characters. Browser sessions use CSRF protection for write requests.
+Seed account passwords must be at least 12 characters (default dev seed password: `1qaz2wsx3edc`; configure `APP_ADMIN_PASSWORD`/`APP_OPERATOR_PASSWORD`/`APP_GUEST_PASSWORD` for real deployments). Browser sessions use CSRF protection for write requests.
 
 | Capability | ADMIN | OPERATOR | GUEST |
 |---|:---:|:---:|:---:|
