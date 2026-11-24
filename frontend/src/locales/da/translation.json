@@ -328,5 +328,13 @@
   "Invalid license key: confirm it matches the Installation ID and correct public key.": "Ugyldig licensnøgle: bekræft, at den matcher installations-ID og den korrekte offentlige nøgle.",
   "Database migration/startup issue: back up bookings.db and review logs; pre-V1 DBs need the documented manual migration path.": "Problem med DB-migrering/opstart: tag backup af bookings.db og gennemgå logs; pre-V1-databaser kræver den dokumenterede manuelle migreringsvej.",
   "Backup/restore: stop the app before restore, verify on a copy, and keep passphrases separate.": "Backup/gendannelse: stop appen før gendannelse, verificer på en kopi, og hold adgangssætninger adskilt.",
-  "Need help: download the Support bundle and include app version, steps, and logs.": "Brug for hjælp: download supportpakken og inkluder app-version, trin og logs."
+  "Need help: download the Support bundle and include app version, steps, and logs.": "Brug for hjælp: download supportpakken og inkluder app-version, trin og logs.",
+  "Total charged (€)": "Samlet opkrævet (€)",
+  "Total charged": "Samlet opkrævet",
+  "Rental subtotal (€)": "Leje-subtotal (€)",
+  "Rental subtotal: {amount}": "Leje-subtotal: {amount}",
+  "Balance = Total charged − Received − Commission − Rental tax": "Saldo = Samlet opkrævet − Modtaget − Kommission − Lejeskat",
+  "Rental subtotal = Total charged − Rental tax": "Leje-subtotal = Samlet opkrævet − Lejeskat",
+  "Total charged less rental tax": "Samlet opkrævet minus lejeskat",
+  "Total charged less received, commission, and rental tax": "Samlet opkrævet minus modtaget, kommission og lejeskat"
 }

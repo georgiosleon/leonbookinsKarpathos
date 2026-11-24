@@ -74,6 +74,7 @@ export function BookingForm({
     - (Number(form.received) || 0)
     - (Number(form.commission) || 0)
     - (Number(form.rentalTax) || 0);
+  const rentalSubTotalValue = (Number(form.charge) || 0) - (Number(form.rentalTax) || 0);
 
   return (
     <form className="booking-form" onSubmit={onSubmit}>
@@ -186,7 +187,8 @@ export function BookingForm({
         <div className="panel-heading">
           <div>
             <h3 id="financial-section-heading">{t('Financials')}</h3>
-            <p>{t('Balance = Total − Received − Commission − Rental tax')}</p>
+            <p>{t('Balance = Total charged − Received − Commission − Rental tax')}</p>
+            <p>{t('Rental subtotal = Total charged − Rental tax')}</p>
           </div>
           <button type="button" className="button button-muted" onClick={() => setShowFinancials((v) => !v)}>
             {t(showFinancials ? 'Hide financials' : 'Show financials')}
@@ -194,14 +196,14 @@ export function BookingForm({
         </div>
         {!showFinancials && (
           <p className="form-note">
-            {t('Balance (€)')}: {formatMoney(balanceValue, locale)} · {t('Rental tax (€)')}: {formatMoney(Number(form.rentalTax) || 0, locale)}
+            {t('Balance (€)')}: {formatMoney(balanceValue, locale)} · {t('Rental tax (€)')}: {formatMoney(Number(form.rentalTax) || 0, locale)} · {t('Rental subtotal (€)')}: {formatMoney(rentalSubTotalValue, locale)}
           </p>
         )}
         {showFinancials && (
           <fieldset disabled={readOnly} style={{ border: 0, padding: 0, margin: 0, minInlineSize: 0 }}>
             <div className="form-grid">
               <label className="field">
-                <span>{t('Total (€)')}</span>
+                <span>{t('Total charged (€)')}</span>
                 <input type="number" step="0.01" value={form.charge} onChange={(event) => updateMoney('charge', event.target.value)} />
               </label>
 
@@ -223,6 +225,11 @@ export function BookingForm({
               <label className="field">
                 <span>{t('Rental tax (€)')}</span>
                 <input readOnly tabIndex={-1} value={formatMoney(Number(form.rentalTax) || 0, locale)} />
+              </label>
+
+              <label className="field">
+                <span>{t('Rental subtotal (€)')}</span>
+                <input readOnly tabIndex={-1} value={formatMoney(rentalSubTotalValue, locale)} />
               </label>
 
               <label className="field">

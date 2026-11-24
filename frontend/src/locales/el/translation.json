@@ -328,5 +328,13 @@
   "Invalid license key: confirm it matches the Installation ID and correct public key.": "Μη έγκυρο κλειδί άδειας: επιβεβαιώστε ότι ταιριάζει με το ID εγκατάστασης και το σωστό δημόσιο κλειδί.",
   "Database migration/startup issue: back up bookings.db and review logs; pre-V1 DBs need the documented manual migration path.": "Πρόβλημα μετεγκατάστασης/εκκίνησης βάσης: δημιουργήστε αντίγραφο του bookings.db και ελέγξτε τα logs· οι βάσεις πριν το V1 χρειάζονται τη τεκμηριωμένη χειροκίνητη διαδρομή μετεγκατάστασης.",
   "Backup/restore: stop the app before restore, verify on a copy, and keep passphrases separate.": "Αντίγραφο/επαναφορά: σταματήστε την εφαρμογή πριν την επαναφορά, επαληθεύστε σε αντίγραφο και κρατήστε τις φράσεις πρόσβασης χωριστά.",
-  "Need help: download the Support bundle and include app version, steps, and logs.": "Χρειάζεστε βοήθεια: κατεβάστε το πακέτο υποστήριξης και συμπεριλάβετε έκδοση εφαρμογής, βήματα και logs."
+  "Need help: download the Support bundle and include app version, steps, and logs.": "Χρειάζεστε βοήθεια: κατεβάστε το πακέτο υποστήριξης και συμπεριλάβετε έκδοση εφαρμογής, βήματα και logs.",
+  "Total charged (€)": "Σύνολο χρέωσης (€)",
+  "Total charged": "Σύνολο χρέωσης",
+  "Rental subtotal (€)": "Μερικό σύνολο ενοικίασης (€)",
+  "Rental subtotal: {amount}": "Μερικό σύνολο ενοικίασης: {amount}",
+  "Balance = Total charged − Received − Commission − Rental tax": "Υπόλοιπο = Σύνολο χρέωσης − Εισπράξεις − Προμήθεια − Φόρος ενοικίασης",
+  "Rental subtotal = Total charged − Rental tax": "Μερικό σύνολο ενοικίασης = Σύνολο χρέωσης − Φόρος ενοικίασης",
+  "Total charged less rental tax": "Σύνολο χρέωσης μείον φόρο ενοικίασης",
+  "Total charged less received, commission, and rental tax": "Σύνολο χρέωσης μείον εισπράξεις, προμήθεια και φόρο ενοικίασης"
 }

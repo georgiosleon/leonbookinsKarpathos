@@ -41,6 +41,10 @@ export function calculateBalance(charge, received, commission, rentalTax = 0) {
   return (Number(charge) || 0) - (Number(received) || 0) - (Number(commission) || 0) - (Number(rentalTax) || 0);
 }
 
+export function calculateRentalSubTotal(charge, rentalTax = 0) {
+  return (Number(charge) || 0) - (Number(rentalTax) || 0);
+}
+
 export function hasAvailabilityConflict(candidate, bookings, ignoredBookingId = null) {
   if (!['active', 'paid'].includes(candidate.status)) return false;
   const candidateStart = europeanToIsoDate(candidate.startDate);

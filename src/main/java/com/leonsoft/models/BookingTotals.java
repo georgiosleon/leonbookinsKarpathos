@@ -10,6 +10,7 @@ public class BookingTotals {
     private Double totReceived =  Double.valueOf(0.0);
     private Double totCommission =  Double.valueOf(0.0);
     private Double totRentalTax =  Double.valueOf(0.0);
+    private Double totRentalSubTotal = Double.valueOf(0.0); // rentalSubTotal = charge - rentalTax
     private Double totBalance = Double.valueOf(0.0);   // balance = charge - (received + commission + rentalTax)
 
     private Integer totNights = Integer.valueOf(0);

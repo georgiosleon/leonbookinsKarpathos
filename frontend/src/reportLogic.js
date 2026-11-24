@@ -33,6 +33,7 @@ export function summarizeBookings(bookings, mode) {
       charge: sum(resourceBookings, 'charge'),
       received: sum(resourceBookings, 'received'),
       rentalTax: sum(resourceBookings, 'rentalTax'),
+      rentalSubTotal: sum(resourceBookings, 'rentalSubTotal') || (sum(resourceBookings, 'charge') - sum(resourceBookings, 'rentalTax')),
       balance: sum(resourceBookings, 'balance'),
     };
   });
@@ -46,6 +47,7 @@ export function summarizeBookings(bookings, mode) {
     charge: sum(bookableBookings, 'charge'),
     received: sum(bookableBookings, 'received'),
     rentalTax: sum(bookableBookings, 'rentalTax'),
+    rentalSubTotal: sum(bookableBookings, 'rentalSubTotal') || (sum(bookableBookings, 'charge') - sum(bookableBookings, 'rentalTax')),
     balance: sum(bookableBookings, 'balance'),
     resources,
   };

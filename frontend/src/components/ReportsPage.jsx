@@ -111,7 +111,7 @@ export function ReportsPage() {
     const resourceById = new Map(mode.resources.map((r) => [r.id, r]));
     const headers = [
       'Status','Arrival','Departure','Resource','Registration number','Tax category','Name','Agency','Guests','Nights',
-      'Rate/night','Charge','Received','Rental tax','Balance','Platform reservation ID','Country','Email','Tel','Invoice number','Tax ref number','Notes'
+      'Rate/night','Total charged','Received','Rental tax','Rental subtotal','Balance','Platform reservation ID','Country','Email','Tel','Invoice number','Tax ref number','Notes'
     ];
     const escape = (value) => {
       const text = value == null ? '' : String(value);
@@ -122,9 +122,10 @@ export function ReportsPage() {
       const nights = Number(b.numOfNights) || 0;
       const rentalTax = Number(b.rentalTax) || 0;
       const rate = nights > 0 ? rentalTax / nights : 0;
+      const charge = Number(b.charge) || 0;
       return [
         b.status, b.startDate, b.endDate, b.resourceName ?? b.resourceId, r?.registrationNumber ?? '', r?.taxCategory ?? '',
-        b.name, b.agency, b.numOfGuests ?? 0, nights, rate.toFixed(2), b.charge ?? 0, b.received ?? 0, rentalTax.toFixed(2), b.balance ?? 0,
+        b.name, b.agency, b.numOfGuests ?? 0, nights, rate.toFixed(2), charge.toFixed(2), (Number(b.received) || 0).toFixed(2), rentalTax.toFixed(2), (charge - rentalTax).toFixed(2), (Number(b.balance) || 0).toFixed(2),
         b.platformReservationId ?? '', b.country ?? '', b.email ?? '', b.tel ?? '', b.invoiceNumber ?? '', b.taxRefNumber ?? '', b.extraInfo ?? ''
       ].map(escape).join(',');
     });
@@ -262,10 +263,11 @@ export function ReportsPage() {
             <SummaryCard label={t('Cancelled bookings')} value={summary.cancelledBookings} detail={t('Excluded from financial totals')} />
             <SummaryCard label={t('Guests')} value={summary.guests} detail={t('Active and paid bookings')} />
             <SummaryCard label={t('Nights')} value={summary.nights} detail={t('Active and paid bookings')} />
-            <SummaryCard label={t('Charge')} value={formatMoney(summary.charge, locale)} detail={t('Active and paid bookings')} />
+            <SummaryCard label={t('Total charged')} value={formatMoney(summary.charge, locale)} detail={t('Active and paid bookings')} />
             <SummaryCard label={t('Received')} value={formatMoney(summary.received, locale)} detail={t('Active and paid bookings')} />
             <SummaryCard label={t('Rental tax (€)')} value={formatMoney(summary.rentalTax, locale)} detail={t('Active and paid bookings')} />
-            <SummaryCard label={t('Balance')} value={formatMoney(summary.balance, locale)} detail={t('Charge less received, commission, and rental tax')} />
+            <SummaryCard label={t('Rental subtotal (€)')} value={formatMoney((Number(summary.charge)||0)-(Number(summary.rentalTax)||0), locale)} detail={t('Total charged less rental tax')} />
+            <SummaryCard label={t('Balance')} value={formatMoney(summary.balance, locale)} detail={t('Total charged less received, commission, and rental tax')} />
           </section>
 
           <section className="panel" aria-labelledby="resource-report-heading">
@@ -283,9 +285,10 @@ export function ReportsPage() {
                     <th>{t('Bookings')}</th>
                     <th>{t('Guests')}</th>
                     <th>{t('Nights')}</th>
-                    <th>{t('Charge')}</th>
+                    <th>{t('Total charged')}</th>
                     <th>{t('Received')}</th>
                     <th>{t('Rental tax (€)')}</th>
+                    <th>{t('Rental subtotal (€)')}</th>
                     <th>{t('Balance')}</th>
                   </tr>
                 </thead>
@@ -299,6 +302,7 @@ export function ReportsPage() {
                       <td>{formatMoney(resource.charge, locale)}</td>
                       <td>{formatMoney(resource.received, locale)}</td>
                       <td>{formatMoney(resource.rentalTax, locale)}</td>
+                      <td>{formatMoney((Number(resource.charge)||0)-(Number(resource.rentalTax)||0), locale)}</td>
                       <td>{formatMoney(resource.balance, locale)}</td>
                     </tr>
                   ))}
@@ -331,9 +335,10 @@ export function ReportsPage() {
                     <th>{t('Guests')}</th>
                     <th>{t('Nights')}</th>
                     <th>{t('Rental tax per night (€)')}</th>
-                    <th>{t('Charge')}</th>
+                    <th>{t('Total charged')}</th>
                     <th>{t('Received')}</th>
                     <th>{t('Rental tax (€)')}</th>
+                    <th>{t('Rental subtotal (€)')}</th>
                     <th>{t('Balance')}</th>
                   </tr>
                 </thead>
@@ -354,12 +359,13 @@ export function ReportsPage() {
                       <td>{formatMoney(Number(booking.charge) || 0, locale)}</td>
                       <td>{formatMoney(Number(booking.received) || 0, locale)}</td>
                       <td>{formatMoney(Number(booking.rentalTax) || 0, locale)}</td>
+                      <td>{formatMoney((Number(booking.charge)||0)-(Number(booking.rentalTax)||0), locale)}</td>
                       <td>{formatMoney(Number(booking.balance) || 0, locale)}</td>
                     </tr>
                   ))}
                   {filteredBookings.length === 0 && (
                     <tr>
-                      <td colSpan="15" className="report-empty-row">{t('No bookings start in this period.')}</td>
+                      <td colSpan="16" className="report-empty-row">{t('No bookings start in this period.')}</td>
                     </tr>
                   )}
                 </tbody>

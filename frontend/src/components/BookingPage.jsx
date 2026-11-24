@@ -7,6 +7,7 @@ import {
 import {
   bookingToForm,
   calculateBalance,
+  calculateRentalSubTotal,
   hasAvailabilityConflict,
   toBookingPayload,
 } from '../bookingLogic.js';
@@ -268,6 +269,7 @@ export function BookingPage() {
   }
 
   const balance = calculateBalance(form.charge, form.received, form.commission, form.rentalTax);
+  const rentalSubTotal = calculateRentalSubTotal(form.charge, form.rentalTax);
   const mode = useMemo(() => ({
     ...baseMode,
     resources: resourcesForMode(resources, baseMode),
@@ -300,7 +302,7 @@ export function BookingPage() {
             </p>
           </div>
           <div className="booking-form-heading-actions">
-            <strong className="balance-summary">{t('Balance: {amount}', { amount: formatMoney(balance, locale) })}</strong>
+            <strong className="balance-summary">{t('Rental subtotal: {amount}', { amount: formatMoney(rentalSubTotal, locale) })} · {t('Balance: {amount}', { amount: formatMoney(balance, locale) })}</strong>
             <button
               type="button"
               className="button button-muted"

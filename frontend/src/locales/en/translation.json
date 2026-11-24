@@ -328,5 +328,13 @@
   "Invalid license key: confirm it matches the Installation ID and correct public key.": "Invalid license key: confirm it matches the Installation ID and correct public key.",
   "Database migration/startup issue: back up bookings.db and review logs; pre-V1 DBs need the documented manual migration path.": "Database migration/startup issue: back up bookings.db and review logs; pre-V1 DBs need the documented manual migration path.",
   "Backup/restore: stop the app before restore, verify on a copy, and keep passphrases separate.": "Backup/restore: stop the app before restore, verify on a copy, and keep passphrases separate.",
-  "Need help: download the Support bundle and include app version, steps, and logs.": "Need help: download the Support bundle and include app version, steps, and logs."
+  "Need help: download the Support bundle and include app version, steps, and logs.": "Need help: download the Support bundle and include app version, steps, and logs.",
+  "Total charged (€)": "Total charged (€)",
+  "Total charged": "Total charged",
+  "Rental subtotal (€)": "Rental subtotal (€)",
+  "Rental subtotal: {amount}": "Rental subtotal: {amount}",
+  "Balance = Total charged − Received − Commission − Rental tax": "Balance = Total charged − Received − Commission − Rental tax",
+  "Rental subtotal = Total charged − Rental tax": "Rental subtotal = Total charged − Rental tax",
+  "Total charged less rental tax": "Total charged less rental tax",
+  "Total charged less received, commission, and rental tax": "Total charged less received, commission, and rental tax"
 }

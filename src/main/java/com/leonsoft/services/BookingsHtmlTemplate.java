@@ -51,6 +51,7 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
               .append("<th>").append(label(locale, "commission")).append("</th>")
               .append("<th>").append(label(locale, "received")).append("</th>")
               .append("<th>").append(label(locale, "rentalTax")).append("</th>")
+              .append("<th>").append(label(locale, "rentalSubTotal")).append("</th>")
               .append("<th>").append(label(locale, "balance")).append("</th>")
               .append("<th>").append(label(locale, "country")).append("</th>")
               .append("<th>").append(label(locale, "id")).append("</th>")
@@ -84,6 +85,7 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
             totals.setTotCommission(totals.getTotCommission() + n(booking.commission()));
             totals.setTotReceived(totals.getTotReceived() + n(booking.received()));
             totals.setTotRentalTax(totals.getTotRentalTax() + n(booking.rentalTax()));
+            totals.setTotRentalSubTotal(totals.getTotRentalSubTotal() + n(booking.rentalSubTotal()));
             totals.setTotGuests(totals.getTotGuests() + n(booking.numOfGuests()));
             totals.setTotNights(totals.getTotNights() + n(booking.numOfNights()));
 
@@ -111,6 +113,7 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
                   .append("<td>").append(n(booking.commission())).append("</td>")
                   .append("<td>").append(n(booking.received())).append("</td>")
                   .append("<td>").append(n(booking.rentalTax())).append("</td>")
+                  .append("<td>").append(n(booking.rentalSubTotal())).append("</td>")
                   .append("<td>").append(n(booking.balance())).append("</td>")
 
                   .append("<td>").append(htmlEscape(booking.country())).append("</td>")
@@ -156,6 +159,7 @@ public class BookingsHtmlTemplate implements BookingHtmlReportRenderer {
                   .append("<td>").append(numberFormat.format(totals.getTotCommission())).append("</td>")
                   .append("<td>").append(numberFormat.format(totals.getTotReceived())).append("</td>")
                   .append("<td>").append(numberFormat.format(totals.getTotRentalTax())).append("</td>")
+                  .append("<td>").append(numberFormat.format(totals.getTotRentalSubTotal())).append("</td>")
                   .append("<td>").append(numberFormat.format(totals.getTotBalance())).append("</td>")
               .append(" </tr>");
         report.append("  </table>")
