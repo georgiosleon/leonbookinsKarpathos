@@ -74,10 +74,11 @@ public class CustomErrorHandler {
 
     private ResponseEntity<ApiError> build(HttpStatus status, String message, HttpServletRequest request) {
         String path = request == null ? "" : request.getRequestURI();
+        String code = status.name();
         return ResponseEntity.status(status)
-              .body(new ApiError(Instant.now().toString(), status.value(), status.getReasonPhrase(), message, path));
+              .body(new ApiError(Instant.now().toString(), status.value(), status.getReasonPhrase(), code, message, path));
     }
 
-    public record ApiError(String timestamp, int status, String error, String message, String path) {
+    public record ApiError(String timestamp, int status, String error, String code, String message, String path) {
     }
 }

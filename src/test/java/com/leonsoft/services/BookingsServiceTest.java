@@ -42,12 +42,15 @@ class BookingsServiceTest {
     @Mock
     private UserRepository userRepository;
 
+    @Mock
+    private AuditService auditService;
+
     private BookingsService bookingsService;
 
     @BeforeEach
     void setUp() {
         bookingsService = new BookingsService(
-              bookingRepository, resourceService, new BookingAvailabilityPolicy(true, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository));
+              bookingRepository, resourceService, new BookingAvailabilityPolicy(true, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository), auditService);
         User admin = new User();
         admin.setId(1);
         admin.setUsername("admin");
@@ -215,7 +218,7 @@ class BookingsServiceTest {
     @Test
     void roomFlagCanAllowOverlapsWithoutDisablingVehicleProtection() {
         bookingsService = new BookingsService(
-              bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository));
+              bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository), auditService);
         when(resourceService.requireExisting("APT2"))
               .thenReturn(new BookingResource("APT2", "rooms", "APT 2"));
         when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
@@ -226,7 +229,7 @@ class BookingsServiceTest {
               .findByResourceIdAndStatusIn("APT2", BookingStatus.BOOKABLE);
 
         bookingsService = new BookingsService(
-              bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository));
+              bookingRepository, resourceService, new BookingAvailabilityPolicy(false, true), new BookingOverlapChecker(bookingRepository), new CurrentUserProvider(userRepository), auditService);
         Booking existingVehicleBooking = savedBooking("vehicle-existing", "2026-06-20", "2026-06-23", "paid");
         existingVehicleBooking.setResourceId("CAR1");
         when(resourceService.requireExisting("CAR1"))

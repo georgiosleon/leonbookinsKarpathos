@@ -282,7 +282,8 @@ java --source 25 tools/LicenseSigner.java tools/dev-license-private.pkcs8.b64 <i
 ```
 
 **Production:** set `APP_LICENSE_PUBLIC_KEY` (or `app.license.public-key`) to your production Ed25519 X.509 public key (base64). Keep the matching private key outside the repository. Do not use the committed `tools/dev-license-*.b64` dev keypair for real customer deployments.
-**Development/testing only:** `app.license.bypass=true` (or `APP_LICENSE_BYPASS=true`) bypasses the license gate. Never enable in production.
+
+> **Development/testing only:** `app.license.bypass=true` (or `APP_LICENSE_BYPASS=true`) bypasses the license gate. Default dev profile enables bypass for tester convenience. **Never enable in production**; production profile sets it to `false`.
 
 ## API versioning
 
@@ -521,12 +522,38 @@ The build writes the bundled React app to the ignored
 `src/main/resources/public/react-assets/` directory. `/rooms.html` and
 `/cars.html` remain as redirects to the shared screen.
 
+## Useful commands
+
+| Purpose | Command |
+|---|---|
+| Run dev (Maven) | `./mvnw generate-resources spring-boot:run` |
+| Run tests | `./mvnw -q test -Dskip.installnodenpm=true -Dskip.npm=true` |
+| Quality verify | `./mvnw -q -Pquality verify` |
+| Frontend tests | `cd frontend && npm test` |
+| i18n check | `cd frontend && node scripts/check-translations.js` |
+| Docs smoke | `cd frontend && node scripts/check-docs-smoke.js` |
+| Backup (encrypted) | `java -jar leonbookinsKarpathos.jar db backup --database ./bookings.db --encrypt` |
+| Restore | `java -jar leonbookinsKarpathos.jar db restore --database ./bookings.db --input ./backups/<file>.enc` |
+
+## Support and diagnostics
+
+- **In-app**: authenticated users can download a **Support bundle** (`/api/v1/support-bundle`) containing redacted `diagnostics.txt` and `app-info.json`. It excludes secrets, install ID, and customer PII.
+- **Diagnostics endpoint**: `/api/v1/diagnostics` remains available for backward compatibility.
+- **Troubleshooting**: see [docs/troubleshooting.md](docs/troubleshooting.md).
+
+## Known limitations
+
+- **Pre-V1 legacy DBs**: not auto-migratable with current Flyway baseline (`baseline-version=1`). Use V1-compatible/baselined DB or manual migration.
+- **Single installation license**: one license per install ID; activation is stored in local DB.
+- **SQLite concurrency**: single-process/local-file design; do not share live DB over network share.
+- **No built-in HTTPS**: use a trusted reverse proxy for TLS.
+
 ## Production deployment checklist
 
 - **HTTPS/reverse proxy**: run behind a trusted HTTPS reverse proxy (nginx/Caddy/Traefik) for LAN or remote access; do not expose the app directly to the internet.
-- **Secrets**: set strong `APP_*_PASSWORD` values, configure `APP_LICENSE_PUBLIC_KEY` for production license verification, and keep signing keys outside the repo.
+- **Secrets**: set strong `APP_*_PASSWORD` values, configure `APP_LICENSE_PUBLIC_KEY`, keep signing keys outside the repo. Set `APP_LICENSE_BYPASS=false` (prod profile does this explicitly).
 - **Backups**: schedule encrypted database backups and store passphrases separately from backup files. Test restore on a copy before upgrades.
-- **Upgrades**: back up `bookings.db` before upgrading, then smoke-test login, license status, booking CRUD, and report export.
+- **Upgrades**: back up `bookings.db` before upgrading, then smoke-test login, license status, booking CRUD, and report export. For pre-V1 DBs, use documented manual path.
 
 ## Compliance scope (local only) and unsupported items
 

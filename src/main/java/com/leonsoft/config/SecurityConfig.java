@@ -91,6 +91,8 @@ public class SecurityConfig {
                         .hasRole("ADMIN")
                     // Operational endpoints: visible to authenticated users.
                     .requestMatchers("/api/v1/app-info", "/api/v1/diagnostics", "/api/v1/support-bundle").authenticated()
+                    // Actuator: admin-only, limited endpoints exposed by configuration.
+                    .requestMatchers("/actuator", "/actuator/**").hasRole("ADMIN")
                     // Deny-by-default for any unmapped endpoint.
                     .anyRequest().denyAll())
               .formLogin(form -> form

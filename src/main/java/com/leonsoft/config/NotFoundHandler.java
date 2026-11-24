@@ -45,12 +45,12 @@ public class NotFoundHandler {
                 log.error("Failed to load SPA entry page", exceptionReadingPage);
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                       .body(new CustomErrorHandler.ApiError(
-                            Instant.now().toString(), 500, "Internal Server Error",
+                            Instant.now().toString(), 500, "Internal Server Error", "INTERNAL_SERVER_ERROR",
                             "There was an error completing the action.", request.getRequestURI()));
             }
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
               .body(new CustomErrorHandler.ApiError(
-                    Instant.now().toString(), 404, "Not Found", "Not found.", request.getRequestURI()));
+                    Instant.now().toString(), 404, "Not Found", "NOT_FOUND", "Not found.", request.getRequestURI()));
     }
 }

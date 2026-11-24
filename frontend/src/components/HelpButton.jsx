@@ -337,6 +337,14 @@ export function HelpButton() {
                 <section>
                   <h3>{t('Support')}</h3>
                   <p>{t('Diagnostic information for troubleshooting.')}</p>
+                  <h4>{t('Troubleshooting')}</h4>
+                  <ul>
+                    <li>{t('License activation required: sign in as ADMIN and activate with the Installation ID, or set APP_LICENSE_BYPASS=true for dev/test only.')}</li>
+                    <li>{t('Invalid license key: confirm it matches the Installation ID and correct public key.')}</li>
+                    <li>{t('Database migration/startup issue: back up bookings.db and review logs; pre-V1 DBs need the documented manual migration path.')}</li>
+                    <li>{t('Backup/restore: stop the app before restore, verify on a copy, and keep passphrases separate.')}</li>
+                    <li>{t('Need help: download the Support bundle and include app version, steps, and logs.')}</li>
+                  </ul>
                   {diagnosticsLoading ? <p role="status">{t('Loading...')}</p> : null}
                   {diagnosticsError ? <p className="feedback feedback-error" role="alert">{diagnosticsError}</p> : null}
                   {!diagnosticsLoading && !diagnosticsError && diagnostics ? (

@@ -24,6 +24,12 @@ Generated translations should be reviewed by native speakers before release, esp
 - Password *
 - Replace the database path as needed. For Docker, run the same db backup command against the mounted /data/bookings.db.
 - Replace your-backup.sqlite3.enc with the actual backup filename and adjust the database path as needed.
+- Troubleshooting
+- License activation required: sign in as ADMIN and activate with the Installation ID, or set APP_LICENSE_BYPASS=true for dev/test only.
+- Invalid license key: confirm it matches the Installation ID and correct public key.
+- Database migration/startup issue: back up bookings.db and review logs; pre-V1 DBs need the documented manual migration path.
+- Backup/restore: stop the app before restore, verify on a copy, and keep passphrases separate.
+- Need help: download the Support bundle and include app version, steps, and logs.
 
 ## Notes
 - Keep placeholders unchanged (e.g. `{name}`, `{username}`, `{version}`).

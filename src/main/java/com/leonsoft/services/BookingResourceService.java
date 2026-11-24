@@ -17,9 +17,11 @@ import org.springframework.web.server.ResponseStatusException;
 public class BookingResourceService {
 
     private final BookingResourceRepository resourceRepository;
+    private final AuditService auditService;
 
-    public BookingResourceService(BookingResourceRepository resourceRepository) {
+    public BookingResourceService(BookingResourceRepository resourceRepository, AuditService auditService) {
         this.resourceRepository = resourceRepository;
+        this.auditService = auditService;
     }
 
     public List<BookingResource> getAll() {
@@ -31,7 +33,9 @@ public class BookingResourceService {
         if (resourceRepository.existsByTypeAndNameIgnoreCase(request.type(), name)) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "A resource with this name already exists.");
         }
-        return resourceRepository.save(request.toResource(UUID.randomUUID().toString()));
+        BookingResource saved = resourceRepository.save(request.toResource(UUID.randomUUID().toString()));
+        auditService.record("CREATE", "BookingResource", saved.getId(), "type=" + saved.getType() + ",name=" + saved.getName());
+        return saved;
     }
 
     public BookingResource update(String id, BookingResourceUpdateRequest request) {
@@ -50,7 +54,9 @@ public class BookingResourceService {
         resource.setRegistrationNumber(trimToNull(request.registrationNumber()));
         resource.setPropertyAddress(trimToNull(request.propertyAddress()));
         resource.setTaxCategory(trimToNull(request.taxCategory()));
-        return resourceRepository.save(resource);
+        BookingResource saved = resourceRepository.save(resource);
+        auditService.record("UPDATE", "BookingResource", saved.getId(), "type=" + saved.getType() + ",name=" + saved.getName() + ",active=" + saved.isActive());
+        return saved;
     }
 
     public BookingResource requireActive(String id) {

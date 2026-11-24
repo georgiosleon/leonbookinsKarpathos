@@ -27,18 +27,21 @@ public class BookingsService {
     private final BookingAvailabilityPolicy availabilityPolicy;
     private final BookingOverlapChecker overlapChecker;
     private final CurrentUserProvider currentUserProvider;
+    private final AuditService auditService;
 
     public BookingsService(
             BookingRepository bookingRepository,
             BookingResourceService resourceService,
             BookingAvailabilityPolicy availabilityPolicy,
             BookingOverlapChecker overlapChecker,
-            CurrentUserProvider currentUserProvider) {
+            CurrentUserProvider currentUserProvider,
+            AuditService auditService) {
         this.bookingRepository = bookingRepository;
         this.resourceService = resourceService;
         this.availabilityPolicy = availabilityPolicy;
         this.overlapChecker = overlapChecker;
         this.currentUserProvider = currentUserProvider;
+        this.auditService = auditService;
     }
 
     /** Admins and operators can create/update/delete any booking; guests cannot. */
@@ -68,6 +71,7 @@ public class BookingsService {
         if (log.isDebugEnabled()) {
             log.debug("Booking created with ID: {}", saved.getId());
         }
+        auditService.record("CREATE", "Booking", saved.getId(), "resource=" + saved.getResourceId() + ",status=" + saved.getStatus());
         return saved;
     }
 
@@ -148,6 +152,7 @@ public class BookingsService {
         }
 
         bookingRepository.deleteById(bookingId);
+        auditService.record("DELETE", "Booking", bookingId, "hard-delete");
         return true;
     }
 
@@ -164,6 +169,7 @@ public class BookingsService {
         }
 
         bookingRepository.deleteById(bookingId);
+        auditService.record("DELETE_CANCELLED", "Booking", bookingId, "cancelled-only");
     }
 
     @Transactional(readOnly = true)

@@ -322,5 +322,11 @@
   "Download diagnostics": "Diagnose herunterladen",
   "Download support bundle": "Support-Paket herunterladen",
   "Replace the database path as needed. For Docker, run the same db backup command against the mounted /data/bookings.db.": "Ersetzen Sie den Datenbankpfad bei Bedarf. Führen Sie für Docker denselben db-backup-Befehl für die gemountete /data/bookings.db aus.",
-  "Replace your-backup.sqlite3.enc with the actual backup filename and adjust the database path as needed.": "Ersetzen Sie your-backup.sqlite3.enc durch den tatsächlichen Backup-Dateinamen und passen Sie den Datenbankpfad bei Bedarf an."
+  "Replace your-backup.sqlite3.enc with the actual backup filename and adjust the database path as needed.": "Ersetzen Sie your-backup.sqlite3.enc durch den tatsächlichen Backup-Dateinamen und passen Sie den Datenbankpfad bei Bedarf an.",
+  "Troubleshooting": "Fehlerbehebung",
+  "License activation required: sign in as ADMIN and activate with the Installation ID, or set APP_LICENSE_BYPASS=true for dev/test only.": "Lizenzaktivierung erforderlich: Melden Sie sich als ADMIN an und aktivieren Sie mit der Installations-ID, oder setzen Sie APP_LICENSE_BYPASS=true nur für Dev/Test.",
+  "Invalid license key: confirm it matches the Installation ID and correct public key.": "Ungültiger Lizenzschlüssel: Prüfen Sie, ob er zur Installations-ID und zum richtigen öffentlichen Schlüssel passt.",
+  "Database migration/startup issue: back up bookings.db and review logs; pre-V1 DBs need the documented manual migration path.": "Problem bei DB-Migration/Start: Sichern Sie bookings.db und prüfen Sie Logs; Pre-V1-DBs benötigen den dokumentierten manuellen Migrationspfad.",
+  "Backup/restore: stop the app before restore, verify on a copy, and keep passphrases separate.": "Backup/Wiederherstellung: Stoppen Sie die App vor der Wiederherstellung, prüfen Sie an einer Kopie und bewahren Sie Passphrasen getrennt auf.",
+  "Need help: download the Support bundle and include app version, steps, and logs.": "Hilfe benötigt: Laden Sie das Support-Paket herunter und fügen Sie App-Version, Schritte und Logs bei."
 }
