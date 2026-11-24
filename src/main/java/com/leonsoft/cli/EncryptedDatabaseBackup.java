@@ -35,7 +35,7 @@ final class EncryptedDatabaseBackup {
         }
     }
 
-    static void encrypt(Path source, Path destination, char[] passphrase) throws IOException {
+    static void encrypt(Path source, Path destination, char... passphrase) throws IOException {
         validatePassphrase(passphrase);
         byte[] salt = new byte[SALT_LENGTH];
         byte[] nonce = new byte[NONCE_LENGTH];
@@ -59,7 +59,7 @@ final class EncryptedDatabaseBackup {
         }
     }
 
-    static void decrypt(Path source, Path destination, char[] passphrase) throws IOException {
+    static void decrypt(Path source, Path destination, char... passphrase) throws IOException {
         validatePassphrase(passphrase);
         byte[] key = null;
         boolean decryptedSuccessfully = false;
@@ -78,13 +78,14 @@ final class EncryptedDatabaseBackup {
             try (OutputStream output = Files.newOutputStream(destination,
                     StandardOpenOption.TRUNCATE_EXISTING, StandardOpenOption.WRITE)) {
                 byte[] buffer = new byte[8192];
-                int count;
-                while ((count = input.read(buffer)) != -1) {
+                int count = input.read(buffer);
+                while (count != -1) {
                     byte[] plaintext = cipher.update(buffer, 0, count);
                     if (plaintext != null) {
                         output.write(plaintext);
                         Arrays.fill(plaintext, (byte) 0);
                     }
+                    count = input.read(buffer);
                 }
                 byte[] finalPlaintext = cipher.doFinal();
                 try {
@@ -138,7 +139,7 @@ final class EncryptedDatabaseBackup {
         }
     }
 
-    private static void validatePassphrase(char[] passphrase) {
+    private static void validatePassphrase(char... passphrase) {
         if (passphrase == null || passphrase.length < MIN_PASSPHRASE_LENGTH) {
             throw new IllegalArgumentException(
                     "Backup passphrase must be at least " + MIN_PASSPHRASE_LENGTH + " characters");

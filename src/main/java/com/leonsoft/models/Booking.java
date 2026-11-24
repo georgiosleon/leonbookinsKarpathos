@@ -14,6 +14,8 @@ import lombok.ToString;
 @Entity
 public class Booking {
 
+    private static final String INTEGER_COLUMN = "integer";
+
     @Id
     @Column(name = "id")
     private String id;
@@ -32,23 +34,23 @@ public class Booking {
     private Integer numOfNights;
 
     @Convert(converter = MoneyCentsConverter.class)
-    @Column(name = "charge", columnDefinition = "integer")
+    @Column(name = "charge", columnDefinition = INTEGER_COLUMN)
     private java.math.BigDecimal charge;
 
     @Convert(converter = MoneyCentsConverter.class)
-    @Column(name = "received", columnDefinition = "integer")
+    @Column(name = "received", columnDefinition = INTEGER_COLUMN)
     private java.math.BigDecimal received;
 
     @Convert(converter = MoneyCentsConverter.class)
-    @Column(name = "commission", columnDefinition = "integer")
+    @Column(name = "commission", columnDefinition = INTEGER_COLUMN)
     private java.math.BigDecimal commission;
 
     @Convert(converter = MoneyCentsConverter.class)
-    @Column(name = "rental_tax", columnDefinition = "integer")
+    @Column(name = "rental_tax", columnDefinition = INTEGER_COLUMN)
     private java.math.BigDecimal rentalTax;
 
     @Convert(converter = MoneyCentsConverter.class)
-    @Column(name = "balance", columnDefinition = "integer")
+    @Column(name = "balance", columnDefinition = INTEGER_COLUMN)
     private java.math.BigDecimal balance;  // balance = charge - (received + commission + rentalTax)
 
     @Column(name = "name")

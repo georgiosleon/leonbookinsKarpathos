@@ -70,7 +70,7 @@ public class LicenseEnforcementFilter extends OncePerRequestFilter {
             }
         }
         // Allow SPA entry pages; frontend decides what to show based on role/license status.
-        if (path.equals("/") || "/index.html".equals(path) || "/rooms.html".equals(path) || "/cars.html".equals(path)) {
+        if ("/".equals(path) || "/index.html".equals(path) || "/rooms.html".equals(path) || "/cars.html".equals(path)) {
             return true;
         }
         return false;

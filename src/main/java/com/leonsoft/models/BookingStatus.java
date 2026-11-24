@@ -30,7 +30,7 @@ public enum BookingStatus {
         if (value == null) {
             return null;
         }
-        String normalized = value.trim().toLowerCase();
+        String normalized = value.trim().toLowerCase(Locale.ROOT);
         return Arrays.stream(values())
                 .filter(status -> status.value.equals(normalized))
                 .findFirst()

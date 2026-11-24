@@ -26,6 +26,7 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Function;
 
+@SuppressWarnings("PMD.LooseCoupling")
 public class BookingsPDFExporter {
     private static final List<String> BOOKING_HEADERS = List.of(
             "status", "arrival", "departure", "resource", "name", "agency",
@@ -59,13 +60,11 @@ public class BookingsPDFExporter {
         this.moneyFormat.setCurrency(Currency.getInstance("EUR"));
     }
 
-    @SuppressWarnings("PMD.LooseCoupling")
     public void export(HttpServletResponse response) throws DocumentException, IOException {
         reportBaseFont = createReportBaseFont();
-        Document document = new Document(PageSize.A4.rotate(), 20, 20, 24, 20);
-        PdfWriter.getInstance(document, response.getOutputStream());
-        document.open();
-        try {
+        try (Document document = new Document(PageSize.A4.rotate(), 20, 20, 24, 20)) {
+            PdfWriter.getInstance(document, response.getOutputStream());
+            document.open();
             Font titleFont = reportFont(14);
             Paragraph title = new Paragraph(
                   text("title") + " — " + text(resourceType) + " — "
@@ -77,8 +76,6 @@ public class BookingsPDFExporter {
             addSummary(document);
             addResourceSummary(document);
             addBookings(document);
-        } finally {
-            document.close();
         }
     }
 

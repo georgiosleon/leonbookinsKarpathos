@@ -47,7 +47,9 @@ public class CustomerService {
         customer.setCreatedAt(now);
         customer.setUpdatedAt(now);
         Customer saved = customerRepository.save(customer);
-        log.info("Customer created id={}, name={}", saved.getId(), saved.getName());
+        if (log.isInfoEnabled()) {
+            log.info("Customer created id={}, name={}", saved.getId(), saved.getName());
+        }
         auditService.record("CREATE", "CUSTOMER", String.valueOf(saved.getId()), "name=" + saved.getName());
         return saved;
     }
@@ -58,7 +60,9 @@ public class CustomerService {
         apply(customer, request);
         customer.setUpdatedAt(LocalDateTime.now());
         Customer saved = customerRepository.save(customer);
-        log.info("Customer updated id={}, name={}", saved.getId(), saved.getName());
+        if (log.isInfoEnabled()) {
+            log.info("Customer updated id={}, name={}", saved.getId(), saved.getName());
+        }
         auditService.record("UPDATE", "CUSTOMER", String.valueOf(saved.getId()), "name=" + saved.getName());
         return saved;
     }
@@ -73,7 +77,9 @@ public class CustomerService {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Cannot delete the customer linked to the active license.");
         }
         customerRepository.delete(customer);
-        log.info("Customer deleted id={}, name={}", customer.getId(), customer.getName());
+        if (log.isInfoEnabled()) {
+            log.info("Customer deleted id={}, name={}", customer.getId(), customer.getName());
+        }
         auditService.record("DELETE", "CUSTOMER", String.valueOf(customer.getId()), "name=" + customer.getName());
     }
 

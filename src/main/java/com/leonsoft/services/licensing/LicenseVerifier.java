@@ -46,7 +46,7 @@ public final class LicenseVerifier {
             payloadBytes = Base64.getUrlDecoder().decode(parts[0]);
             signatureBytes = Base64.getUrlDecoder().decode(parts[1]);
         } catch (IllegalArgumentException e) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "License key encoding is invalid.");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "License key encoding is invalid.", e);
         }
 
         boolean valid;

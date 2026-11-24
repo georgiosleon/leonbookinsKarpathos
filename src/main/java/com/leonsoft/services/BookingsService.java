@@ -137,9 +137,9 @@ public class BookingsService {
         booking.setBalance(BookingsUtils.calculateBalance(
                 booking.getCharge(), booking.getReceived(), booking.getCommission(), booking.getRentalTax()));
 
-        booking = bookingRepository.save(booking);
-        booking.setResourceName(resource.getName());
-        return booking;
+        Booking saved = bookingRepository.save(booking);
+        saved.setResourceName(resource.getName());
+        return saved;
     }
 
     public Boolean deleteObject(String bookingId) {
