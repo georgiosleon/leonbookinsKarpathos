@@ -12,10 +12,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.security.SecureRandom;
 import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.HexFormat;
 import java.util.List;
 import java.util.Locale;
@@ -86,6 +88,11 @@ public final class DesktopLauncher {
                     javaExecutable().toString(), "-jar", applicationJar.toString());
             builder.environment().put("APP_ADMIN_USERNAME", credentials.username());
             builder.environment().put("APP_ADMIN_PASSWORD", new String(credentials.password()));
+            // Production rejects the built-in seed passwords. On a fresh database the
+            // OPERATOR and GUEST accounts are placeholders; the administrator sets
+            // usable passwords later in User Management.
+            builder.environment().put("APP_OPERATOR_PASSWORD", randomSeedPassword());
+            builder.environment().put("APP_GUEST_PASSWORD", randomSeedPassword());
             builder.environment().put("APP_DB_URL", "jdbc:sqlite:" + database);
             builder.environment().put("APP_DEPLOYMENT_TYPE", "desktop");
             builder.environment().put("APP_DIAGNOSTICS_LOG_FILE", logFile.toString());
@@ -107,6 +114,8 @@ public final class DesktopLauncher {
 
             Process server = builder.start();
             builder.environment().remove("APP_ADMIN_PASSWORD");
+            builder.environment().remove("APP_OPERATOR_PASSWORD");
+            builder.environment().remove("APP_GUEST_PASSWORD");
             credentials.clear();
             Runtime.getRuntime().addShutdownHook(new Thread(() -> stopServer(server),
                     "booking-server-shutdown-hook"));
@@ -223,6 +232,12 @@ public final class DesktopLauncher {
         } catch (NoSuchAlgorithmException error) {
             throw new IOException("Could not fingerprint the application package.", error);
         }
+    }
+
+    private static String randomSeedPassword() {
+        byte[] bytes = new byte[24];
+        new SecureRandom().nextBytes(bytes);
+        return Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
     }
 
     private static Credentials askForCredentials(Console console) {

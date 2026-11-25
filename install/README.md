@@ -46,9 +46,10 @@ The application uses database-backed users with roles `ADMIN`, `OPERATOR`, and
 created only when missing.
 
 - **Desktop installer:** the launcher prompts for admin credentials and passes
-  them as `APP_ADMIN_USERNAME`/`APP_ADMIN_PASSWORD`. Configure operator/guest
-  seed accounts via `APP_OPERATOR_*` and `APP_GUEST_*` environment variables as
-  needed.
+  them as `APP_ADMIN_USERNAME`/`APP_ADMIN_PASSWORD`. On a fresh database it gives
+  the seeded OPERATOR and GUEST accounts random passwords, so production never
+  uses the built-in default. Set usable passwords for those accounts later in
+  User Management.
 - **Docker:** set `APP_ADMIN_*`, `APP_OPERATOR_*`, and `APP_GUEST_*` in the
   private `.env` file before running Compose. Replace placeholder passwords.
 - **Direct Spring Boot/Maven run:** set the same environment variables in the
@@ -271,6 +272,9 @@ notarized, so Windows SmartScreen or macOS Gatekeeper may show warnings.
 The Windows output name is
 `LeonBookings-<version>-windows-<architecture>.zip`; the macOS output name is
 `LeonBookings-<version>-macos-<architecture>.zip`.
+
+For a multi-OS demo USB carrying these portable packages and one activated
+`bookings.db`, see [usb-kit/README.md](../usb-kit/README.md).
 
 ### Launcher maintenance commands
 

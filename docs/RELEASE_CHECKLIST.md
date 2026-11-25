@@ -85,6 +85,24 @@ below.
 | Linux x86-64 | Launch portable archive and `.deb` package where applicable; verify the same checks. |
 | macOS 13+ | Verify separate Intel x86-64 and Apple Silicon arm64 packages; note signing/notarization requirement for public distribution. |
 
+For a multi-OS demo/test USB, use [usb-kit/README.md](../usb-kit/README.md). It
+assembles the portable packages and one activated `bookings.db`; it is not an
+ISO or a bootable image. Packages cannot be cross-built: Windows and macOS
+archives must be produced on their matching OS, with separate Intel x86-64 and
+Apple Silicon arm64 builds.
+
+The Linux x86-64 portable archive requires glibc 2.38 or newer (checked with
+`objdump -T` on the bundled runtime; `libjli.so`, `libjvm.so`, `libjava.so`, and
+`libawt.so` reference `GLIBC_2.38`). It was built and smoke-tested on Fedora 45
+(glibc 2.44). Ubuntu 24.04 (glibc 2.39) should run it; Ubuntu 22.04 (glibc 2.35)
+and older cannot. If older Ubuntu must be supported, rebuild the package on an
+older base system. A desktop install also provides the X11 libraries used only
+by the optional browser auto-open; on headless systems open the URL manually.
+
+| Date | Platform | Result | Sign-off |
+|---|---|---|---|
+| 2026-11-25 | Fedora 45 x86-64 portable `tar.gz` | Fresh prod launcher startup, login 200, launcher backup/restore wrappers, production-signed activation, bookings/resources/report/app-info/support-bundle 200, build ID/schema/license state verified | Local smoke only; Ubuntu, `.deb`, Windows, and macOS still pending |
+
 ## 6. Native-speaker translation review
 
 Complete the review in [i18n-review-checklist.md](i18n-review-checklist.md) for

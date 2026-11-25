@@ -1,7 +1,7 @@
 # Troubleshooting
 
 ## Login / access
-- **Invalid username or password**: verify credentials. Default dev seed accounts are `admin/user/guest` with password `1qaz2wsx3edc` only when those accounts were seeded by the app; production should use `APP_*` environment variables.
+- **Invalid username or password**: verify credentials. Default dev seed accounts are `admin/user/guest` with password `1qaz2wsx3edc` only when those accounts were seeded by the app; production should use `APP_*` environment variables. On a fresh desktop database, OPERATOR/GUEST receive random passwords; set usable ones in User Management.
 - **Signed in but app shows license activation**: a fresh install requires ADMIN license activation. Use the Installation ID shown on screen to obtain a signed key. For dev/test only, set `APP_LICENSE_BYPASS=true`.
 - **403 / CSRF errors**: refresh the page to get a fresh CSRF token; ensure browser allows cookies for the app origin.
 

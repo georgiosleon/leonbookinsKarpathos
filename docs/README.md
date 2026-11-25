@@ -20,6 +20,7 @@ tests as authoritative when behavior changes.
   native-speaker translation review.
 - [Troubleshooting](troubleshooting.md): common login, licensing, DB, backup, and support issues.
 - [Release checklist](RELEASE_CHECKLIST.md): automated gates, backup/restore drill, upgrade smoke, platform checks, and sign-offs before shipping.
+- [USB test kit](../usb-kit/README.md): assemble portable OS packages and one activated database onto a demo/test USB.
 - [System architecture diagram](diagrams/system-architecture.puml) and
   [booking/resource class diagram](diagrams/booking-resource-classes.puml):
   editable PlantUML sources.

@@ -152,8 +152,10 @@ $env:APP_ADMIN_PASSWORD = Read-Host "Admin password"
 The default seed account credentials are read from `APP_ADMIN_*`,
 `APP_OPERATOR_*`, and `APP_GUEST_*` environment variables at startup. Missing seed
 accounts are created in SQLite; existing user accounts are not overwritten.
-Passwords must be at least 12 characters. Protect the environment and avoid putting
-real credentials in source control.
+Passwords must be at least 12 characters. The desktop launcher asks for the admin
+password and assigns random passwords to the fresh OPERATOR/GUEST seed accounts;
+change them in User Management if those accounts are needed. Protect the environment
+and avoid putting real credentials in source control.
 
 Build and run the tests:
 
@@ -353,7 +355,8 @@ new major prefix, such as `/api/v2`, rather than changing v1 behavior.
 Release tags use the `v<major>.<minor>.<patch>` format. Desktop installers are
 built locally on the matching operating system; tags do not trigger an installer
 workflow. Use the [release checklist](docs/RELEASE_CHECKLIST.md) before tagging
-or shipping. See [CHANGELOG.md](CHANGELOG.md) for curated release notes.
+or shipping. For a multi-OS demo USB, see [usb-kit/README.md](usb-kit/README.md).
+See [CHANGELOG.md](CHANGELOG.md) for curated release notes.
 
 ## Developer documentation
 
