@@ -135,11 +135,11 @@ activate by pasting an Ed25519-signed key (`base64url(payload).base64url(signatu
 through `POST /api/v1/license/activate`. `LicenseEnforcementFilter` blocks normal
 API use until activated, while allowing login/static/SPA shell, CSRF, current-user,
 license status, and admin license/customer endpoints. Activation takes effect
-immediately with no restart. For production, configure `APP_LICENSE_PUBLIC_KEY`
-(base64 X.509 Ed25519 public key); when `app.license.public-key` is unset,
-`LicenseVerifier` falls back to the embedded development key. Docker Compose
-forwards only the variables listed in `compose.yaml`, so set this key through an
-explicit `environment` entry there (or run the JAR directly).
+immediately with no restart. For production, `APP_LICENSE_PUBLIC_KEY`
+(base64 X.509 Ed25519 public key) is mandatory; `prod` rejects the embedded
+development key and rejects `app.license.bypass=true` at startup. Docker Compose
+requires and forwards this key from `.env`; the desktop launcher bakes in the
+production public key and forces `prod` with bypass disabled.
 For development/testing only, `app.license.bypass=true` disables the license gate; it logs a warning and must never be enabled in production.
 
 ## Persistence and reports

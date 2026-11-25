@@ -69,14 +69,14 @@ export function HelpButton() {
   }, [open]);
 
   const backupCommands = {
-    windows: String.raw`.\runtime\bin\java.exe -jar .\app\leonbookinsKarpathos.jar db backup --database .\bookings.db --encrypt`,
-    linux: './lib/runtime/bin/java -jar ./lib/app/leonbookinsKarpathos.jar db backup --database ./bookings.db --encrypt',
-    macos: './LeonBookings.app/Contents/runtime/Contents/Home/bin/java -jar ./LeonBookings.app/Contents/app/leonbookinsKarpathos.jar db backup --database ./bookings.db --encrypt',
+    windows: String.raw`.\LeonBookings.exe backup`,
+    linux: './bin/LeonBookings backup',
+    macos: './LeonBookings.app/Contents/MacOS/LeonBookings backup',
   };
   const restoreCommands = {
-    windows: String.raw`.\runtime\bin\java.exe -jar .\app\leonbookinsKarpathos.jar db restore --database .\bookings.db --input .\backups\your-backup.sqlite3.enc`,
-    linux: './lib/runtime/bin/java -jar ./lib/app/leonbookinsKarpathos.jar db restore --input ./backups/your-backup.sqlite3.enc --database ./bookings.db',
-    macos: './LeonBookings.app/Contents/runtime/Contents/Home/bin/java -jar ./LeonBookings.app/Contents/app/leonbookinsKarpathos.jar db restore --database ./bookings.db --input ./backups/your-backup.sqlite3.enc',
+    windows: String.raw`.\LeonBookings.exe restore .\backups\your-backup.sqlite3.enc`,
+    linux: './bin/LeonBookings restore ./backups/your-backup.sqlite3.enc',
+    macos: './LeonBookings.app/Contents/MacOS/LeonBookings restore ./backups/your-backup.sqlite3.enc',
   };
   const lanCommands = {
     windows: String.raw`$env:SERVER_ADDRESS = "0.0.0.0"; .\LeonBookings.exe`,
@@ -186,8 +186,19 @@ export function HelpButton() {
                 </section>
 
                 <section>
+                  <h3>{t('First-run checklist')}</h3>
+                  <ol>
+                    <li>{t('Choose a strong administrator password when the launcher asks for one; it is not saved to disk.')}</li>
+                    <li>{t('Sign in as ADMIN, copy the Installation ID, and paste the signed license key to activate.')}</li>
+                    <li>{t('Open Manage rooms and cars and create the first room or vehicle you rent.')}</li>
+                    <li>{t('Run the launcher backup command, enter a passphrase, and store the encrypted file away from the computer.')}</li>
+                  </ol>
+                  <p>{t('The launcher creates a local pre-upgrade backup automatically when the application package changes.')}</p>
+                </section>
+
+                <section>
                   <h3>{t('License activation')}</h3>
-                  <p>{t('License-enforced/production installs require one-time ADMIN activation; dev/test may use APP_LICENSE_BYPASS=true.')}</p>
+                  <p>{t('Production builds use a configured production public key and cannot use the dev license bypass; dev/test builds may use APP_LICENSE_BYPASS=true.')}</p>
                 </section>
 
                 <section>
@@ -300,7 +311,7 @@ export function HelpButton() {
                     <pre><code>{backupCommands.macos}</code></pre>
                     <button type="button" className="button button-muted" onClick={() => copyCommand(backupCommands.macos)}>{t('Copy')}</button>
                   </div>
-                  <p>{t('Replace the database path as needed. For Docker, run the same db backup command against the mounted /data/bookings.db.')}</p>
+                  <p>{t('The launcher uses bookings.db in the current directory. For Docker, run the same db backup command against the mounted /data/bookings.db.')}</p>
                 </section>
 
                 <section className="help-warning">
@@ -310,7 +321,7 @@ export function HelpButton() {
 
                 <section>
                   <h3>{t('Restore an encrypted backup')}</h3>
-                  <p>{t('Stop the application before restoring. Run db restore with the encrypted .sqlite3.enc file as --input. Confirm restore and enter the same passphrase. A pre-restore copy of the current database is saved.')}</p>
+                  <p>{t('Stop the application before restoring. Run the launcher restore command with the encrypted .sqlite3.enc file. Confirm restore and enter the same passphrase. A pre-restore copy of the current database is saved.')}</p>
                   <h4>{t('Windows portable app')}</h4>
                   <div className="help-command">
                     <pre><code>{restoreCommands.windows}</code></pre>
@@ -326,7 +337,7 @@ export function HelpButton() {
                     <pre><code>{restoreCommands.macos}</code></pre>
                     <button type="button" className="button button-muted" onClick={() => copyCommand(restoreCommands.macos)}>{t('Copy')}</button>
                   </div>
-                  <p>{t('Replace your-backup.sqlite3.enc with the actual backup filename and adjust the database path as needed.')}</p>
+                  <p>{t('Replace your-backup.sqlite3.enc with the actual backup filename. The launcher uses bookings.db in the current directory.')}</p>
                 </section>
               </div>
 
@@ -346,6 +357,18 @@ export function HelpButton() {
                     <li>{t('Database migration/startup issue: back up bookings.db and review logs; only V1-baselined/current schemas are supported, and pre-V1 DBs must be exported/reimported or upgraded outside the supported path.')}</li>
                     <li>{t('Backup/restore: stop the app before restore, verify on a copy, and keep passphrases separate.')}</li>
                     <li>{t('Need help: download the Support bundle and include app version, steps, and logs.')}</li>
+                  </ul>
+                  <p className="feedback">{t('Review the support bundle before sharing: log masking is best-effort and may leave install IDs, customer names, or other personal data.')}</p>
+                </section>
+
+                <section>
+                  <h3>{t('Supported platforms and support policy')}</h3>
+                  <ul>
+                    <li>{t('Windows 11 x86-64 and Linux x86-64 portable/installer builds are supported on the matching OS.')}</li>
+                    <li>{t('macOS 13+ builds are architecture-specific: Intel x86-64 and Apple Silicon arm64.')}</li>
+                    <li>{t('Support covers the current and previous release, one artifact per OS, and V1-baselined/current SQLite schemas.')}</li>
+                    <li>{t('Pre-V1 databases, custom builds, channel sync, payments, email/SMS, and cloud sync are not supported.')}</li>
+                    <li>{t('The one-time price includes 12 months of updates and setup help; continued support after that is by agreement.')}</li>
                   </ul>
                   {diagnosticsLoading ? <p role="status">{t('Loading...')}</p> : null}
                   {diagnosticsError ? <p className="feedback feedback-error" role="alert">{diagnosticsError}</p> : null}

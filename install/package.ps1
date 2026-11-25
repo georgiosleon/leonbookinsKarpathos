@@ -79,6 +79,11 @@ try {
     $Output = Join-Path $Root ("target/desktop-output-" + [guid]::NewGuid().ToString())
     $Dist = Join-Path $Root "install/dist/$Type"
     New-Item -ItemType Directory -Force $LauncherClasses, $PackageInput, $Output, $Dist | Out-Null
+    $BuildIdDirectory = Join-Path $LauncherClasses "com/leonsoft/desktop"
+    New-Item -ItemType Directory -Force $BuildIdDirectory | Out-Null
+    $BuildTimestamp = (Get-Date).ToUniversalTime().ToString("yyyyMMddTHHmmssZ")
+    $BuildId = "$Version-$BuildTimestamp"
+    Set-Content -LiteralPath (Join-Path $BuildIdDirectory "build-id.txt") -Value $BuildId -Encoding ascii
 
     & javac --release 25 -d $LauncherClasses `
         (Join-Path $Root "install/desktop-launcher/src/com/leonsoft/desktop/DesktopLauncher.java")

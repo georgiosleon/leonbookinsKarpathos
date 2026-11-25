@@ -16,6 +16,7 @@ services:
       APP_DEPLOYMENT_TYPE: docker
       APP_DIAGNOSTICS_LOG_FILE: /data/application.log
       LOGGING_FILE_NAME: /data/application.log
+      APP_LICENSE_PUBLIC_KEY: ${APP_LICENSE_PUBLIC_KEY:?Set APP_LICENSE_PUBLIC_KEY in .env}
       SPRING_PROFILES_ACTIVE: prod
       SERVER_ADDRESS: 0.0.0.0
     volumes:

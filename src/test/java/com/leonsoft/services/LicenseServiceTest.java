@@ -19,6 +19,7 @@ import java.util.Optional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.springframework.mock.env.MockEnvironment;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -36,7 +37,7 @@ class LicenseServiceTest {
 
     @BeforeEach
     void setUp() {
-        licenseService = new LicenseService(installationRepository, licenseRepository, customerService, licenseVerifier, currentUserProvider, auditService, false);
+        licenseService = new LicenseService(installationRepository, licenseRepository, customerService, licenseVerifier, currentUserProvider, auditService, new MockEnvironment(), false);
     }
 
     @Test
@@ -92,12 +93,23 @@ class LicenseServiceTest {
 
     @Test
     void bypassReturnsActivatedWithoutDbLicense() {
-        LicenseService bypass = new LicenseService(installationRepository, licenseRepository, customerService, licenseVerifier, currentUserProvider, auditService, true);
+        LicenseService bypass = new LicenseService(installationRepository, licenseRepository, customerService, licenseVerifier, currentUserProvider, auditService, new MockEnvironment(), true);
         when(installationRepository.findById(1)).thenReturn(Optional.of(install("install-1")));
         assertTrue(bypass.isActivated());
         LicenseStatusResponse status = bypass.getStatus();
         assertTrue(status.activated());
         assertEquals("BYPASS", status.activatedBy());
+    }
+
+    @Test
+    void rejectsBypassWhenProdProfileIsActive() {
+        MockEnvironment prod = new MockEnvironment();
+        prod.setActiveProfiles("prod");
+
+        LicenseService service = new LicenseService(installationRepository, licenseRepository,
+                customerService, licenseVerifier, currentUserProvider, auditService, prod, true);
+
+        assertThrows(IllegalStateException.class, service::validateProductionConfiguration);
     }
 
     private static AppInstallation install(String id) {

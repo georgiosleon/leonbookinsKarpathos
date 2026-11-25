@@ -216,17 +216,19 @@ Deny-by-default plus last-active ADMIN/OPERATOR protections in `UserRestControll
 2. ADMIN sees it in the UI and obtains a signed key built as
    `base64url(JSON payload).base64url(Ed25519 signature)` (`tools/LicenseSigner.java`).
 3. `POST /api/v1/license/activate` → `LicenseVerifier` checks signature with
-   `APP_LICENSE_PUBLIC_KEY` (dev key is fallback), product name, install ID, and
-   customer name → customer upsert → license row marked `ACTIVE` → in-memory
-   `activatedCache = true` → effective immediately.
+   `APP_LICENSE_PUBLIC_KEY` (required in `prod`; dev key only in dev/test),
+   product name, install ID, and customer name → customer upsert → license row
+   marked `ACTIVE` → in-memory `activatedCache = true` → effective immediately.
 4. `LicenseEnforcementFilter` blocks normal `/api/v1/*` traffic until activated,
    while permitting login, static assets, SPA shell, CSRF, `/users/me`,
    license status, and admin license/customer APIs.
-5. `app.license.bypass=true` disables the gate; **dev default**, prod sets false.
+5. `app.license.bypass=true` disables the gate; **dev default**, prod rejects it
+   at startup. The launcher forces `prod`, bypass `false`, a baked production
+   public key, and a build ID.
 
-Sources: `src/main/java/com/leonsoft/services/LicenseService.java:51-132`,
-`services/licensing/LicenseVerifier.java:35-84`,
-`config/LicenseEnforcementFilter.java`, `README.md:262-286`.
+Sources: `src/main/java/com/leonsoft/services/LicenseService.java`,
+`services/licensing/LicenseVerifier.java`,
+`config/LicenseEnforcementFilter.java`, `README.md`.
 
 ### Reports — three implementations that do not fully agree
 
@@ -270,25 +272,28 @@ Sources: `services/BookingReportService.java:48-120`,
 | `SERVER_ADDRESS` | Bind address for direct runs | `127.0.0.1` by default; set `0.0.0.0` for opt-in LAN access. |
 | `BOOKING_HOST_ADDRESS` | Published port bind in Compose | `127.0.0.1` by default. |
 | `BOOKING_AVAILABILITY_ROOMS_PREVENT_OVERLAP`, `..._CARS_...` | Overlap enforcement per resource type | Both default `true`; read via `/api/v1/settings/availability`. |
-| `APP_LICENSE_PUBLIC_KEY` | Production Ed25519 X.509 public key (base64) | Dev key fallback otherwise; keep private key outside repo. |
-| `APP_LICENSE_BYPASS` | Disable license gate (dev/test only) | `false` globally, `true` in dev profile. |
+| `APP_LICENSE_PUBLIC_KEY` | Production Ed25519 X.509 public key (base64) | Required in `prod`; no dev fallback; keep private key outside repo. |
+| `APP_LICENSE_BYPASS` | Disable license gate (dev/test only) | `false` globally, `true` in dev profile; rejected in `prod`. |
+| `APP_BUILD_ID` | Optional build identifier | Launcher and Maven build-info set it for support diagnostics. |
 | `APP_DIAGNOSTICS_LOG_FILE`, `LOGGING_FILE_NAME` | Log file location | `/data/application.log` in Compose. |
 | `APP_DEPLOYMENT_TYPE` | `standalone|desktop|docker` | Validated at startup by `ApplicationConfigurationValidator`. |
 | `VITE_BOOKING_SAVE_MODE` | Frontend build-time default create/edit | `create` when unset; session override checkbox exists. |
 
 `.env.example` is the template for Docker; never commit a real `.env`.
 
-**Important Docker caveat:** `compose.yaml:8-20` forwards only the six seed-account
-variables plus `APP_DB_URL`, `APP_DEPLOYMENT_TYPE`, `APP_DIAGNOSTICS_LOG_FILE`,
-`LOGGING_FILE_NAME`, `SPRING_PROFILES_ACTIVE`, and `SERVER_ADDRESS`. Setting
-`APP_LICENSE_PUBLIC_KEY`, `APP_LICENSE_BYPASS`, or `BOOKING_AVAILABILITY_*` in
-`.env` does **not** reach the container. In particular, a Docker deployment that
-expects a production public key will silently fall back to the embedded dev key.
+**Docker env note:** `compose.yaml` forwards `APP_LICENSE_PUBLIC_KEY` and requires
+it in `.env`. `APP_LICENSE_BYPASS` and `BOOKING_AVAILABILITY_*` are opt-in; add
+explicit `environment` entries to pass them through. A `prod` start without the
+public key now fails instead of falling back to the dev key.
 
 Desktop launcher details (`install/desktop-launcher/.../DesktopLauncher.java`):
 prompts for admin credentials (12–72 UTF-8 bytes), sets `APP_DB_URL` to
 `jdbc:sqlite:<cwd>/bookings.db`, `APP_DEPLOYMENT_TYPE=desktop`, default loopback
-bind, and stops the app when Enter is pressed. Logs go to OS-specific data dirs.
+bind, and stops the app when Enter is pressed. It forces `SPRING_PROFILES_ACTIVE=prod`,
+`APP_LICENSE_BYPASS=false`, the embedded production public key, and a build ID.
+`backup [file]` and `restore [file]` wrap the encrypted `DatabaseCli` commands,
+and a changed application jar triggers a local pre-upgrade backup. Logs go to
+OS-specific data dirs.
 
 ---
 
@@ -376,12 +381,13 @@ These are observations from this onboarding pass, not changes:
    date-parsing strategies.
 8. **Security defaults**: dev seed password `1qaz2wsx3edc` is hardcoded and used
    in CI; dev license signing material is committed encrypted with a documented
-   passphrase; ensure prod never uses the dev key or bypass.
+   passphrase. The `prod` profile now rejects the dev key and bypass at startup;
+   the production private key stays outside the repo.
 9. **Known manual gaps from `TODO.md`**: native-speaker i18n review, real
-   anonymized DB upgrade smoke, production keypair process, backup/restore drill,
-   Actuator exposure review, broader E2E coverage.
-10. **Docker env forwarding**: `.env.example` documents variables that Compose
-    never passes through (see §6) — most importantly `APP_LICENSE_PUBLIC_KEY`.
+   anonymized DB upgrade smoke, backup/restore drill, Actuator exposure review,
+   broader E2E coverage.
+10. **Docker env forwarding**: `.env.example` documents `APP_LICENSE_PUBLIC_KEY`,
+    which Compose requires. Other opt-in variables still need explicit entries.
 11. **CI E2E does not exercise licensing**: `ci.yml:98-120` starts with the dev
     profile, where `app.license.bypass=true`, so the licensed flow is untested in
     CI.

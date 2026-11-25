@@ -9,6 +9,7 @@ import java.security.Signature;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.util.Base64;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.env.MockEnvironment;
 import org.springframework.web.server.ResponseStatusException;
 import tools.jackson.databind.ObjectMapper;
 
@@ -57,6 +58,15 @@ class LicenseVerifierTest {
         LicenseVerifier otherVerifier = new LicenseVerifier(new ObjectMapper(), otherPublic);
         String key = sign(payload(INSTALL_ID, "Acme", "+30", "a@b.com"));
         assertThrows(ResponseStatusException.class, () -> otherVerifier.verify(key, INSTALL_ID));
+    }
+
+    @Test
+    void rejectsDevelopmentKeyWhenProdProfileIsActive() {
+        MockEnvironment prod = new MockEnvironment();
+        prod.setActiveProfiles("prod");
+
+        assertThrows(IllegalStateException.class,
+                () -> new LicenseVerifier(new ObjectMapper(), "", prod));
     }
 
     private static String payload(String installId, String name, String phone, String email) {

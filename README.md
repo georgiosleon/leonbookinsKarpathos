@@ -58,7 +58,10 @@ cp .env.example .env
 ```
 
 Edit `.env` and replace the placeholder passwords with strong, unique values for
-the admin, operator, and guest seed accounts. Then build and start the application:
+the admin, operator, and guest seed accounts. Keep `APP_LICENSE_PUBLIC_KEY` set to
+the product's production public key; the `prod` profile will not start without it
+and never falls back to the embedded development key. Then build and start the
+application:
 
 ```sh
 docker compose up --build -d
@@ -282,16 +285,62 @@ Generate a dev/test license key with the included tool (dev-only):
 java --source 25 tools/LicenseSigner.java tools/dev-license-private.pkcs8.b64 <installId> "Customer Name" "+30..." "customer@example.com"
 ```
 
-**Production:** set `APP_LICENSE_PUBLIC_KEY` (or `app.license.public-key`) to your production Ed25519 X.509 public key (base64). Keep the matching private key outside the repository. Do not use the committed `tools/dev-license-*.b64` dev keypair for real customer deployments.
+### Production license workflow
 
-> **Development/testing only:** `app.license.bypass=true` (or `APP_LICENSE_BYPASS=true`) bypasses the license gate. Default dev profile enables bypass for tester convenience. **Never enable in production**; production profile sets it to `false`.
+1. Generate an Ed25519 keypair **once**, outside the repository. Only the base64
+   X.509 public key is shipped. The matching private key stays with the license
+   issuer and is never committed or placed in a customer package.
+2. Configure the public key for every production run. The desktop launcher bakes
+   it in and sets `SPRING_PROFILES_ACTIVE=prod`, `APP_LICENSE_BYPASS=false`, and
+   a build ID. Direct JAR/Docker runs must set `APP_LICENSE_PUBLIC_KEY` (or
+   `app.license.public-key`) explicitly. There is **no fallback** to the
+   embedded development key in the `prod` profile.
+3. Ask the customer for the Installation ID and customer details shown in the
+   activation screen, then sign them with the production private key:
 
-> **Docker Compose:** `compose.yaml` forwards only the variables listed in its
-> `environment` block. `APP_LICENSE_PUBLIC_KEY`, `APP_LICENSE_BYPASS`, and
-> `BOOKING_AVAILABILITY_*` are not forwarded from `.env`; add explicit entries to
-> `compose.yaml` (or run the JAR directly with those variables) to set them. When
-> `app.license.public-key` is unset, `LicenseVerifier` falls back to the embedded
-> development public key.
+   ```sh
+   java --source 25 tools/LicenseSigner.java \
+     /secure/path/production-license-private.pkcs8.b64 \
+     <installId> "Customer Name" "+30..." "customer@example.com"
+   ```
+
+4. Send only the resulting signed key to the customer. They paste it into the
+   activation screen; activation takes effect immediately.
+
+The production public key used by the shipped launcher is:
+
+```text
+MCowBQYDK2VwAyEAmi1yDWu05LnXrnmFwnYS62X+QAl3xPWYvtYyBvHFjig=
+```
+
+> **Development/testing only:** the `dev` profile enables
+> `app.license.bypass=true` for tester convenience. Production rejects bypass at
+> startup even if `APP_LICENSE_BYPASS=true` is set; do not use the committed
+> `tools/dev-license-*.b64` keypair for customer deployments.
+
+> **Docker Compose:** `compose.yaml` forwards `APP_LICENSE_PUBLIC_KEY` from
+> `.env` and requires it to be set. Other variables such as
+> `APP_LICENSE_BYPASS` and `BOOKING_AVAILABILITY_*` are still opt-in; add
+> explicit `environment` entries to `compose.yaml` (or run the JAR directly) to
+> override them.
+
+## Support policy and platforms
+
+Leon Bookings is sold as one offline package per supported operating system for
+small room/vehicle rental businesses. The one-time price includes 12 months of
+updates and setup help; continued updates/support after that are by agreement.
+
+| Platform | Supported package | Notes |
+|---|---|---|
+| Windows 11 x86-64 | Portable ZIP, MSI | Start from a terminal; unsigned portable builds may show SmartScreen warnings. |
+| Linux x86-64 | Portable `tar.gz`; `.deb` for Debian/Ubuntu | Fedora/RHEL builds default to the portable archive; other distributions use it too. |
+| macOS 13+ | DMG or portable ZIP, Intel x86-64 and Apple Silicon arm64 | Builds are architecture-specific; public distribution needs signing/notarization. |
+
+Support covers the current and previous release, one artifact per OS, and
+V1-baselined/current SQLite schemas. Pre-V1 databases, per-customer code forks,
+channel sync, payments, email/SMS, cloud sync, and compliance submissions are
+outside the supported scope. The app is intentionally local/offline and does not
+provide HTTPS; use a trusted reverse proxy for any LAN/remote access.
 
 ## API versioning
 
@@ -553,7 +602,7 @@ The build writes the bundled React app to the ignored
 
 ## Support and diagnostics
 
-- **In-app**: authenticated users can download a **Support bundle** (`/api/v1/support-bundle`) containing `diagnostics.txt` and `app-info.json`. Its structured app info excludes secrets, install ID, and customer PII, but the log tail is sanitized only on a best-effort basis and may still contain install IDs or customer names.
+- **In-app**: authenticated users can download a **Support bundle** (`/api/v1/support-bundle`) containing `diagnostics.txt` and `app-info.json`. The structured app info includes version, build ID, deployment type, schema version, and license state, but excludes secrets and customer PII. Diagnostics include the install ID, and the log tail is masked only on a best-effort basis; review the bundle before sharing because names, IDs, or other personal data may remain.
 - **Diagnostics endpoint**: `/api/v1/diagnostics` remains available for backward compatibility.
 - **Troubleshooting**: see [docs/troubleshooting.md](docs/troubleshooting.md).
 
@@ -567,7 +616,7 @@ The build writes the bundled React app to the ignored
 ## Production deployment checklist
 
 - **HTTPS/reverse proxy**: run behind a trusted HTTPS reverse proxy (nginx/Caddy/Traefik) for LAN or remote access; do not expose the app directly to the internet.
-- **Secrets**: set strong `APP_*_PASSWORD` values, configure `APP_LICENSE_PUBLIC_KEY`, keep signing keys outside the repo. Set `APP_LICENSE_BYPASS=false` (prod profile does this explicitly).
+- **Secrets**: set strong `APP_*_PASSWORD` values and configure `APP_LICENSE_PUBLIC_KEY` explicitly (the launcher bakes it in and forces `prod` + `APP_LICENSE_BYPASS=false`). Keep the signing private key outside the repo; the `prod` profile rejects the dev key and bypass at startup.
 - **Backups**: schedule encrypted database backups and store passphrases separately from backup files. Test restore on a copy before upgrades.
 - **Upgrades**: back up `bookings.db` before upgrading, then smoke-test login, license status, booking CRUD, and report export. Only V1-baselined/current schemas are supported; pre-V1 DBs must be exported/reimported or upgraded outside the supported path.
 

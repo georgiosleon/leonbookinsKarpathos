@@ -5,8 +5,11 @@ import java.security.KeyFactory;
 import java.security.PublicKey;
 import java.security.Signature;
 import java.security.spec.X509EncodedKeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
@@ -23,9 +26,20 @@ public final class LicenseVerifier {
 
     @Autowired
     public LicenseVerifier(ObjectMapper objectMapper,
-                           @org.springframework.beans.factory.annotation.Value("${app.license.public-key:" + DEFAULT_PUBLIC_KEY_B64 + "}") String publicKeyB64) {
+                           @Value("${app.license.public-key:}") String publicKeyB64,
+                           Environment environment) {
         this.objectMapper = objectMapper;
-        this.publicKey = loadPublicKey(publicKeyB64);
+        String configuredKey = resolvePublicKey(publicKeyB64);
+        if (isProd(environment) && DEFAULT_PUBLIC_KEY_B64.equals(configuredKey)) {
+            throw new IllegalStateException(
+                    "Production requires APP_LICENSE_PUBLIC_KEY; the embedded development key is not allowed.");
+        }
+        this.publicKey = loadPublicKey(configuredKey);
+    }
+
+    public LicenseVerifier(ObjectMapper objectMapper, String publicKeyB64) {
+        this.objectMapper = objectMapper;
+        this.publicKey = loadPublicKey(resolvePublicKey(publicKeyB64));
     }
 
     LicenseVerifier(ObjectMapper objectMapper) {
@@ -91,6 +105,16 @@ public final class LicenseVerifier {
         } catch (Exception e) {
             throw new IllegalStateException("Could not encode license payload", e);
         }
+    }
+
+    private static String resolvePublicKey(String publicKeyB64) {
+        return publicKeyB64 == null || publicKeyB64.isBlank()
+                ? DEFAULT_PUBLIC_KEY_B64 : publicKeyB64.trim();
+    }
+
+    private static boolean isProd(Environment environment) {
+        return environment != null
+                && Arrays.stream(environment.getActiveProfiles()).anyMatch("prod"::equalsIgnoreCase);
     }
 
     private static PublicKey loadPublicKey(String publicKeyB64) {

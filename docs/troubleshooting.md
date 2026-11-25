@@ -6,8 +6,8 @@
 - **403 / CSRF errors**: refresh the page to get a fresh CSRF token; ensure browser allows cookies for the app origin.
 
 ## Licensing
-- **Invalid license key**: confirm the key matches the exact Installation ID and was signed for the correct public key (`APP_LICENSE_PUBLIC_KEY` in production). Compose forwards only the variables listed in `compose.yaml`; add this key as an explicit `environment` entry there (or run the JAR directly). Otherwise `LicenseVerifier` falls back to the embedded development public key.
-- **Activation should not be bypassed in production**: run with `prod` profile and `APP_LICENSE_BYPASS=false`.
+- **Invalid license key**: confirm the key matches the exact Installation ID and was signed with the private key paired to `APP_LICENSE_PUBLIC_KEY`. The `prod` profile requires this variable and never falls back to the dev key; Compose reads it from `.env`, and the desktop launcher bakes it in.
+- **Activation should not be bypassed in production**: run with `prod` profile and `APP_LICENSE_BYPASS=false`; the app now fails at startup if bypass is enabled in `prod`.
 
 ## Database / startup
 - **Migration failure on startup**: back up `bookings.db` before upgrades. Only V1-baselined/current schemas are supported; pre-V1 DBs must be exported/reimported or upgraded outside the supported path.

@@ -1,5 +1,6 @@
 package com.leonsoft.services;
 
+import com.leonsoft.api.LicenseStatusResponse;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
@@ -9,6 +10,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.regex.Pattern;
+import org.flywaydb.core.Flyway;
+import org.flywaydb.core.api.MigrationInfo;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -35,43 +38,59 @@ public class ApplicationSupportService {
     private final Environment environment;
     private final String logFile;
     private final LicenseService licenseService;
+    private final Flyway flyway;
 
     public ApplicationSupportService(
           BuildProperties buildProperties,
           Environment environment,
           @Value("${app.diagnostics.log-file:}") String logFile,
-          LicenseService licenseService) {
+          LicenseService licenseService,
+          Flyway flyway) {
         this.buildProperties = buildProperties;
         this.environment = environment;
         this.logFile = logFile;
         this.licenseService = licenseService;
+        this.flyway = flyway;
     }
 
     public AppInfo appInfo() {
-        var licenseStatus = licenseService.getStatus();
+        LicenseStatusResponse licenseStatus = licenseService.getStatus();
         return new AppInfo(
               buildProperties.getVersion(),
+              buildId(),
               environment.getProperty("app.deployment-type", "standalone"),
+              schemaVersion(),
+              licenseState(licenseStatus),
               licenseStatus.activated());
     }
 
     public String diagnostics() {
+        LicenseStatusResponse licenseStatus = licenseService.getStatus();
         StringBuilder report = new StringBuilder()
               .append("Leon Bookings diagnostics\n")
-              .append("Version: ").append(buildProperties.getVersion()).append('\n')
-              .append("Deployment: ").append(environment.getProperty("app.deployment-type", "standalone")).append('\n')
+              .append("Version: ").append(singleLine(buildProperties.getVersion())).append('\n')
+              .append("Build ID: ").append(singleLine(buildId())).append('\n')
+              .append("Deployment: ")
+              .append(singleLine(environment.getProperty("app.deployment-type", "standalone"))).append('\n')
               .append("Active profiles: ").append(activeProfiles()).append('\n')
-              .append("Java: ").append(System.getProperty("java.version")).append('\n')
-              .append("OS: ").append(System.getProperty("os.name"))
-              .append(" (").append(System.getProperty("os.arch")).append(")\n")
-              .append("Server address: ").append(environment.getProperty("server.address", "default")).append('\n')
-              .append("Server port: ").append(environment.getProperty("server.port", "8080")).append('\n')
+              .append("Java: ").append(singleLine(System.getProperty("java.version"))).append('\n')
+              .append("OS: ").append(singleLine(System.getProperty("os.name")))
+              .append(" (").append(singleLine(System.getProperty("os.arch"))).append(")\n")
+              .append("Schema version: ").append(singleLine(schemaVersion())).append('\n')
+              .append("Server address: ")
+              .append(singleLine(environment.getProperty("server.address", "default"))).append('\n')
+              .append("Server port: ").append(singleLine(environment.getProperty("server.port", "8080"))).append('\n')
               .append("Database: SQLite (database path omitted)\n")
               .append("Room overlap prevention: ")
-              .append(environment.getProperty("booking.availability.rooms.prevent-overlap", "true")).append('\n')
+              .append(singleLine(environment.getProperty("booking.availability.rooms.prevent-overlap", "true")))
+              .append('\n')
               .append("Vehicle overlap prevention: ")
-              .append(environment.getProperty("booking.availability.cars.prevent-overlap", "true")).append('\n')
-              .append("License activated: ").append(licenseService.isActivated()).append('\n')
+              .append(singleLine(environment.getProperty("booking.availability.cars.prevent-overlap", "true")))
+              .append('\n')
+              .append("License state: ").append(licenseState(licenseStatus)).append('\n')
+              .append("License activated: ").append(licenseStatus.activated()).append('\n')
+              .append("Install ID: ").append(singleLine(licenseStatus.installId())).append('\n')
+              .append("Redaction: log lines are masked for secrets, emails, IP addresses, phone numbers, query values, and record IDs; review this bundle before sharing.\n")
               .append("\nRecent logs (last ").append(MAX_LOG_LINES).append(" lines maximum):\n");
         appendLogs(report);
         return report.toString();
@@ -82,7 +101,14 @@ public class ApplicationSupportService {
              var zip = new java.util.zip.ZipOutputStream(baos, StandardCharsets.UTF_8)) {
             writeZipEntry(zip, "diagnostics.txt", diagnostics().getBytes(StandardCharsets.UTF_8));
             AppInfo info = appInfo();
-            String json = "{\n  \"version\": \"" + escapeJson(info.version()) + "\",\n  \"deploymentType\": \"" + escapeJson(info.deploymentType()) + "\",\n  \"licenseActivated\": " + info.licenseActivated() + "\n}\n";
+            List<String> fields = List.of(
+                  jsonStringField("version", info.version()),
+                  jsonStringField("buildId", info.buildId()),
+                  jsonStringField("deploymentType", info.deploymentType()),
+                  jsonStringField("schemaVersion", info.schemaVersion()),
+                  jsonStringField("licenseState", info.licenseState()),
+                  "  \"licenseActivated\": " + info.licenseActivated());
+            String json = "{\n" + String.join(",\n", fields) + "\n}\n";
             writeZipEntry(zip, "app-info.json", json.getBytes(StandardCharsets.UTF_8));
             zip.finish();
             return baos.toByteArray();
@@ -98,9 +124,40 @@ public class ApplicationSupportService {
         zip.closeEntry();
     }
 
+    private static String jsonStringField(String name, String value) {
+        return "  \"" + name + "\": \"" + escapeJson(value) + "\"";
+    }
+
     private static String escapeJson(String value) {
         if (value == null) return "";
         return value.replace("\\", "\\\\").replace("\"", "\\\"");
+    }
+
+    private static String licenseState(LicenseStatusResponse status) {
+        return status.activated() ? "ACTIVE" : "NOT ACTIVATED";
+    }
+
+    private String buildId() {
+        String configured = environment.getProperty("app.build.id");
+        if (configured != null && !configured.isBlank()) {
+            return configured.trim();
+        }
+        String generated = buildProperties.get("buildId");
+        return generated == null || generated.isBlank() ? "unknown" : generated.trim();
+    }
+
+    private String schemaVersion() {
+        try {
+            MigrationInfo current = flyway.info().current();
+            return current == null || current.getVersion() == null
+                  ? "unknown" : current.getVersion().toString();
+        } catch (RuntimeException exception) {
+            return "unavailable";
+        }
+    }
+
+    private static String singleLine(String value) {
+        return value == null || value.isBlank() ? "unknown" : value.replaceAll("\\R", " ").trim();
     }
 
     private String activeProfiles() {
@@ -153,6 +210,7 @@ public class ApplicationSupportService {
         return sanitized.replaceAll("[\\p{Cntrl}&&[^\\t]]", "");
     }
 
-    public record AppInfo(String version, String deploymentType, boolean licenseActivated) {
+    public record AppInfo(String version, String buildId, String deploymentType, String schemaVersion,
+                          String licenseState, boolean licenseActivated) {
     }
 }

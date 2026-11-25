@@ -132,7 +132,8 @@ class BookingSecurityTest {
     @Test
     void applicationSupportEndpointsAreAvailableToAuthenticatedUsers() throws Exception {
         when(applicationSupportService.appInfo())
-                .thenReturn(new ApplicationSupportService.AppInfo("1.0.0", "standalone", true));
+                .thenReturn(new ApplicationSupportService.AppInfo(
+                      "1.0.0", "build-1.0.0", "standalone", "12", "ACTIVE", true));
         when(applicationSupportService.diagnostics()).thenReturn("diagnostics");
         when(applicationSupportService.supportBundle()).thenReturn(new byte[] {80, 75, 3, 4});
 

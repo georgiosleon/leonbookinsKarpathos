@@ -22,14 +22,21 @@ Generated translations should be reviewed by native speakers before release, esp
 - Install and start, Leon Bookings, Linux portable app, Roles and access
 - Sign in with your assigned account. Available actions depend on your role.
 - Password *
-- Replace the database path as needed. For Docker, run the same db backup command against the mounted /data/bookings.db.
-- Replace your-backup.sqlite3.enc with the actual backup filename and adjust the database path as needed.
+- The launcher uses bookings.db in the current directory. For Docker, run the same db backup command against the mounted /data/bookings.db.
+- Replace your-backup.sqlite3.enc with the actual backup filename. The launcher uses bookings.db in the current directory.
 - Troubleshooting
 - License activation required: sign in as ADMIN and activate with the Installation ID, or set APP_LICENSE_BYPASS=true for dev/test only.
 - Invalid license key: confirm it matches the Installation ID and correct public key.
 - Database migration/startup issue: back up bookings.db and review logs; only V1-baselined/current schemas are supported, and pre-V1 DBs must be exported/reimported or upgraded outside the supported path.
 - Backup/restore: stop the app before restore, verify on a copy, and keep passphrases separate.
 - Need help: download the Support bundle and include app version, steps, and logs.
+- Production builds use a configured production public key and cannot use the dev license bypass; dev/test builds may use APP_LICENSE_BYPASS=true.
+- Review the support bundle before sharing: log masking is best-effort and may leave install IDs, customer names, or other personal data.
+- Supported platforms and support policy; Windows 11 x86-64 and Linux x86-64 portable/installer builds are supported on the matching OS.
+- macOS 13+ builds are architecture-specific: Intel x86-64 and Apple Silicon arm64.
+- Support covers the current and previous release, one artifact per OS, and V1-baselined/current SQLite schemas.
+- Pre-V1 databases, custom builds, channel sync, payments, email/SMS, and cloud sync are not supported.
+- The one-time price includes 12 months of updates and setup help; continued support after that is by agreement.
 
 ## Notes
 - Keep placeholders unchanged (e.g. `{name}`, `{username}`, `{version}`).

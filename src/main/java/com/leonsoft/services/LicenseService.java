@@ -10,8 +10,11 @@ import com.leonsoft.repositories.AppInstallationRepository;
 import com.leonsoft.repositories.AppLicenseRepository;
 import com.leonsoft.services.licensing.LicensePayload;
 import com.leonsoft.services.licensing.LicenseVerifier;
+import jakarta.annotation.PostConstruct;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.UUID;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +27,7 @@ public class LicenseService {
     private final LicenseVerifier licenseVerifier;
     private final CurrentUserProvider currentUserProvider;
     private final AuditService auditService;
+    private final Environment environment;
     private final boolean bypassEnabled;
     private volatile Boolean activatedCache;
 
@@ -34,6 +38,7 @@ public class LicenseService {
             LicenseVerifier licenseVerifier,
             CurrentUserProvider currentUserProvider,
             AuditService auditService,
+            Environment environment,
             @org.springframework.beans.factory.annotation.Value("${app.license.bypass:false}") boolean bypassEnabled) {
         this.installationRepository = installationRepository;
         this.licenseRepository = licenseRepository;
@@ -41,10 +46,20 @@ public class LicenseService {
         this.licenseVerifier = licenseVerifier;
         this.currentUserProvider = currentUserProvider;
         this.auditService = auditService;
+        this.environment = environment;
         this.bypassEnabled = bypassEnabled;
         if (bypassEnabled) {
             org.slf4j.LoggerFactory.getLogger(LicenseService.class)
                     .warn("LICENSE BYPASS ENABLED (app.license.bypass=true). Do not use in production.");
+        }
+    }
+
+    @PostConstruct
+    public void validateProductionConfiguration() {
+        if (bypassEnabled && Arrays.stream(environment.getActiveProfiles())
+                .anyMatch("prod"::equalsIgnoreCase)) {
+            throw new IllegalStateException(
+                    "LICENSE BYPASS is not allowed in the prod profile. Set app.license.bypass=false.");
         }
     }
 

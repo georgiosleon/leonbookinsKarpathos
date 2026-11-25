@@ -236,6 +236,9 @@ fi
 LAUNCHER_CLASSES="target/desktop-launcher/classes"
 PACKAGE_INPUT="target/desktop-package"
 mkdir -p "$LAUNCHER_CLASSES" "$PACKAGE_INPUT" "install/dist/$TYPE"
+mkdir -p "$LAUNCHER_CLASSES/com/leonsoft/desktop"
+printf '%s\n' "$VERSION-$(date -u +%Y%m%dT%H%M%SZ)" \
+  > "$LAUNCHER_CLASSES/com/leonsoft/desktop/build-id.txt"
 OUTPUT="$(mktemp -d "$ROOT/target/desktop-output.XXXXXX")"
 javac --release 25 -d "$LAUNCHER_CLASSES" \
   install/desktop-launcher/src/com/leonsoft/desktop/DesktopLauncher.java

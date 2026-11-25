@@ -21,13 +21,15 @@ Hibernate `ddl-auto=validate`; `DatabaseInitializer` seeds only default user
 accounts. No sample bookings are loaded. Back up the database before moving,
 upgrading, or replacing it, and test upgrades against a copy.
 
-For a support copy, use `db backup --encrypt` to create a passphrase-protected
-`.sqlite3.enc` file; the full Windows and macOS commands are in the app's Help
-dialog. Send the encrypted file and communicate its passphrase separately
-through a trusted channel. The passphrase cannot be recovered. The app detects
-encrypted files during restore, which must be done after stopping the service.
-The app does not email or upload backups. Use the approved support channel and
-never send the passphrase in the same message as the backup.
+The launcher also wraps the maintenance CLI: `LeonBookings backup [file]` creates
+a passphrase-protected `.sqlite3.enc` file, and `LeonBookings restore [file]`
+restores it after the app is stopped. Both commands prompt securely and the full
+Windows/Linux/macOS commands are in the app's Help dialog. When the application
+package fingerprint changes, the launcher creates a local unencrypted
+pre-upgrade copy under the user data directory before starting the new build;
+this is not a substitute for an encrypted off-computer backup. Send support
+copies through the approved channel and communicate passphrases separately;
+they cannot be recovered. The app does not email or upload backups.
 
 The installer scripts check prerequisites before building and stop with an
 actionable error if a required command or native packaging tool is missing.
@@ -55,11 +57,12 @@ created only when missing.
 Seed passwords must be at least 12 characters. Keep environment files and
 shell/session access private; do not commit real credentials.
 
-Compose forwards only the variables listed in `compose.yaml`. To set
-`APP_LICENSE_PUBLIC_KEY`, `APP_LICENSE_BYPASS`, or `BOOKING_AVAILABILITY_*`, add
-explicit `environment` entries there (or run the JAR directly with those
-variables). When `app.license.public-key` is unset, `LicenseVerifier` falls back
-to the embedded development public key.
+Compose requires `APP_LICENSE_PUBLIC_KEY` in `.env` and forwards it explicitly;
+the `prod` profile will not start without it and never falls back to the dev
+key. `APP_LICENSE_BYPASS` and `BOOKING_AVAILABILITY_*` are opt-in: add explicit
+`environment` entries in `compose.yaml` (or run the JAR directly) to override
+them. The desktop launcher always forces `prod`, `APP_LICENSE_BYPASS=false`, and
+the embedded production public key.
 
 ## Install build prerequisites
 
@@ -269,6 +272,31 @@ The Windows output name is
 `LeonBookings-<version>-windows-<architecture>.zip`; the macOS output name is
 `LeonBookings-<version>-macos-<architecture>.zip`.
 
+### Launcher maintenance commands
+
+Run these from the same directory as `bookings.db`, in a terminal:
+
+```powershell
+# Windows
+.\LeonBookings.exe backup .\backups\bookings.sqlite3.enc
+.\LeonBookings.exe restore .\backups\bookings.sqlite3.enc
+```
+
+```sh
+# Linux
+./bin/LeonBookings backup ./backups/bookings.sqlite3.enc
+./bin/LeonBookings restore ./backups/bookings.sqlite3.enc
+
+# macOS
+./LeonBookings.app/Contents/MacOS/LeonBookings backup ./backups/bookings.sqlite3.enc
+./LeonBookings.app/Contents/MacOS/LeonBookings restore ./backups/bookings.sqlite3.enc
+```
+
+`backup` prompts for a new passphrase twice; `restore` requires `RESTORE`
+confirmation and the original passphrase. Stop other application instances
+before restoring. The encrypted file is created by the same `DatabaseCli`
+commands used by the JAR.
+
 The optional `--install-deps` flag is supported on Linux (`dnf`/`apt-get`) and
 macOS (Homebrew); it installs only the build prerequisites required by the
 chosen package format. Use `--manager` if automatic package-manager detection
@@ -337,6 +365,24 @@ On macOS, a smooth public release still requires Apple signing and notarization.
 Windows MSI packaging requires WiX Toolset 3 on `PATH`.
 The MSI uses a stable upgrade identifier so newer versions can upgrade the
 existing application without removing the user's database.
+
+## Support policy and platforms
+
+Build one artifact per OS and support only the current and previous release.
+The one-time price includes 12 months of updates and setup help; later support
+is by agreement. No per-customer code forks are supported.
+
+| Platform | Supported artifact | Limits |
+|---|---|---|
+| Windows 11 x86-64 | Portable ZIP or MSI | Terminal launcher; unsigned builds may trigger SmartScreen. |
+| Linux x86-64 | Portable `tar.gz`; `.deb` on Debian/Ubuntu | Other distributions use the portable archive. |
+| macOS 13+ | DMG or portable ZIP, Intel x86-64 and Apple Silicon arm64 | Architecture-specific; signing/notarization needed for public distribution. |
+
+Only V1-baselined/current SQLite schemas are supported. Pre-V1 databases must
+be exported/reimported or upgraded outside the supported path. Channel sync,
+payments, email/SMS, cloud sync, and compliance submissions are out of scope.
+The launcher forces production licensing settings and records a build ID in
+support diagnostics.
 
 ## API versions
 
