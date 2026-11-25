@@ -19,6 +19,7 @@ tests as authoritative when behavior changes.
 - [i18n review checklist](i18n-review-checklist.md): keys and checks for
   native-speaker translation review.
 - [Troubleshooting](troubleshooting.md): common login, licensing, DB, backup, and support issues.
+- [Release checklist](RELEASE_CHECKLIST.md): automated gates, backup/restore drill, upgrade smoke, platform checks, and sign-offs before shipping.
 - [System architecture diagram](diagrams/system-architecture.puml) and
   [booking/resource class diagram](diagrams/booking-resource-classes.puml):
   editable PlantUML sources.

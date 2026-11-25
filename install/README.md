@@ -382,7 +382,8 @@ Only V1-baselined/current SQLite schemas are supported. Pre-V1 databases must
 be exported/reimported or upgraded outside the supported path. Channel sync,
 payments, email/SMS, cloud sync, and compliance submissions are out of scope.
 The launcher forces production licensing settings and records a build ID in
-support diagnostics.
+support diagnostics. Use the [release checklist](../docs/RELEASE_CHECKLIST.md)
+before shipping a package.
 
 ## API versions
 

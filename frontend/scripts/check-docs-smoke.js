@@ -4,11 +4,13 @@ import path from 'node:path';
 
 const root = path.resolve(process.cwd(), '..');
 const checks = [
-  { file: 'README.md', patterns: ['## Licensing and activation', '1qaz2wsx3edc', '/api/v1/license/status', '/api/v1/license/activate'] },
+  { file: 'README.md', patterns: ['## Licensing and activation', '1qaz2wsx3edc', '/api/v1/license/status', '/api/v1/license/activate', '## Support policy and platforms', 'docs/RELEASE_CHECKLIST.md'] },
   { file: 'docs/backend.md', patterns: ['## Licensing', 'Flyway', 'ddl-auto=validate', '1qaz2wsx3edc'] },
   { file: 'docs/frontend.md', patterns: ['License activation', 'license gate'] },
   { file: 'docs/architecture.md', patterns: ['Licensing', 'LicenseEnforcementFilter'] },
-  { file: 'frontend/src/components/HelpButton.jsx', patterns: ['License activation', 'Activate/manage license & customer'] },
+  { file: 'docs/RELEASE_CHECKLIST.md', patterns: ['Backup/restore drill', 'Upgrade smoke', 'Native-speaker translation review'] },
+  { file: 'install/README.md', patterns: ['## Support policy and platforms', 'Launcher maintenance commands'] },
+  { file: 'frontend/src/components/HelpButton.jsx', patterns: ['License activation', 'Activate/manage license & customer', 'Supported platforms and support policy', 'Review the support bundle before sharing'] },
 ];
 let failed = false;
 for (const { file, patterns } of checks) {

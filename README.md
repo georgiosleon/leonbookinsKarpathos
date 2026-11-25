@@ -352,7 +352,8 @@ new major prefix, such as `/api/v2`, rather than changing v1 behavior.
 
 Release tags use the `v<major>.<minor>.<patch>` format. Desktop installers are
 built locally on the matching operating system; tags do not trigger an installer
-workflow. See [CHANGELOG.md](CHANGELOG.md) for curated release notes.
+workflow. Use the [release checklist](docs/RELEASE_CHECKLIST.md) before tagging
+or shipping. See [CHANGELOG.md](CHANGELOG.md) for curated release notes.
 
 ## Developer documentation
 

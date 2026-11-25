@@ -7,9 +7,10 @@ These items are intentionally left for manual/external follow-up.
 - [ ] **Add screenshots/GIFs** to README/docs (login, license activation, booking calendar, reports, support bundle/download).
 
 ## Release / operations
+Use [docs/RELEASE_CHECKLIST.md](docs/RELEASE_CHECKLIST.md) for the full release gate.
 - [ ] **Real anonymized DB upgrade smoke** before releases: backup copy -> migrate -> login/license/booking/report smoke. Confirm a V1-baselined/current schema; pre-V1 DBs are unsupported and must be exported/reimported or upgraded outside the supported path.
 - [x] **Production keypair/signing process**: production Ed25519 keypair generated; `APP_LICENSE_PUBLIC_KEY` is required in `prod`, private key stays outside the repo, and the signing workflow is documented in `README.md`.
-- [ ] **Backup/restore drill** on a staging copy: encrypted backup, restore, app startup, key data/report checks.
+- [x] **Backup/restore drill** on a staging copy: encrypted backup, restore, app startup, key data/report checks passed on 2026-11-25 (v12/current schema copy). Repeat per release using `docs/RELEASE_CHECKLIST.md`; the V1-baseline upgrade smoke remains separate and pending.
 
 ## Security / quality (optional next)
 - [ ] **Review Actuator exposure** for deployment needs; keep admin-only or add probe-safe health endpoint rules as required.

@@ -372,10 +372,11 @@ These are observations from this onboarding pass, not changes:
    the app would not invalidate it until restart.
 5. **CSRF token cached once** in `frontend/src/bookingApi.js:4,51-57`; no refresh
    on rotation or 403 (only cleared on logout).
-6. **Config/docs drift**: `application-prod.properties:4-5` still calls Actuator
-   optional although `pom.xml` includes it; the leading-space ` logback.xml` is
-   not auto-loaded; the diagram's old `room`/`String` date fields were corrected
-   in the documentation cleanup.
+6. **Config/docs drift**: the stale "Actuator is optional" comment in
+   `application-prod.properties` was corrected; the leading-space ` logback.xml`
+   is still not auto-loaded and needs a deliberate decision before renaming;
+   the diagram's old `room`/`String` date fields were corrected in the
+   documentation cleanup.
 7. **Dead/duplicated code candidates**: unused repository methods, duplicated
    `trimToNull` helpers, manual JSON error bodies in four places, three different
    date-parsing strategies.
