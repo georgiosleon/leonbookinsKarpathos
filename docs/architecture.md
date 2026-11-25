@@ -112,8 +112,9 @@ persistence entity and domain data type.
 The browser and backend are part of one application, requests are synchronous,
 and the application currently uses a single SQLite database. REST with JSON
 is a direct fit for these boundaries and is straightforward to inspect, test,
-and version. API routes use `/api/v1`; existing unversioned paths remain
-compatibility aliases.
+and version. API routes use `/api/v1`, the only supported prefix; unversioned
+aliases were removed in 2.0.0. Breaking changes should use a new major prefix
+(for example `/api/v2`).
 
 ### Protocol Buffers
 

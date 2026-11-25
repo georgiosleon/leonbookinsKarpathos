@@ -9,4 +9,5 @@ export default defineConfig({
     trace: 'on-first-retry',
   },
   reporter: process.env.CI ? [['list'], ['html', { open: 'never' }]] : 'list',
+  projects: [{ name: 'chromium', use: { browserName: 'chromium' } }],
 });

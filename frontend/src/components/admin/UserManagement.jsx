@@ -215,7 +215,7 @@ export function UserManagement() {
                     <tr key={user.id}>
                       <td>{user.username}</td>
                       <td>{user.email}</td>
-                      <td>{user.role}</td>
+                      <td>{t(user.role)}</td>
                       <td>{user.active ? t('Active') : t('Inactive')}</td>
                       <td>
                         <button type="button" className="button button-muted" onClick={() => openEdit(user)}>

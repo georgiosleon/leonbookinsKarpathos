@@ -112,7 +112,7 @@ export function ReportsPage() {
     const headers = [
       'Status','Arrival','Departure','Resource','Registration number','Tax category','Name','Agency','Guests','Nights',
       'Rate/night','Total charged','Received','Rental tax','Rental subtotal','Balance','Platform reservation ID','Country','Email','Tel','Invoice number','Tax ref number','Notes'
-    ];
+    ].map((key) => t(key));
     const escape = (value) => {
       const text = value == null ? '' : String(value);
       return /[",\n]/.test(text) ? `"${text.replace(/"/g, '""')}"` : text;

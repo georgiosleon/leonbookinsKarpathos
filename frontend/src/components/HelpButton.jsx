@@ -70,10 +70,12 @@ export function HelpButton() {
 
   const backupCommands = {
     windows: String.raw`.\runtime\bin\java.exe -jar .\app\leonbookinsKarpathos.jar db backup --database .\bookings.db --encrypt`,
+    linux: './lib/runtime/bin/java -jar ./lib/app/leonbookinsKarpathos.jar db backup --database ./bookings.db --encrypt',
     macos: './LeonBookings.app/Contents/runtime/Contents/Home/bin/java -jar ./LeonBookings.app/Contents/app/leonbookinsKarpathos.jar db backup --database ./bookings.db --encrypt',
   };
   const restoreCommands = {
     windows: String.raw`.\runtime\bin\java.exe -jar .\app\leonbookinsKarpathos.jar db restore --database .\bookings.db --input .\backups\your-backup.sqlite3.enc`,
+    linux: './lib/runtime/bin/java -jar ./lib/app/leonbookinsKarpathos.jar db restore --input ./backups/your-backup.sqlite3.enc --database ./bookings.db',
     macos: './LeonBookings.app/Contents/runtime/Contents/Home/bin/java -jar ./LeonBookings.app/Contents/app/leonbookinsKarpathos.jar db restore --database ./bookings.db --input ./backups/your-backup.sqlite3.enc',
   };
   const lanCommands = {
@@ -185,7 +187,7 @@ export function HelpButton() {
 
                 <section>
                   <h3>{t('License activation')}</h3>
-                  <p>{t('A fresh installation requires one-time ADMIN license activation before normal use. The activation screen shows the Installation ID; provide it to the license issuer, then paste the signed license key. Activation takes effect immediately.')}</p>
+                  <p>{t('License-enforced/production installs require one-time ADMIN activation; dev/test may use APP_LICENSE_BYPASS=true.')}</p>
                 </section>
 
                 <section>
@@ -195,9 +197,9 @@ export function HelpButton() {
                       <thead>
                         <tr>
                           <th>{t('Capability')}</th>
-                          <th>ADMIN</th>
-                          <th>OPERATOR</th>
-                          <th>GUEST</th>
+                          <th>{t('ADMIN')}</th>
+                          <th>{t('OPERATOR')}</th>
+                          <th>{t('GUEST')}</th>
                         </tr>
                       </thead>
                       <tbody>
@@ -257,7 +259,7 @@ export function HelpButton() {
 
                 <section>
                   <h3>{t('Creating, updating, and cancelling bookings')}</h3>
-                  <p>{t('Operators can create bookings with required fields and Save as new booking. To update/cancel, select a booking, enable Edit selected booking, make changes, and choose Update booking. Set Status to Cancelled to keep the record without blocking availability; deleting removes it permanently.')}</p>
+                  <p>{t('Operators can create bookings with required fields and Save as new booking. To update/cancel, select a booking, switch to Update mode, make changes, and choose Update booking. Set Status to Cancelled to keep the record without blocking availability; deleting removes it permanently.')}</p>
                 </section>
 
                 <section>
@@ -341,7 +343,7 @@ export function HelpButton() {
                   <ul>
                     <li>{t('License activation required: sign in as ADMIN and activate with the Installation ID, or set APP_LICENSE_BYPASS=true for dev/test only.')}</li>
                     <li>{t('Invalid license key: confirm it matches the Installation ID and correct public key.')}</li>
-                    <li>{t('Database migration/startup issue: back up bookings.db and review logs; pre-V1 DBs need the documented manual migration path.')}</li>
+                    <li>{t('Database migration/startup issue: back up bookings.db and review logs; only V1-baselined/current schemas are supported, and pre-V1 DBs must be exported/reimported or upgraded outside the supported path.')}</li>
                     <li>{t('Backup/restore: stop the app before restore, verify on a copy, and keep passphrases separate.')}</li>
                     <li>{t('Need help: download the Support bundle and include app version, steps, and logs.')}</li>
                   </ul>

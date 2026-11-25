@@ -286,7 +286,7 @@ export function BookingPage() {
         modeId={mode.id}
         isAdmin={isAdmin}
         canAccessReports={canSeeReports}
-        signedInLabel={me ? t('Signed in as {username}', { username: `${me.username} (${me.role})` }) : ''}
+        signedInLabel={me ? t('Signed in as {username}', { username: `${me.username} (${t(me.role)})` }) : ''}
         theme={theme}
         onToggleTheme={toggleTheme}
         onLogout={handleLogout}

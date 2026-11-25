@@ -15,8 +15,6 @@ import com.leonsoft.services.AuditService;
 import com.leonsoft.services.LicenseService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-//import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-// After (Spring Boot 4.x)
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
@@ -25,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
@@ -197,7 +196,7 @@ class BookingSecurityTest {
     void resourceManagementRequiresAdminRole() throws Exception {
         when(bookingResourceService.getAll()).thenReturn(List.<BookingResource>of());
 
-        // Room/car data is needed by every authenticated role.
+        // The resource catalog is readable by every authenticated role.
         mockMvc.perform(get("/api/v1/resources").with(user("operator").roles("OPERATOR")))
                 .andExpect(status().isOk());
 
@@ -427,7 +426,7 @@ class BookingSecurityTest {
     @Test
     void bookingMutationsAreAllowedForAdminAndOperatorButNotGuest() throws Exception {
         String bookingJson = """
-                {"name":"Alice","numOfGuests":2,"agency":"direct","room":"APT2","startDate":"20/06/2026","endDate":"23/06/2026","charge":100,"commission":0,"received":0,"status":"active"}
+                {"name":"Alice","numOfGuests":2,"agency":"direct","resourceId":"APT2","startDate":"20/06/2026","endDate":"23/06/2026","charge":100,"commission":0,"received":0,"status":"active"}
                 """;
         when(bookingsService.create(any(Booking.class))).thenAnswer(inv -> inv.getArgument(0));
 
@@ -523,13 +522,10 @@ class BookingSecurityTest {
 
     @Test
     void imagesArePublicStaticAssets() throws Exception {
-        mockMvc.perform(get("/images/login-image-1.jpg"))
-                .andExpect(result -> {
-                    int status = result.getResponse().getStatus();
-                    if (status == 401 || status == 403) {
-                        throw new AssertionError("Expected /images/** to be public, got " + status);
-                    }
-                });
+        mockMvc.perform(get("/images/login-robot-greek-island.webp"))
+                .andExpect(status().isOk())
+                .andExpect(result -> assertEquals(
+                      "image/webp", result.getResponse().getContentType()));
     }
 
     @Test

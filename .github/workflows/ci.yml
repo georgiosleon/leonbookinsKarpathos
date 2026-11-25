@@ -100,7 +100,7 @@ jobs:
           java -jar target/leonbookinsKarpathos-*.jar > target/app-e2e.log 2>&1 &
           echo $! > target/app-e2e.pid
           for i in $(seq 1 60); do
-            if curl -fsS http://127.0.0.1:8080/login >/dev/null; then exit 0; fi
+            if curl --max-time 5 -fsS http://127.0.0.1:8080/login >/dev/null; then exit 0; fi
             sleep 1
           done
           echo "App failed to start"; cat target/app-e2e.log; exit 1
@@ -117,7 +117,7 @@ jobs:
         working-directory: frontend
         env:
           PLAYWRIGHT_BASE_URL: http://127.0.0.1:8080
-        run: npx playwright test
+        run: npm run test:e2e
 
       - name: Stop app
         if: always()

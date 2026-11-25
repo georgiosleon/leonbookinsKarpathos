@@ -59,14 +59,6 @@ public class BookingResourceService {
         return saved;
     }
 
-    public BookingResource requireActive(String id) {
-        BookingResource resource = resourceRepository.findById(id)
-              .filter(BookingResource::isActive)
-              .orElseThrow(() -> new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST, "The selected room or vehicle is not available."));
-        return resource;
-    }
-
     public BookingResource requireExisting(String id) {
         return resourceRepository.findById(id)
               .orElseThrow(() -> new ResponseStatusException(

@@ -1,5 +1,6 @@
 package com.leonsoft.api;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -18,6 +19,7 @@ import java.util.List;
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -72,7 +74,7 @@ class BookingsRestControllerTest {
                             "name": "Ada",
                             "numOfGuests": 2,
                             "agency": "agency",
-                            "room": "room-1",
+                            "resourceId": "room-1",
                             "startDate": "31/02/2026",
                             "endDate": "01/03/2026",
                             "status": "active"
@@ -123,7 +125,7 @@ class BookingsRestControllerTest {
                             "name": "Ada",
                             "numOfGuests": 2,
                             "agency": "agency",
-                            "room": "room-1",
+                            "resourceId": "room-1",
                             "startDate": "20/06/2026",
                             "endDate": "23/06/2026",
                             "status": "active"
@@ -134,6 +136,30 @@ class BookingsRestControllerTest {
               .andExpect(jsonPath("$.startDate").value("20/06/2026"))
               .andExpect(jsonPath("$.endDate").value("23/06/2026"))
               .andExpect(jsonPath("$.resourceName").value("APT 2"));
+    }
+
+    @Test
+    void acceptsLegacyRoomAliasAsResourceId() throws Exception {
+        org.mockito.Mockito.when(bookingsService.create(any())).thenAnswer(invocation -> invocation.getArgument(0));
+
+        mockMvc.perform(post("/api/v1/booking/save")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .content("""
+                          {
+                            "name": "Ada",
+                            "numOfGuests": 2,
+                            "agency": "agency",
+                            "room": "legacy-room",
+                            "startDate": "20/06/2026",
+                            "endDate": "23/06/2026",
+                            "status": "active"
+                          }
+                          """))
+              .andExpect(status().isOk());
+
+        ArgumentCaptor<Booking> captor = ArgumentCaptor.forClass(Booking.class);
+        verify(bookingsService).create(captor.capture());
+        assertEquals("legacy-room", captor.getValue().getResourceId());
     }
 
     private static Booking booking(String startDate, String endDate) {

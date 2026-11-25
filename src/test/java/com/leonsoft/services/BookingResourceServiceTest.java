@@ -59,18 +59,6 @@ class BookingResourceServiceTest {
     }
 
     @Test
-    void bookingCanOnlyUseAnActiveManagedResource() {
-        BookingResource inactive = new BookingResource("inactive", "rooms", "Old room");
-        inactive.setActive(false);
-        when(resourceRepository.findById("inactive")).thenReturn(Optional.of(inactive));
-
-        ResponseStatusException exception = assertThrows(
-              ResponseStatusException.class, () -> resourceService.requireActive("inactive"));
-
-        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
-    }
-
-    @Test
     void requireExistingReturnsInactiveResource() {
         BookingResource inactive = new BookingResource("inactive", "rooms", "APT 1");
         inactive.setActive(false);

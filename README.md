@@ -118,10 +118,10 @@ Docker Compose explicitly activates the Spring `prod` profile. Direct
 development runs use the `dev` profile by default; override it with
 `SPRING_PROFILES_ACTIVE=prod` for a production deployment. The `dev` profile
 binds to loopback, enables more application logging, and disables static
-resource caching. The `prod` profile listens on all interfaces by default
-(override with `SERVER_ADDRESS`), uses normal application log levels, suppresses
-stack traces in error responses, and only exposes the Actuator health endpoint
-if Actuator is enabled.
+resource caching. The `prod` profile binds to `127.0.0.1` by default (override
+with `SERVER_ADDRESS`), uses normal application log levels, suppresses stack
+traces in error responses, and exposes the Actuator `health` and `info` endpoints
+to `ADMIN` users only.
 
 ## Developer setup (Maven)
 
@@ -223,9 +223,10 @@ Replace the filename with the version and architecture you downloaded. The
 launcher asks for the administrator credentials, starts the service, and opens
 the app in your browser. Keep the terminal open while using the app; pressing
 Enter stops the service. The database is `bookings.db` in the launcher's
-current working directory. An existing database is retained and receives any
-missing tables; a new database is initialized with one sample booking. Logs
-are stored under `${XDG_DATA_HOME:-~/.local/share}/leon-bookings`.
+current working directory. Schema changes are applied by Flyway migrations
+(through V12), with Hibernate `ddl-auto=validate`; `DatabaseInitializer` seeds
+only default user accounts. No sample bookings are loaded. Logs are stored under
+`${XDG_DATA_HOME:-~/.local/share}/leon-bookings`.
 
 #### Portable Windows and macOS apps
 
@@ -285,6 +286,13 @@ java --source 25 tools/LicenseSigner.java tools/dev-license-private.pkcs8.b64 <i
 
 > **Development/testing only:** `app.license.bypass=true` (or `APP_LICENSE_BYPASS=true`) bypasses the license gate. Default dev profile enables bypass for tester convenience. **Never enable in production**; production profile sets it to `false`.
 
+> **Docker Compose:** `compose.yaml` forwards only the variables listed in its
+> `environment` block. `APP_LICENSE_PUBLIC_KEY`, `APP_LICENSE_BYPASS`, and
+> `BOOKING_AVAILABILITY_*` are not forwarded from `.env`; add explicit entries to
+> `compose.yaml` (or run the JAR directly with those variables) to set them. When
+> `app.license.public-key` is unset, `LicenseVerifier` falls back to the embedded
+> development public key.
+
 ## API versioning
 
 The frontend uses the major-versioned `/api/v1` routes, such as
@@ -293,8 +301,9 @@ new major prefix, such as `/api/v2`, rather than changing v1 behavior.
 
 ## Releases
 
-Release tags use the `v<major>.<minor>.<patch>` format and trigger the desktop
-installer workflow. See [CHANGELOG.md](CHANGELOG.md) for curated release notes.
+Release tags use the `v<major>.<minor>.<patch>` format. Desktop installers are
+built locally on the matching operating system; tags do not trigger an installer
+workflow. See [CHANGELOG.md](CHANGELOG.md) for curated release notes.
 
 ## Developer documentation
 
@@ -319,11 +328,13 @@ Overlap prevention for active/paid reservations is enabled separately for
 rooms and vehicles by default. Override either global application setting
 with `BOOKING_AVAILABILITY_ROOMS_PREVENT_OVERLAP` or
 `BOOKING_AVAILABILITY_CARS_PREVENT_OVERLAP`; these are deployment environment
-settings, not switches in the application UI. When enabled, overlapping
+settings, not switches in the application UI. Compose forwards only the
+variables listed in `compose.yaml`, so add explicit `environment` entries there
+(or run the JAR directly) to override them in Docker. When enabled, overlapping
 active/paid bookings for the same resource are rejected, while cancelled
 bookings do not block availability.
-Administrators can add rooms and vehicles from the **Manage rooms and cars**
-screen. Existing bookings keep their stored resource assignments.
+Administrators can add and edit rooms and vehicles from the **Manage rooms and
+cars** screen. Existing bookings keep their stored resource assignments.
 
 #### Recent security and usability improvements
 
@@ -347,8 +358,11 @@ Open `/?type=rooms&page=reports` or `/?type=cars&page=reports` for the reports
 page. It summarizes bookings from the database-backed
 `GET /api/v1/booking/getAll` endpoint, filters by arrival date and resource
 type, and provides detailed HTML and PDF exports using the versioned report
-endpoints. The PDF export follows the selected type and arrival-date range and
-includes the on-screen totals, per-resource breakdown, and booking columns.
+endpoints. The browser tables and CSV export filter by arrival date, while the
+server HTML report requires the full stay to fall within the selected range. The
+PDF export filters by resource type only (the dates appear in its title) and
+includes its own summary, resource breakdown, and booking columns, so it may not
+match the selected period's on-screen totals.
 
 The global frontend save behavior defaults to creating a new booking when
 `VITE_BOOKING_SAVE_MODE` is unset. Set it to `edit` at build time to default to
@@ -370,7 +384,8 @@ Danish, and French. Use the language selector in the header; the choice is
 saved in the current browser. English is the default and fallback. Dates and
 currency follow that language's locale, and detailed reports use the selected
 language. The reports screen's Export PDF action exports the selected resource
-type and date range, including the displayed summaries and resource breakdown.
+type with its own summary and resource breakdown; the server-side filtering may
+differ from the date range shown on screen.
 The sign-in page offers the same languages. Booking values and API
 status codes remain language-neutral. Frontend translation catalogs are in
 `frontend/src/locales/`; the build validates catalog keys and interpolation
@@ -392,9 +407,10 @@ Before installing an update, stop the application and create an encrypted
 backup outside the application folder. Keep the existing database at the same
 path and check the path printed at startup; after updating, confirm that recent
 bookings and resources are present before removing the previous application
-copy. Current SQL initialization creates missing tables but does not migrate
-changed columns, so test updates against a copy of the customer database and
-keep the backup until the update is verified.
+copy. Schema changes are applied by versioned Flyway migrations (through V12)
+with Hibernate `ddl-auto=validate`; `DatabaseInitializer` seeds only default
+user accounts and no sample data is loaded. Test updates against a copy of the
+customer database and keep the backup until the update is verified.
 
 Create a timestamped backup in `backups/`:
 
@@ -458,8 +474,8 @@ java -jar "target/leonbookinsKarpathos-${VERSION}.jar" db restore \
   --input /path/to/backup.sqlite3 --backup-dir /path/to/backups --yes
 ```
 
-Both operations check SQLite integrity and require the application's `Booking`
-table. Backup creation uses SQLite's online backup API and refuses to
+Both operations check SQLite integrity and require the application's lowercase
+`bookings` table. Backup creation uses SQLite's online backup API and refuses to
 overwrite an existing output file. Restore replaces the target only after
 validating a staged copy. If SQLite WAL, shared-memory, or journal sidecars
 remain beside the database, restore stops rather than risk discarding pending
@@ -532,18 +548,18 @@ The build writes the bundled React app to the ignored
 | Frontend tests | `cd frontend && npm test` |
 | i18n check | `cd frontend && node scripts/check-translations.js` |
 | Docs smoke | `cd frontend && node scripts/check-docs-smoke.js` |
-| Backup (encrypted) | `java -jar leonbookinsKarpathos.jar db backup --database ./bookings.db --encrypt` |
-| Restore | `java -jar leonbookinsKarpathos.jar db restore --database ./bookings.db --input ./backups/<file>.enc` |
+| Backup (encrypted) | `java -jar target/leonbookinsKarpathos-*.jar db backup --database ./bookings.db --encrypt` |
+| Restore | `java -jar target/leonbookinsKarpathos-*.jar db restore --database ./bookings.db --input ./backups/<file>.enc` |
 
 ## Support and diagnostics
 
-- **In-app**: authenticated users can download a **Support bundle** (`/api/v1/support-bundle`) containing redacted `diagnostics.txt` and `app-info.json`. It excludes secrets, install ID, and customer PII.
+- **In-app**: authenticated users can download a **Support bundle** (`/api/v1/support-bundle`) containing `diagnostics.txt` and `app-info.json`. Its structured app info excludes secrets, install ID, and customer PII, but the log tail is sanitized only on a best-effort basis and may still contain install IDs or customer names.
 - **Diagnostics endpoint**: `/api/v1/diagnostics` remains available for backward compatibility.
 - **Troubleshooting**: see [docs/troubleshooting.md](docs/troubleshooting.md).
 
 ## Known limitations
 
-- **Pre-V1 legacy DBs**: not auto-migratable with current Flyway baseline (`baseline-version=1`). Use V1-compatible/baselined DB or manual migration.
+- **Pre-V1 legacy DBs**: unsupported. Only V1-baselined/current schemas are supported by the Flyway migrations (`baseline-version=1`); pre-V1 data must be exported/reimported or upgraded outside the supported path.
 - **Single installation license**: one license per install ID; activation is stored in local DB.
 - **SQLite concurrency**: single-process/local-file design; do not share live DB over network share.
 - **No built-in HTTPS**: use a trusted reverse proxy for TLS.
@@ -553,7 +569,7 @@ The build writes the bundled React app to the ignored
 - **HTTPS/reverse proxy**: run behind a trusted HTTPS reverse proxy (nginx/Caddy/Traefik) for LAN or remote access; do not expose the app directly to the internet.
 - **Secrets**: set strong `APP_*_PASSWORD` values, configure `APP_LICENSE_PUBLIC_KEY`, keep signing keys outside the repo. Set `APP_LICENSE_BYPASS=false` (prod profile does this explicitly).
 - **Backups**: schedule encrypted database backups and store passphrases separately from backup files. Test restore on a copy before upgrades.
-- **Upgrades**: back up `bookings.db` before upgrading, then smoke-test login, license status, booking CRUD, and report export. For pre-V1 DBs, use documented manual path.
+- **Upgrades**: back up `bookings.db` before upgrading, then smoke-test login, license status, booking CRUD, and report export. Only V1-baselined/current schemas are supported; pre-V1 DBs must be exported/reimported or upgraded outside the supported path.
 
 ## Compliance scope (local only) and unsupported items
 

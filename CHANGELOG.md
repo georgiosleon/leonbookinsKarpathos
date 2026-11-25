@@ -13,11 +13,18 @@ and this project uses semantic version tags: `vMAJOR.MINOR.PATCH`.
 - Corrected the expected `rentalSubTotal` in the report unit test and preserved legitimate zero subtotals in report summaries.
 - Added `id="login-form"` to the generated login form so the Playwright smoke selector matches.
 - Added `/api` and `/images` to the Vite dev proxy for standalone frontend development.
+- Corrected stale tests: current WebP image asset, canonical `resourceId` payloads, stronger Flyway V12 upgrade checks, browser-storage guards, and active-resource rules.
+- Added missing translation keys across all six catalogs and Linux backup/restore help commands; localized CSV headers, ARIA labels, and role names.
+- Made the translation check fail on missing catalog or source `t()` keys, so builds catch future gaps.
 
 ### Changed
 - Login images converted to smaller WebP assets; clean application jar reduced from ~141 MB to ~81 MB.
 - Booking form adds telephone/email autocomplete hints and non-negative money inputs.
 - Renamed the `Booking` database table to lowercase `bookings` via Flyway `V12`, with matching entity, CLI, and test updates.
+
+### Documentation
+- Corrected prod bind address/Actuator exposure, release tagging, Compose env forwarding, Flyway/schema seeding, support-bundle redaction, PDF/report filtering, and `/api/v1`-only API wording to match the code.
+- Updated resource editing, testing/CI status, pre-V1 DB support, CLI/jar names, onboarding counts, and i18n key references.
 
 ## [2.0.2] - 2026-11-24
 

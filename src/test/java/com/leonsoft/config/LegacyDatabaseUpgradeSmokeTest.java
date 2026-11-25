@@ -63,6 +63,24 @@ class LegacyDatabaseUpgradeSmokeTest {
                 assertTrue(rs.next());
                 assertTrue(rs.getInt(1) >= 1);
             }
+            try (var st = c.createStatement(); var rs = st.executeQuery(
+                    "SELECT COUNT(*) FROM sqlite_master WHERE type = 'table' AND name = 'Booking'")) {
+                assertTrue(rs.next());
+                assertEquals(0, rs.getInt(1), "uppercase Booking table should be renamed by V12");
+            }
+            try (var st = c.createStatement(); var rs = st.executeQuery(
+                    "SELECT COUNT(*) FROM flyway_schema_history WHERE version = '12' AND success = 1")) {
+                assertTrue(rs.next());
+                assertEquals(1, rs.getInt(1), "V12 should be recorded as successful");
+            }
+            try (var st = c.createStatement(); var rs = st.executeQuery(
+                    "SELECT resource_id, start_date, end_date, status FROM bookings WHERE id = 'legacy-booking-1'")) {
+                assertTrue(rs.next());
+                assertEquals("APT1", rs.getString("resource_id"));
+                assertEquals("2025-07-10", rs.getString("start_date"));
+                assertEquals("2025-07-14", rs.getString("end_date"));
+                assertEquals("active", rs.getString("status"));
+            }
         }
 
         mockMvc.perform(get("/api/v1/license/status").with(user("admin").roles("ADMIN")))

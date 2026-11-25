@@ -39,6 +39,10 @@ const roomMode = {
   ...bookingModes.rooms,
   resources: resourcesForMode(managedResources, bookingModes.rooms),
 };
+const carMode = {
+  ...bookingModes.cars,
+  resources: resourcesForMode(managedResources, bookingModes.cars),
+};
 
 test('converts and validates the API date format', () => {
   assert.equal(isoToEuropeanDate('2026-03-08'), '08/03/2026');
@@ -244,6 +248,52 @@ test('resolves and persists the theme preference', () => {
   }
 });
 
+test('falls back safely when browser storage is unavailable', () => {
+  const previousWindow = globalThis.window;
+  const blockedStorage = {
+    getItem: () => { throw new Error('storage blocked'); },
+    setItem: () => { throw new Error('storage blocked'); },
+  };
+  globalThis.window = {
+    sessionStorage: blockedStorage,
+    localStorage: blockedStorage,
+    matchMedia: () => ({ matches: false }),
+  };
+
+  try {
+    assert.equal(getInitialBookingSaveMode(), 'create');
+    assert.equal(storeBookingSaveMode('edit'), 'edit');
+    assert.equal(getInitialTheme(), 'light');
+    assert.equal(storeTheme('dark'), 'dark');
+  } finally {
+    if (previousWindow === undefined) {
+      delete globalThis.window;
+    } else {
+      globalThis.window = previousWindow;
+    }
+  }
+});
+
+test('ignores stale values left in browser storage by older versions', () => {
+  const previousWindow = globalThis.window;
+  globalThis.window = {
+    sessionStorage: { getItem: () => 'replace', setItem: () => {} },
+    localStorage: { getItem: () => 'blue', setItem: () => {} },
+    matchMedia: () => ({ matches: false }),
+  };
+
+  try {
+    assert.equal(getInitialBookingSaveMode(), 'create');
+    assert.equal(getInitialTheme(), 'light');
+  } finally {
+    if (previousWindow === undefined) {
+      delete globalThis.window;
+    } else {
+      globalThis.window = previousWindow;
+    }
+  }
+});
+
 test('creates a standalone report document with theme-specific colors', () => {
   assert.match(reportDocument('<table></table>', 'dark'), /color-scheme: dark/);
   assert.match(reportDocument('<table></table>', 'dark'), /#151b26/);
@@ -258,7 +308,7 @@ test('filters report records by selected mode and inclusive arrival-date range',
   const bookings = [
     { id: 'inside', resourceId: 'APT2', startDate: '10/07/2026', status: 'active' },
     { id: 'before', resourceId: 'APT2', startDate: '30/06/2026', status: 'active' },
-    { id: 'other-mode', room: 'CAR1', startDate: '10/07/2026', status: 'active' },
+    { id: 'other-mode', resourceId: 'CAR1', startDate: '10/07/2026', status: 'active' },
     { id: 'cancelled', resourceId: 'APT2', startDate: '10/07/2026', status: 'cancelled' },
   ];
 
@@ -270,6 +320,11 @@ test('filters report records by selected mode and inclusive arrival-date range',
   assert.deepEqual(
     selectBookingsForReport(bookings, roomMode, '2026-07-31', '2026-07-01'),
     [],
+  );
+  assert.deepEqual(
+    selectBookingsForReport(bookings, carMode, '2026-07-01', '2026-07-31')
+      .map(({ id }) => id),
+    ['other-mode'],
   );
 });
 
@@ -329,15 +384,16 @@ test('summarizes active financials by resource and counts cancellations separate
     balance: 150,
   });
 
-  test('builds a PDF export URL with the selected resource type, date range, and language', () => {
-    const url = new URL(bookingPdfUrl('2026-07-01', '2026-07-31', 'fr', 'cars'), 'http://localhost');
+});
 
-    assert.equal(url.pathname, '/api/v1/booking/export/pdf');
-    assert.equal(url.searchParams.get('fromDate'), '01/07/2026');
-    assert.equal(url.searchParams.get('toDate'), '31/07/2026');
-    assert.equal(url.searchParams.get('lang'), 'fr');
-    assert.equal(url.searchParams.get('type'), 'cars');
-  });
+test('builds a PDF export URL with the selected resource type, date range, and language', () => {
+  const url = new URL(bookingPdfUrl('2026-07-01', '2026-07-31', 'fr', 'cars'), 'http://localhost');
+
+  assert.equal(url.pathname, '/api/v1/booking/export/pdf');
+  assert.equal(url.searchParams.get('fromDate'), '01/07/2026');
+  assert.equal(url.searchParams.get('toDate'), '31/07/2026');
+  assert.equal(url.searchParams.get('lang'), 'fr');
+  assert.equal(url.searchParams.get('type'), 'cars');
 });
 
 test('keeps a reported zero rental subtotal instead of recomputing it', () => {

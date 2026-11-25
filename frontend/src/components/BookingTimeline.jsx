@@ -154,7 +154,11 @@ export const BookingTimeline = forwardRef(function BookingTimeline({
         </div>
       </div>
       {visibleCount === 0 && <p className="timeline-empty">{t(timelineType === 'cancelled' ? 'No cancelled bookings.' : 'No active or paid bookings.')}</p>}
-      <div className="timeline-container" ref={containerRef} aria-label={`${t(mode.resourceLabel)} ${title.toLowerCase()} timeline`} />
+      <div
+        className="timeline-container"
+        ref={containerRef}
+        aria-label={t('{resource} {title} timeline', { resource: t(mode.resourceLabel), title: title.toLowerCase() })}
+      />
     </section>
   );
 });

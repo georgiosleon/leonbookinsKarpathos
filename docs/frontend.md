@@ -35,15 +35,16 @@ backend at its configured local address.
   `VITE_BOOKING_SAVE_MODE` setting selects the default (`create` or `edit`);
   the in-session control is intended for testing and lasts only for the
   current browser tab session.
-- Reports can be opened with `?page=reports`; the UI filters bookings and can
-  request the detailed HTML report or download a PDF of the selected resource
-  type and date range. The PDF includes the page's summary, resource
+- Reports can be opened with `?page=reports`; the UI filters bookings by arrival
+  date and resource type and can request the detailed HTML report or download a
+  PDF. The server PDF filters by resource type only; the selected dates appear
+  in its title and do not filter its rows. It has its own summary, resource
   breakdown, and booking columns, with a landscape layout and repeated table
   headers across pages.
 - English, Greek, German, Dutch, Danish, and French are supported. English is
   the default and fallback. Language and light/dark theme preferences are
   stored in the browser.
-- The admin resource screen (`?page=resources`) adds rooms and vehicles to the shared catalog. Active resources are selectable for new bookings; the booking stores the resource ID while API/report display uses its name.
+- The admin resource screen (`?page=resources`) adds and edits rooms and vehicles in the shared catalog, including the active flag and compliance fields. Active resources are selectable for new bookings; the booking stores the resource ID while API/report display uses its name when available.
 - The admin user-management screen (`?page=users`) lists/creates/updates/deletes database-backed users. The UI gates actions by role, but backend authorization is authoritative.
 - License activation is enforced before normal app use. The SPA fetches `/api/v1/license/status`; when unactivated, it shows a license gate. ADMIN can view the installation ID, manage the single customer record, and paste a signed license key to activate immediately. OPERATOR/GUEST see a blocked message.
 

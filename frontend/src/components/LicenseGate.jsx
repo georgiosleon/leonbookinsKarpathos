@@ -120,7 +120,7 @@ export function LicenseGate({ currentUser, onActivated }) {
           <div>
             <p className="eyebrow">{t('Karpathos booking planner')}</p>
             <h1>{t('License activation')}</h1>
-            {currentUser ? <p className="signed-in-label">{t('Signed in as {username}', { username: `${currentUser.username} (${currentUser.role})` })}</p> : null}
+            {currentUser ? <p className="signed-in-label">{t('Signed in as {username}', { username: `${currentUser.username} (${t(currentUser.role)})` })}</p> : null}
           </div>
           <div className="app-header-top-meta">
             <ThemeToggle theme={theme} onToggle={toggleTheme} />

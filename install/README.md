@@ -16,10 +16,10 @@ Application logs are kept in the current user's application data directory:
 - Linux: `${XDG_DATA_HOME:-~/.local/share}/leon-bookings`
 
 The desktop launcher uses `bookings.db` in its current working directory by
-default. Startup uses JPA schema updates and `DatabaseInitializer` for
-idempotent seed/migration logic (including legacy role normalization). Back up
-the database before moving, upgrading, or replacing it; future schema-altering
-changes should use versioned migrations.
+default. Schema changes are applied by Flyway migrations (through V12), with
+Hibernate `ddl-auto=validate`; `DatabaseInitializer` seeds only default user
+accounts. No sample bookings are loaded. Back up the database before moving,
+upgrading, or replacing it, and test upgrades against a copy.
 
 For a support copy, use `db backup --encrypt` to create a passphrase-protected
 `.sqlite3.enc` file; the full Windows and macOS commands are in the app's Help
@@ -45,16 +45,21 @@ created only when missing.
 
 - **Desktop installer:** the launcher prompts for admin credentials and passes
   them as `APP_ADMIN_USERNAME`/`APP_ADMIN_PASSWORD`. Configure operator/guest
-  seed accounts via `APP_OPERATOR_*` (or legacy `APP_USER_*`) and `APP_GUEST_*`
-  environment variables as needed.
-- **Docker:** set `APP_ADMIN_*`, `APP_OPERATOR_*` (or legacy `APP_USER_*`), and
-  `APP_GUEST_*` in the private `.env` file before running Compose. Replace
-  placeholder passwords.
+  seed accounts via `APP_OPERATOR_*` and `APP_GUEST_*` environment variables as
+  needed.
+- **Docker:** set `APP_ADMIN_*`, `APP_OPERATOR_*`, and `APP_GUEST_*` in the
+  private `.env` file before running Compose. Replace placeholder passwords.
 - **Direct Spring Boot/Maven run:** set the same environment variables in the
   shell before starting the application.
 
 Seed passwords must be at least 12 characters. Keep environment files and
 shell/session access private; do not commit real credentials.
+
+Compose forwards only the variables listed in `compose.yaml`. To set
+`APP_LICENSE_PUBLIC_KEY`, `APP_LICENSE_BYPASS`, or `BOOKING_AVAILABILITY_*`, add
+explicit `environment` entries there (or run the JAR directly with those
+variables). When `app.license.public-key` is unset, `LicenseVerifier` falls back
+to the embedded development public key.
 
 ## Install build prerequisites
 
@@ -336,7 +341,7 @@ existing application without removing the user's database.
 ## API versions
 
 The current frontend uses `/api/v1` routes, including
-`/api/v1/booking/...` and `/api/v1/csrf`. Existing `/booking/...` and `/csrf`
-routes remain available for compatibility. Changes that break clients should
-be introduced under a new major path such as `/api/v2`; do not silently change
-the meaning or shape of `/api/v1` responses.
+`/api/v1/booking/...` and `/api/v1/csrf`. `/api/v1` is the only supported prefix;
+unversioned `/booking/...` and `/csrf` aliases were removed in 2.0.0. Changes
+that break clients should be introduced under a new major path such as `/api/v2`;
+do not silently change the meaning or shape of `/api/v1` responses.

@@ -33,7 +33,11 @@ Windows), which includes the Maven test phase, before creating platform
 packages. Frontend unit/component tests are separate from Maven's frontend
 production build unless explicitly wired into CI.
 
-## Current test suites
+## Representative test suites
+
+The table below is representative rather than exhaustive; see
+`src/test/java/com/leonsoft/` for all backend tests and `frontend/tests/` plus
+co-located component tests for frontend coverage.
 
 | Test file | Current focus |
 |---|---|
@@ -54,6 +58,17 @@ production build unless explicitly wired into CI.
 | `frontend/src/components/ReportsPage.test.jsx` | Reports page access-denied UX for unauthorized role. |
 | `frontend/src/components/ResourcesPage.test.jsx` | Resources page access-denied UX for non-admin role. |
 | `src/test/java/com/leonsoft/services/licensing/LicenseVerifierTest.java` | Offline Ed25519 license signature verification, install-ID binding, and tamper rejection. |
+| `src/test/java/com/leonsoft/api/ApplicationSupportControllerTest.java` | Support bundle, diagnostics, and app-info endpoint behavior. |
+| `src/test/java/com/leonsoft/api/CustomerControllerTest.java` | Customer CRUD endpoint behavior. |
+| `src/test/java/com/leonsoft/api/LicenseActivationIntegrationTest.java` | End-to-end license activation flow. |
+| `src/test/java/com/leonsoft/api/LicenseControllerTest.java` | License status and activation controller behavior. |
+| `src/test/java/com/leonsoft/api/LoginPageControllerTest.java` | Generated login page markup. |
+| `src/test/java/com/leonsoft/config/LegacyDatabaseUpgradeSmokeTest.java` | Legacy schema upgrade smoke checks. |
+| `src/test/java/com/leonsoft/config/LicenseEnforcementFilterTest.java` | License gate behavior. |
+| `src/test/java/com/leonsoft/services/ApplicationSupportServiceTest.java` | Support bundle contents and log sanitization. |
+| `src/test/java/com/leonsoft/services/CustomerServiceTest.java` | Customer record behavior. |
+| `src/test/java/com/leonsoft/services/LicenseServiceTest.java` | Installation ID, activation state, and license status. |
+| `frontend/src/components/LicenseGate.test.jsx` | License gate UI behavior. |
 
 These are focused automated tests; they are not a full end-to-end browser,
 accessibility, desktop-platform, or load-test suite. Installer packages should
@@ -73,7 +88,8 @@ be checked in a browser at relevant screen sizes.
 
 ## Frontend E2E smoke (Playwright)
 
-Playwright is scaffolded for optional browser smoke tests. Install browsers once:
+Playwright browser smoke tests are wired into CI: the `e2e-smoke` job installs
+Chromium and runs `npm run test:e2e`. To run them locally, install browsers once:
 
 ```sh
 cd frontend

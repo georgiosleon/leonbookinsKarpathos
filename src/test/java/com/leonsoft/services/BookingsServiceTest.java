@@ -361,6 +361,55 @@ class BookingsServiceTest {
         verify(bookingRepository, never()).deleteById("booking-1");
     }
 
+    @Test
+    void createRejectsAnInactiveResource() {
+        BookingResource inactive = new BookingResource("APT2", "rooms", "APT 2");
+        inactive.setActive(false);
+        when(resourceService.requireExisting("APT2")).thenReturn(inactive);
+
+        ResponseStatusException exception = assertThrows(
+              ResponseStatusException.class, () -> bookingsService.create(booking("20/06/2026", "23/06/2026")));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        verify(bookingRepository, never()).save(any(Booking.class));
+    }
+
+    @Test
+    void updateCanKeepTheSameResourceAfterItBecameInactive() {
+        Booking existing = booking("20/06/2026", "23/06/2026");
+        existing.setId("booking-1");
+        Booking update = booking("20/06/2026", "23/06/2026");
+        update.setId("booking-1");
+        BookingResource inactive = new BookingResource("APT2", "rooms", "APT 2");
+        inactive.setActive(false);
+        when(bookingRepository.findById("booking-1")).thenReturn(Optional.of(existing));
+        when(resourceService.requireExisting("APT2")).thenReturn(inactive);
+        when(bookingRepository.save(any(Booking.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Booking result = bookingsService.update(update);
+
+        assertEquals("APT2", result.getResourceId());
+    }
+
+    @Test
+    void updateRejectsSwitchingToADifferentInactiveResource() {
+        Booking existing = booking("20/06/2026", "23/06/2026");
+        existing.setId("booking-1");
+        Booking update = booking("20/06/2026", "23/06/2026");
+        update.setId("booking-1");
+        update.setResourceId("APT6");
+        BookingResource inactive = new BookingResource("APT6", "rooms", "APT 6");
+        inactive.setActive(false);
+        when(bookingRepository.findById("booking-1")).thenReturn(Optional.of(existing));
+        when(resourceService.requireExisting("APT6")).thenReturn(inactive);
+
+        ResponseStatusException exception = assertThrows(
+              ResponseStatusException.class, () -> bookingsService.update(update));
+
+        assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+        verify(bookingRepository, never()).save(any(Booking.class));
+    }
+
     private static Booking booking(String startDate, String endDate) {
         return booking(startDate, endDate, null);
     }

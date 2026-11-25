@@ -17,8 +17,8 @@ Generated translations should be reviewed by native speakers before release, esp
 - Activate license, Paste the signed license key for this installation.
 - Customer updated., Customer created., Customer deleted., License activated successfully.
 - Activate/manage license & customer
-- A fresh installation requires one-time ADMIN license activation before normal use. The activation screen shows the Installation ID; provide it to the license issuer, then paste the signed license key. Activation takes effect immediately.
-- Licensed, Not licensed, Download diagnostics, Download support bundle
+- License-enforced/production installs require one-time ADMIN activation; dev/test may use APP_LICENSE_BYPASS=true. The activation screen shows the Installation ID; provide it to the license issuer, then paste the signed license key. Activation takes effect immediately.
+- Licensed, Not licensed, Download support bundle
 - Install and start, Leon Bookings, Linux portable app, Roles and access
 - Sign in with your assigned account. Available actions depend on your role.
 - Password *
@@ -27,7 +27,7 @@ Generated translations should be reviewed by native speakers before release, esp
 - Troubleshooting
 - License activation required: sign in as ADMIN and activate with the Installation ID, or set APP_LICENSE_BYPASS=true for dev/test only.
 - Invalid license key: confirm it matches the Installation ID and correct public key.
-- Database migration/startup issue: back up bookings.db and review logs; pre-V1 DBs need the documented manual migration path.
+- Database migration/startup issue: back up bookings.db and review logs; only V1-baselined/current schemas are supported, and pre-V1 DBs must be exported/reimported or upgraded outside the supported path.
 - Backup/restore: stop the app before restore, verify on a copy, and keep passphrases separate.
 - Need help: download the Support bundle and include app version, steps, and logs.
 

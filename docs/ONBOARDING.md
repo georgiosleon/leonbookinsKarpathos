@@ -48,7 +48,7 @@ Sources: `README.md:8-48`, `docs/application-deep-dive.md:39-55`,
 | Language / runtime | Java 25 | `pom.xml:26`, `Dockerfile:1,13` |
 | Framework | Spring Boot 4.1.2 (MVC, Security, Data JPA, Validation, Actuator, Flyway) | `pom.xml:8-14,41-105` |
 | Database | SQLite via `sqlite-jdbc` + Hibernate community SQLite dialect | `pom.xml:73-80,92-94`, `src/main/resources/persistence-sqlite.properties` |
-| Schema | Flyway `V1…V11`, Hibernate `ddl-auto=validate` | `src/main/resources/db/migration/`, `application.properties:16,19-22` |
+| Schema | Flyway `V1…V12`, Hibernate `ddl-auto=validate` | `src/main/resources/db/migration/`, `application.properties:16,19-22` |
 | Frontend | React 19 + Vite 6 + i18next/react-i18next, vis-timeline as static script | `frontend/package.json:16-31`, `README.md:18-24` |
 | Reports | OpenPDF 1.3.33 + localized HTML templates + embedded DejaVu font | `pom.xml:28,43-47`, `src/main/resources/reports*.properties` |
 | Build | Maven wrapper 3.9.11, `frontend-maven-plugin` with Node 22.14.0 / npm 10.9.2 | `.mvn/wrapper/`, `pom.xml:171-210` |
@@ -70,11 +70,11 @@ Artifact version: `2.0.2` (`pom.xml:18`, `frontend/package.json:4`).
 | `services/` | Booking rules, overlap policy, resources, reports (HTML/PDF), users/licensing/audit/support. |
 | `services/licensing/` | Ed25519 license verification + payload. |
 | `cli/` | Offline backup/restore, AES-256-GCM encryption. |
-| `src/main/resources/db/migration/` | `V1__initial_schema.sql` … `V11__audit_log.sql`. |
+| `src/main/resources/db/migration/` | `V1__initial_schema.sql` … `V12__rename_booking_table_to_lowercase.sql`. |
 | `src/main/resources/public/` | SPA shell (`index.html`), legacy redirects, CSS/JS/images, Vite build output in `react-assets/`. |
 | `frontend/src/` | React source, API clients, booking/report logic, i18n catalogs, tests. |
 | `frontend/e2e/`, `frontend/tests/` | Playwright smoke, Node unit tests. |
-| `src/test/java/com/leonsoft/` | 31 backend test classes (api, config, services, cli, licensing). |
+| `src/test/java/com/leonsoft/` | Backend test classes (api, config, services, cli, licensing). |
 | `docs/` | Architecture, deep dive, backend/frontend, testing, troubleshooting, i18n checklist, diagrams. |
 | `install/` | Desktop launcher source + `jpackage` scripts per OS. |
 | `tools/` | License signer + dev keypair tooling. |
@@ -249,7 +249,8 @@ Sources: `services/BookingReportService.java:48-120`,
 
 - SQLite file is local (default `./bookings.db`, `APP_DB_URL` overrides). Do not
   share a live DB over a network share; only one process should use it.
-- Flyway baseline mode means **pre-V1 databases need a manual migration path**.
+- Only V1-baselined/current schemas are supported; pre-V1 databases must be
+  exported/reimported or upgraded outside the supported path (owner decision in §11).
 - `java -jar <jar> db backup [--encrypt] [--database …] [--output …]` and
   `db restore …` are offline, validate SQLite integrity, refuse overwrite, and
   write a pre-restore backup. Encrypted backups use AES-256-GCM with PBKDF2 and
@@ -300,15 +301,14 @@ Commands run during this onboarding (2026-11-24):
 | Toolchain | `java -version` | OpenJDK 25.0.5 (matches `pom.xml`). |
 | Backend tests | `./mvnw -q -o test` | **127 tests, 0 failures/errors/skips** (surefire reports). |
 | Package | `./mvnw -q -DskipTests package` | Built `target/leonbookinsKarpathos-2.0.2.jar` (~80 MB, includes frontend). |
-| Frontend tests | `cd frontend && npm test` (Node 22.14.0 from `target/node/node`) | **1 of 18 Node tests fails** — see below. |
+| Frontend tests | `cd frontend && npm test` (Node 22.14.0 from `target/node/node`) | **Passing** after the `rentalSubTotal` fix (§13); no known failing frontend test. |
 | Frontend build | Maven `generate-resources` during package | React assets generated in `src/main/resources/public/react-assets/`. |
 | Runtime smoke | JAR started with throwaway DB on port 8081, dev profile, seeded env credentials | Login page 200; unauthenticated `/`, `/api/v1/license/status`, `/actuator/health` all 401; after form login, `/` 200, `/users/me` = ADMIN, license status `activated:true, activatedBy:"BYPASS"` (dev profile). |
 | API write smoke | Created a room and a booking via `/api/v1/resources` and `/api/v1/booking/save` with CSRF headers | Server derived `numOfNights=3`, `rentalTax=37.50` (12.50 × 3), `balance=142.50`, `rentalSubTotal=262.50` from `charge=300, received=100, commission=20`. Confirms backend owns financial math. |
 
-**Known failing test (not fixed, per owner instruction):**
-`frontend/tests/bookingLogic.test.js:270-313` expects resource summaries without
-`rentalSubTotal`, but `frontend/src/reportLogic.js` now adds it. CI runs `npm test`
-at `.github/workflows/ci.yml:51`, so the frontend job is currently red.
+**Resolved (§13):** the `rentalSubTotal` expectation in
+`frontend/tests/bookingLogic.test.js` was corrected, and a reported zero subtotal
+is preserved. Frontend tests and CI's frontend job are no longer red for this reason.
 
 Test distribution (backend `@Test` counts): `BookingSecurityTest` 28,
 `BookingsServiceTest` 14, `DatabaseCliTest` 10, `UserManagementTest` 7, then
@@ -369,8 +369,8 @@ These are observations from this onboarding pass, not changes:
    on rotation or 403 (only cleared on logout).
 6. **Config/docs drift**: `application-prod.properties:4-5` still calls Actuator
    optional although `pom.xml` includes it; the leading-space ` logback.xml` is
-   not auto-loaded; `docs/diagrams/booking-resource-classes.puml` still shows old
-   `room`/`String` date fields.
+   not auto-loaded; the diagram's old `room`/`String` date fields were corrected
+   in the documentation cleanup.
 7. **Dead/duplicated code candidates**: unused repository methods, duplicated
    `trimToNull` helpers, manual JSON error bodies in four places, three different
    date-parsing strategies.
@@ -385,32 +385,28 @@ These are observations from this onboarding pass, not changes:
 11. **CI E2E does not exercise licensing**: `ci.yml:98-120` starts with the dev
     profile, where `app.license.bypass=true`, so the licensed flow is untested in
     CI.
-12. **Docs contradictions to resolve**: `README.md:121-124` claims prod binds to
-    all interfaces while code and `docs/backend.md` say loopback unless
-    `SERVER_ADDRESS` is set; `README.md:294-297` claims `v*` tags trigger desktop
-    installer builds, but that workflow was removed (see `install/README.md:281`);
-    `README.md:395-397` claims SQL init cannot migrate columns although Flyway
-    V3/V4/V6/V7/V8 do; `README.md:225-227` promises a sample booking but no
-    `demo-data.sql` exists and `spring.sql.init.mode=never`.
-13. **Removed legacy aliases still documented**: `docs/backend.md:63`,
-    `docs/application-deep-dive.md:125-127`, and the Vite proxy mention
-    `/booking` and `/csrf`, but `CHANGELOG.md:30` says they were removed in 2.0.0;
-    controllers map only `/api/v1/...`. Similarly `install/README.md` mentions
-    `APP_USER_*` env aliases that no longer exist.
-14. **Linux help commands empty**: `frontend/src/components/HelpButton.jsx:71-74`
-    defines only Windows/macOS backup/restore command maps, but lines 291-295 and
-    317-321 render `*.linux` entries.
+12. **Docs contradictions — resolved in documentation cleanup**: prod bind
+    address and Actuator exposure, release-tag installer claims, Flyway vs
+    "no column migration", and the sample-booking claim were corrected against
+    the code.
+13. **Removed legacy aliases — resolved in documentation cleanup**: docs now
+    state that `/api/v1` is the only supported API prefix and drop the
+    `APP_USER_*` credential aliases.
+14. **Linux help commands empty — resolved in i18n/help cleanup**:
+    `frontend/src/components/HelpButton.jsx` now defines Windows, macOS, and
+    Linux backup/restore commands, and the Linux help sections render them.
 15. **Quality gates are advisory**: Checkstyle/PMD/SpotBugs have
     `failOnViolation=false`/`failsOnError=false` (`pom.xml:299-300,318,341`), and
     the OWASP dependency check uses `continue-on-error: true`.
 16. **Support bundle redaction** is regex-based
     (`services/ApplicationSupportService.java:21-32,146-154`); worth validating
     against realistic logs. It includes version, profiles, Java/OS, overlap
-    flags, license flag, and sanitized log tail; it omits DB path, install ID,
-    and customer PII.
-17. **Testing doc list is incomplete** (`docs/testing.md:38-56` omits several
-    newer tests such as `LicenseActivationIntegrationTest`, `CustomerControllerTest`,
-    `LicenseEnforcementFilterTest`, `LegacyDatabaseUpgradeSmokeTest`).
+    flags, license flag, and a best-effort sanitized log tail; the structured app
+    info omits DB path, install ID, and customer PII, but the log tail may still
+    contain install IDs or customer names.
+17. **Testing doc list — resolved in documentation cleanup**: `docs/testing.md`
+    is now labeled representative and includes the newer license, customer,
+    support, login, legacy-upgrade, and license-gate tests.
 18. **Local ignored artifacts may contain real data**: `bookings.db`,
     `bookings__backup100.db`, `bookings__elias.db`, and an old installer archive
     under `install/dist/`; do not commit or share them.

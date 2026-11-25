@@ -11,10 +11,11 @@ class BookingRepository
 class BookingResourceRepository
 class Booking <<JPA entity>> {
   id: String
-  room: String
-  startDate: String
-  endDate: String
+  resourceId: String
+  startDate: LocalDate
+  endDate: LocalDate
 }
+note right of Booking : table: bookings
 class BookingResource <<JPA entity>> {
   id: String
   type: String
@@ -31,6 +32,6 @@ BookingsService --> BookingResourceService : validates assignment
 BookingRepository --> Booking : persists
 BookingResourceService --> BookingResourceRepository
 BookingResourceRepository --> BookingResource : persists
-Booking --> BookingResource : room stores resource ID
+Booking --> BookingResource : resourceId stores resource ID
 
 @enduml

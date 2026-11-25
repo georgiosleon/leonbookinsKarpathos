@@ -93,9 +93,10 @@ accounts are not overwritten. Passwords are BCrypt-hashed.
 - Overlap prevention for active/paid bookings (env:
   `BOOKING_AVAILABILITY_*_PREVENT_OVERLAP`; exposed via settings API)
 - Create / update / delete bookings with validated DTOs
-- Reports: filter by arrival range + type; detailed text report + PDF
-- Admin resource catalog add (`/?page=resources`) — add only; no delete/retire
-  UI yet
+- Reports: browser/CSV by arrival date, server HTML by full stay containment,
+  PDF by resource type only; detailed text report + PDF
+- Admin resource catalog (`/?page=resources`) — add and edit resources, including
+  active flag and compliance fields
 - i18n: en, el, de, nl, da, fr
 - Light/dark theme (browser preference)
 - Encrypted/unencrypted SQLite backup/restore CLI
@@ -122,9 +123,9 @@ accounts are not overwritten. Passwords are BCrypt-hashed.
 
 ## API surface
 
-Versioned under **`/api/v1`**. Unversioned `/booking/...` and `/csrf` remain as
-compatibility aliases. Breaking changes should use a new major prefix (for
-example `/api/v2`).
+Versioned under **`/api/v1`**, the only supported prefix; unversioned `/booking/...`
+and `/csrf` aliases were removed in 2.0.0. Breaking changes should use a new
+major prefix (for example `/api/v2`).
 
 | Method | Path | Purpose |
 |--------|------|---------|
@@ -172,7 +173,7 @@ Main modules:
   timelines, create/edit
 - `components/BookingForm.jsx`, `BookingTimeline.jsx`
 - `components/ReportsPage.jsx` — filters, HTML report, PDF export
-- `components/ResourcesPage.jsx` — add room/car
+- `components/ResourcesPage.jsx` — add/edit rooms and cars
 - `bookingLogic.js`, `bookingConfig.js`, `appConfig.js` (save mode create/edit)
 - `locales/*/translation.json` — i18n catalogs
 
@@ -208,11 +209,13 @@ unfinished swap. What remains transitional or deferred:
 
 - Old static HTML backups under `src/main/resources/static/bckup/` and leftover
   libs (for example `public/js/w2ui.js`) are not the active app path
-- Unversioned `/booking` and `/csrf` aliases; `/booking/del` legacy delete
+- `/api/v1` is the only supported API prefix; unversioned aliases were removed in
+  2.0.0 (`/api/v1/booking/del` remains as a legacy delete route)
 - Schema evolution is handled by Flyway SQL migrations with Hibernate `ddl-auto=validate`.
 - User management exists (ADMIN CRUD), but user self-service/profile/password
   flows and finer-grained permissions are still limited
-- Resource **add only** (no deactivate/edit UI yet; see [resources.md](resources.md))
+- Resources can be added and edited, including the active flag and compliance
+  fields (see [resources.md](resources.md))
 
 ## Mental model
 

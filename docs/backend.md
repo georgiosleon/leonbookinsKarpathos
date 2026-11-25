@@ -18,9 +18,10 @@ specified, Spring uses `dev`: the server binds to loopback, application logging
 is more detailed, and static resource caching is disabled. Production
 deployments should explicitly activate `prod` with
 `SPRING_PROFILES_ACTIVE=prod`; direct runs bind to loopback by default, keep
-stack traces out of HTTP error responses, and limits Actuator exposure to
-health. Docker Compose activates `prod` automatically and overrides the bind
-address inside the container so its published port can reach the app. Set
+stack traces out of HTTP error responses, and expose only the Actuator `health`
+and `info` endpoints, which `SecurityConfig` restricts to `ADMIN`. Docker
+Compose activates `prod` automatically and overrides the bind address inside the
+container so its published port can reach the app. Set
 `SERVER_ADDRESS=0.0.0.0` to explicitly enable remote access to a direct run.
 The desktop launcher defaults to
 `127.0.0.1` and honors `SERVER_ADDRESS` when it is set. To enable LAN access
@@ -41,7 +42,8 @@ Schema changes are managed by Flyway SQL migrations in
 `DatabaseInitializer` seeds default accounts only when missing. Back up existing
 customer databases before upgrading and test releases against copies of real data.
 Current Flyway baselines existing non-empty schemas at V1 (`baseline-version=1`);
-very old pre-V1 databases may require a manual upgrade path to V1-compatible schema before automatic migrations.
+only V1-baselined/current schemas are supported. Pre-V1 databases must be
+exported/reimported or upgraded outside the supported path.
 
 ## Layers
 
@@ -60,8 +62,9 @@ avoid exposing persistence details as new API contracts.
 
 ## HTTP API
 
-The frontend uses `/api/v1`; `/booking/...` and `/csrf` aliases are retained
-for compatibility. Access is deny-by-default; endpoints below require authentication unless noted.
+The frontend uses `/api/v1`, the only supported API prefix; unversioned aliases
+were removed in 2.0.0. Access is deny-by-default; endpoints below require
+authentication unless noted.
 
 | Method | Route | Access | Purpose |
 |---|---|---|---|
@@ -133,7 +136,10 @@ through `POST /api/v1/license/activate`. `LicenseEnforcementFilter` blocks norma
 API use until activated, while allowing login/static/SPA shell, CSRF, current-user,
 license status, and admin license/customer endpoints. Activation takes effect
 immediately with no restart. For production, configure `APP_LICENSE_PUBLIC_KEY`
-(base64 X.509 Ed25519 public key); the dev key is used only as fallback.
+(base64 X.509 Ed25519 public key); when `app.license.public-key` is unset,
+`LicenseVerifier` falls back to the embedded development key. Docker Compose
+forwards only the variables listed in `compose.yaml`, so set this key through an
+explicit `environment` entry there (or run the JAR directly).
 For development/testing only, `app.license.bypass=true` disables the license gate; it logs a warning and must never be enabled in production.
 
 ## Persistence and reports
@@ -163,10 +169,12 @@ exposes the detailed report text and PDF responses. Report HTML must continue
 escaping booking data before rendering. Reports support English, Greek,
 German, Dutch, Danish, and French, with English as the fallback. Report text
 bundles are stored in `src/main/resources/reports*.properties`. The PDF export
-uses the selected resource type and date range and includes the same summary,
-resource breakdown, and visible booking columns as the reports screen. It
-embeds the licensed DejaVu Sans font with Unicode encoding so Greek text and
-punctuation render correctly without relying on fonts installed on the host.
+filters by the selected resource type only; the requested dates appear in the
+title. The server HTML report requires the full stay to be inside the range,
+while browser views and CSV filter by arrival date. The PDF includes its own
+summary, resource breakdown, and visible booking columns. It embeds the licensed
+DejaVu Sans font with Unicode encoding so Greek text and punctuation render
+correctly without relying on fonts installed on the host.
 
 Room and vehicle overlap prevention are independent deployment-level settings,
 not currently editable in the application UI. Both default to enabled and can
@@ -177,10 +185,12 @@ or paid bookings for the same resource are rejected by the backend; cancelled
 bookings do not block availability. `GET /api/v1/settings/availability`
 returns the configured values to the frontend. Changes to environment
 configuration take effect after application restart and require no database
-schema changes.
+schema changes. Compose forwards only the variables listed in `compose.yaml`;
+add explicit `environment` entries there (or run the JAR directly) to override
+these settings in Docker.
 
 The `db backup` and `db restore` CLI validates SQLite integrity and the
-application booking table. Restore is an offline operation and should be
+lowercase `bookings` table. Restore is an offline operation and should be
 performed after stopping the application. `db backup --encrypt` creates an
 AES-256-GCM encrypted backup using a passphrase entered interactively; the
 restore command detects this format and prompts for the passphrase. The

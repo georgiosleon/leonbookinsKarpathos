@@ -3,6 +3,7 @@ package com.leonsoft.api;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.util.regex.Pattern;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.web.csrf.CsrfToken;
 
@@ -15,7 +16,9 @@ class LoginPageControllerTest {
 
         String page = new LoginPageController().loginPage(csrfToken);
 
-        assertTrue(page.contains("<form id=\"login-form\" method=\"post\" action=\"/login\">"));
+        assertTrue(Pattern.compile("<form\\b[^>]*\\bid=\"login-form\"[^>]*>").matcher(page).find());
+        assertTrue(Pattern.compile("<form\\b[^>]*\\bmethod=\"post\"[^>]*>").matcher(page).find());
+        assertTrue(Pattern.compile("<form\\b[^>]*\\baction=\"/login\"[^>]*>").matcher(page).find());
         assertTrue(page.contains("name=\"_csrf\" value=\"token&quot;&amp;value\""));
         assertTrue(page.contains("Invalid username or password."));
         assertTrue(page.contains("Λανθασμένο όνομα χρήστη ή κωδικός πρόσβασης."));

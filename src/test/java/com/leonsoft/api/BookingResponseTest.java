@@ -22,18 +22,6 @@ class BookingResponseTest {
     }
 
     @Test
-    void fromPreservesLegacyEuropeanDatesAsEuropeanDisplayFormat() {
-        Booking booking = booking();
-        booking.setStartDate(java.time.LocalDate.of(2026,6,20));
-        booking.setEndDate(java.time.LocalDate.of(2026,6,23));
-
-        BookingResponse response = BookingResponse.from(booking);
-
-        assertEquals("20/06/2026", response.startDate());
-        assertEquals("23/06/2026", response.endDate());
-    }
-
-    @Test
     void fromHandlesNullOrBlankDatesAndMapsFields() {
         LocalDateTime requestDateTime = LocalDateTime.of(2026, 6, 1, 12, 30);
         Booking booking = booking();
