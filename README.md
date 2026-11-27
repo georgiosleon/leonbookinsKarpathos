@@ -30,7 +30,8 @@ Browser → React UI → /api/v1/* → Controllers → Services → JPA → SQLi
 
 Main screens use query parameters:
 
-- `/?type=rooms` or `/?type=cars` — booking form and dual timelines (active/paid
+- `/?type=rooms` or `/?type=cars` — booking form (with an optional local-only
+  Booking.com confirmation-email paste helper) and dual timelines (active/paid
   vs cancelled)
 - `?page=reports` — filtered reports and PDF export
 - `?page=resources` — add rooms and cars to the catalog

@@ -373,6 +373,28 @@ textarea {
   background: #f3f6fb;
 }
 
+.field-imported {
+  box-shadow: inset 3px 0 0 #2f7d5b;
+  border-radius: 4px;
+  background: #f0f8f4;
+}
+
+.field-imported input,
+.field-imported select,
+.field-imported textarea,
+.field-imported input:focus,
+.field-imported select:focus,
+.field-imported textarea:focus {
+  border-color: #2f7d5b;
+  background-color: #f7fcfa;
+}
+
+.field-imported input:focus,
+.field-imported select:focus,
+.field-imported textarea:focus {
+  outline-color: rgb(47 125 91 / 25%);
+}
+
 .field-name {
   grid-column: span 2;
 }
@@ -915,6 +937,28 @@ textarea {
 [data-theme="dark"] .field textarea:focus {
   border-color: #79b4ff;
   outline-color: rgb(121 180 255 / 28%);
+}
+
+[data-theme="dark"] .field-imported {
+  box-shadow: inset 3px 0 0 #5dd6a0;
+  background: #172b24;
+}
+
+[data-theme="dark"] .field-imported input,
+[data-theme="dark"] .field-imported select,
+[data-theme="dark"] .field-imported textarea,
+[data-theme="dark"] .field-imported input:focus,
+[data-theme="dark"] .field-imported select:focus,
+[data-theme="dark"] .field-imported textarea:focus {
+  border-color: #5dd6a0;
+  background-color: #13231d;
+  color: #e7edf7;
+}
+
+[data-theme="dark"] .field-imported input:focus,
+[data-theme="dark"] .field-imported select:focus,
+[data-theme="dark"] .field-imported textarea:focus {
+  outline-color: rgb(93 214 160 / 28%);
 }
 
 [data-theme="dark"] .button-muted:hover:not(:disabled) {

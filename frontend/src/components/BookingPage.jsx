@@ -333,6 +333,7 @@ export function BookingPage() {
             onSaveModeChange={handleSaveModeChange}
             busy={busy}
             canManage={canManageBookings}
+            bookings={bookings}
           />
         </div>
 

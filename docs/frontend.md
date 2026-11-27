@@ -35,6 +35,10 @@ backend at its configured local address.
   `VITE_BOOKING_SAVE_MODE` setting selects the default (`create` or `edit`);
   the in-session control is intended for testing and lasts only for the
   current browser tab session.
+- `src/bookingEmailImport.js` parses pasted Booking.com confirmation text in
+  the browser only. `BookingForm.jsx` uses it to prefill reviewable fields and
+  show warnings; it never saves, logs, uploads, or stores the email text. Money
+  found in the email is shown as a note, never written to financial fields.
 - Reports can be opened with `?page=reports`; the UI filters bookings by arrival
   date and resource type and can request the detailed HTML report or download a
   PDF. The server PDF filters by resource type only; the selected dates appear

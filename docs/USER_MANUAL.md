@@ -92,6 +92,33 @@ zoom in or out.
 3. Check the live summary and timeline for conflicts.
 4. Select **Save as new booking**.
 
+### Import from a Booking.com confirmation email (optional)
+
+At the top of the form you can paste the text of a Booking.com confirmation
+email and select **Fill form**. The text is processed locally in your browser:
+it is not sent anywhere, stored, or logged. The pasted text is cleared after
+the form is filled.
+
+The helper fills the fields it can identify reliably: reservation number,
+guest name(s), check-in/check-out dates, actual guest count, guest email/phone
+when present, and the **Booking.com** channel. Multiple guest names are joined
+with a comma. Warnings appear for anything uncertain, missing, or deliberately
+ignored — for example the property phone, property address, PIN code, or a
+reservation ID that already exists. Fields filled from the email are highlighted
+in green; the highlight disappears when you edit that field manually. Choose the
+room/vehicle yourself; property and room names from the email are not matched to
+your resources.
+
+Amounts found in the email are shown as notes only. They are **never** copied
+into Total charged, Commission, or Received, because a guest total is not the
+same as your booking financials. Enter those amounts manually.
+
+**Fill form never saves anything.** Review the whole form, choose the resource,
+and then select **Save as new booking** (or **Update booking**) yourself. The
+helper understands new English and Greek confirmations; manually switch the
+language selector if automatic detection is wrong. Amendments and cancellations
+are not supported.
+
 ### Stay / Reservation
 
 | Field | What to enter |

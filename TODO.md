@@ -3,7 +3,8 @@
 These items are intentionally left for manual/external follow-up.
 
 ## i18n / UX
-- [ ] **Native-speaker translation review** for `el,de,nl,da,fr` using `docs/i18n-review-checklist.md`; verify licensing/security/support wording, placeholders, and UI fit.
+- [ ] **Native-speaker translation review** for `el,de,nl,da,fr` using `docs/i18n-review-checklist.md`; verify licensing/security/support wording, placeholders, and UI fit, including the new Booking.com email-import labels.
+- [ ] **Booking.com paste-helper template maintenance**: fixtures cover standard and updated confirmations in English and Greek only. If Booking.com changes labels or adds templates, update `frontend/src/bookingEmailImport.js` and `frontend/tests/bookingEmailImport.test.js`.
 - [ ] **Add screenshots/GIFs** to README/docs (login, license activation, booking calendar, reports, support bundle/download).
 
 ## Release / operations
